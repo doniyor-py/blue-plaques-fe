@@ -1,46 +1,110 @@
-<div class="container">
-  <h1 class="h3 mb-3">Plaques near you</h1>
+<div class="map-page">
+  <h1 class="visually-hidden">Plaque map</h1>
 
-  <div class="d-flex flex-wrap gap-3 align-items-end mb-2">
-    <button type="button" class="btn btn-primary" (click)="useMyLocation()" [disabled]="locating">
-      {{ locating ? 'Finding you...' : 'Use my location' }}
-    </button>
-    <div>
-      <label for="radius" class="form-label small mb-1">Search within</label>
-      <select id="radius" class="form-select" (change)="changeRadius($any($event.target).value)">
-        @for (option of radiusOptions; track option) {
-          <option [value]="option" [selected]="option === radius">{{ radiusLabel(option) }}</option>
+  <!-- side panel: list of plaques, or the selected plaque's card -->
+  <aside class="panel" aria-label="Plaque information">
+    @if (error) {
+      <div class="alert alert-warning small" role="alert">{{ error }}</div>
+    }
+
+    @if (selected) {
+      <button type="button" class="btn btn-link px-0 mb-2" (click)="closePlaque()">&larr; All plaques</button>
+
+      <div class="d-flex align-items-start gap-2">
+        <span class="colour-dot mt-1" [style.background]="colourOf(selected)"></span>
+        <h2 class="h5 mb-1">{{ titleOf(selected) }}</h2>
+      </div>
+      <p class="text-muted small mb-2">
+        {{ selected.borough }} · {{ selected.colour }} plaque
+        @if (selected.distance_m !== undefined && searchedFromUser) {
+          · {{ selected.distance_m }} m away
         }
-      </select>
-    </div>
-  </div>
-  <p class="text-muted small">Or click anywhere on the map to search around that point.</p>
+      </p>
+      <p class="small">
+        {{ selected.inscription | slice:0:220 }}{{ selected.inscription?.length > 220 ? '…' : '' }}
+      </p>
 
-  @if (error) { <div class="alert alert-warning" role="alert">{{ error }}</div> }
+      @if (!route) {
+        <div class="d-flex flex-wrap gap-2">
+          <button type="button" class="btn btn-primary" (click)="startDirections()"
+                  [disabled]="routeLoading || locating">
+            {{ routeLoading || locating ? 'Finding a route…' : 'Directions' }}
+          </button>
+          <a class="btn btn-outline-primary" [routerLink]="['/plaques', selected._id]">Details</a>
+        </div>
+      } @else {
+        <section class="route mt-3" aria-labelledby="route-heading">
+          <h3 id="route-heading" class="visually-hidden">Walking directions</h3>
+          <div class="route-time">{{ route.minutes }} min</div>
+          <div class="text-muted small mb-3">
+            {{ route.distanceKm | number:'1.1-1' }} km walk · arrive {{ route.arrival | date:'HH:mm' }}
+          </div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <a class="btn btn-primary" [href]="googleMapsUrl(selected)" target="_blank" rel="noopener">
+              Open in Google Maps
+            </a>
+            <button type="button" class="btn btn-outline-secondary" (click)="clearRoute()">Close route</button>
+          </div>
+          <ol class="steps">
+            @for (step of route.steps; track $index) {
+              <li>
+                <span>{{ step.text }}</span>
+                @if (step.km > 0) { <small>{{ step.km * 1000 | number:'1.0-0' }} m</small> }
+              </li>
+            }
+          </ol>
+        </section>
+      }
+    } @else {
+      <h2 class="h5 mb-1">Plaques {{ searchedFromUser ? 'near you' : 'in this area' }}</h2>
+      <p class="text-muted small">Tap a plaque on the map or in the list for details and directions.</p>
 
-  <div class="row g-3">
-    <div class="col-lg-8">
-      <div #mapContainer class="map" role="region" aria-label="Map of nearby plaques"></div>
-    </div>
-
-    <div class="col-lg-4">
-      @if (loading) { <div class="alert alert-secondary">Searching...</div> }
-
-      @if (point && !loading) {
-        <h2 class="h6">The nearest {{ plaques.length }} plaque(s) within {{ radiusLabel(radius) }}</h2>
-        <ol class="list-group list-group-numbered">
+      @if (loading) {
+        <div class="text-muted small py-2">Loading plaques…</div>
+      } @else {
+        <ul class="list-unstyled plaque-list">
           @for (plaque of plaques; track plaque._id) {
-            <li class="list-group-item">
-              <a [routerLink]="['/plaques', plaque._id]">{{ plaque.inscription | slice:0:70 }}...</a>
-              <div class="small text-muted">{{ plaque.distance_m }} m · about {{ plaque.walking_minutes }} min walk</div>
+            <li>
+              <button type="button" class="plaque-row" (click)="selectPlaque(plaque)">
+                <span class="colour-dot" [style.background]="colourOf(plaque)"></span>
+                <span class="flex-grow-1">
+                  <span class="d-block fw-semibold">{{ titleOf(plaque) }}</span>
+                  <small class="text-muted">
+                    {{ plaque.borough }} ·
+                    @if (searchedFromUser) {
+                      {{ plaque.distance_m }} m · {{ plaque.walking_minutes }} min walk
+                    } @else {
+                      {{ plaque.distance_m }} m from the map centre
+                    }
+                  </small>
+                </span>
+              </button>
             </li>
           } @empty {
-            <li class="list-group-item text-muted">No plaques here. Try a bigger distance.</li>
+            <li class="text-muted small py-2">No plaques here. Move the map and press "Search this area".</li>
           }
-        </ol>
-      } @else if (!loading) {
-        <p class="text-muted">Share your location or click the map to see the plaques around you.</p>
+        </ul>
       }
-    </div>
+    }
+  </aside>
+
+  <!-- the map with its floating buttons -->
+  <div class="map-wrap">
+    <div #mapContainer class="map" role="region" aria-label="Map of plaques"></div>
+
+    @if (showSearchArea) {
+      <button type="button" class="btn btn-light shadow search-area" (click)="searchHere()">
+        Search this area
+      </button>
+    }
+
+    <button type="button" class="btn btn-light shadow locate-btn" (click)="locateMe()" [disabled]="locating"
+            aria-label="Show my location" title="Show my location">
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" fill="#1a73e8" />
+        <circle cx="12" cy="12" r="8" fill="none" stroke="#5f6368" stroke-width="2" />
+        <path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="#5f6368" stroke-width="2" />
+      </svg>
+    </button>
   </div>
 </div>

@@ -1,42 +1,52 @@
-<nav class="navbar navbar-expand-sm bg-primary navbar-dark mb-4">
+<nav class="navbar navbar-expand-lg bg-primary navbar-dark mb-4">
   <div class="container">
-    <a class="navbar-brand" routerLink="/">Blue Plaques Explorer</a>
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/" routerLinkActive="active"
-           [routerLinkActiveOptions]="{ exact: true }">Home</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/plaques" routerLinkActive="active">Plaques</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" routerLink="/nearby" routerLinkActive="active">Nearby</a>
-      </li>
-      @if (authService.isLoggedIn()) {
+    <a class="navbar-brand" routerLink="/" (click)="closeMenu()">Blue Plaques Explorer</a>
+
+    <!-- phones and tablets: the links are hidden behind this menu button -->
+    <button class="navbar-toggler" type="button" (click)="toggleMenu()"
+            [attr.aria-expanded]="menuOpen" aria-controls="main-menu" aria-label="Open the menu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="main-menu" class="collapse navbar-collapse" [class.show]="menuOpen">
+      <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/profile" routerLinkActive="active">My profile</a>
-        </li>
-      }
-      @if (authService.isAdmin()) {
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/admin/users" routerLinkActive="active">Users</a>
+          <a class="nav-link" routerLink="/" routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/admin/plaques/new" routerLinkActive="active">Add plaque</a>
+          <a class="nav-link" routerLink="/plaques" routerLinkActive="active" (click)="closeMenu()">Plaques</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/admin/reports" routerLinkActive="active">Reports</a>
+          <a class="nav-link" routerLink="/nearby" routerLinkActive="active" (click)="closeMenu()">Map</a>
         </li>
-      }
-    </ul>
-    <div class="ms-auto">
-      @if (authService.isLoggedIn()) {
-        <span class="navbar-text text-white me-2">Hi, {{ authService.getUsername() }}</span>
-        <button class="btn btn-outline-light btn-sm" (click)="logout()">Log out</button>
-      } @else {
-        <a class="btn btn-outline-light btn-sm me-2" routerLink="/signup">Sign up</a>
-        <a class="btn btn-light btn-sm" routerLink="/login">Log in</a>
-      }
+        @if (authService.isLoggedIn()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">My profile</a>
+          </li>
+        }
+        @if (authService.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/users" routerLinkActive="active" (click)="closeMenu()">Users</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/plaques/new" routerLinkActive="active" (click)="closeMenu()">Add plaque</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/reports" routerLinkActive="active" (click)="closeMenu()">Reports</a>
+          </li>
+        }
+      </ul>
+
+      <div class="d-flex align-items-center gap-2 py-2 py-lg-0">
+        @if (authService.isLoggedIn()) {
+          <span class="navbar-text text-white">Hi, {{ authService.getUsername() }}</span>
+          <button class="btn btn-outline-light btn-sm" (click)="logout()">Log out</button>
+        } @else {
+          <a class="btn btn-outline-light btn-sm" routerLink="/signup" (click)="closeMenu()">Sign up</a>
+          <a class="btn btn-light btn-sm" routerLink="/login" (click)="closeMenu()">Log in</a>
+        }
+      </div>
     </div>
   </div>
 </nav>

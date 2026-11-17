@@ -48,6 +48,13 @@
           <dd class="col-sm-9">{{ plaque.organisation || 'Unknown' }}</dd>
         </dl>
 
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <a class="btn btn-primary" routerLink="/nearby"
+            [queryParams]="{ plaque: plaqueId, directions: 1 }">Directions</a>
+          <a class="btn btn-outline-primary" routerLink="/nearby"
+            [queryParams]="{ plaque: plaqueId }">View on map</a>
+        </div>
+
         @if (plaque.people?.length) {
           <h2 class="h5">People</h2>
           <ul class="list-unstyled">
