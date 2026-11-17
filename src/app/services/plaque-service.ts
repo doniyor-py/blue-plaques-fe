@@ -60,5 +60,12 @@ export class PlaqueService {
     return formData;
   }
 
+  getNearby(lat: number, lng: number, radius: number, limit: number = 20) {
+    const params = new HttpParams()
+      .set('lat', lat).set('lng', lng).set('radius', radius).set('limit', limit);
+    return this.http.get<any[]>(API_URL + '/plaques/nearby', { params });
+  }
+
+
 
 }

@@ -1,0 +1,46 @@
+<div class="container">
+  <h1 class="h3 mb-3">Plaques near you</h1>
+
+  <div class="d-flex flex-wrap gap-3 align-items-end mb-2">
+    <button type="button" class="btn btn-primary" (click)="useMyLocation()" [disabled]="locating">
+      {{ locating ? 'Finding you...' : 'Use my location' }}
+    </button>
+    <div>
+      <label for="radius" class="form-label small mb-1">Search within</label>
+      <select id="radius" class="form-select" (change)="changeRadius($any($event.target).value)">
+        @for (option of radiusOptions; track option) {
+          <option [value]="option" [selected]="option === radius">{{ radiusLabel(option) }}</option>
+        }
+      </select>
+    </div>
+  </div>
+  <p class="text-muted small">Or click anywhere on the map to search around that point.</p>
+
+  @if (error) { <div class="alert alert-warning" role="alert">{{ error }}</div> }
+
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div #mapContainer class="map" role="region" aria-label="Map of nearby plaques"></div>
+    </div>
+
+    <div class="col-lg-4">
+      @if (loading) { <div class="alert alert-secondary">Searching...</div> }
+
+      @if (point && !loading) {
+        <h2 class="h6">The nearest {{ plaques.length }} plaque(s) within {{ radiusLabel(radius) }}</h2>
+        <ol class="list-group list-group-numbered">
+          @for (plaque of plaques; track plaque._id) {
+            <li class="list-group-item">
+              <a [routerLink]="['/plaques', plaque._id]">{{ plaque.inscription | slice:0:70 }}...</a>
+              <div class="small text-muted">{{ plaque.distance_m }} m · about {{ plaque.walking_minutes }} min walk</div>
+            </li>
+          } @empty {
+            <li class="list-group-item text-muted">No plaques here. Try a bigger distance.</li>
+          }
+        </ol>
+      } @else if (!loading) {
+        <p class="text-muted">Share your location or click the map to see the plaques around you.</p>
+      }
+    </div>
+  </div>
+</div>
