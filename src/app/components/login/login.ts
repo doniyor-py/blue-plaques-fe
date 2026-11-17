@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 
 @Component({
@@ -13,6 +13,7 @@ export class Login {
   loginForm: FormGroup;
   error: string = '';
   loading: boolean = false;
+  registered: boolean = false;
 
   constructor(private formBuilder: FormBuilder,
               private authService: AuthService,
@@ -22,7 +23,9 @@ export class Login {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+    this.registered = this.route.snapshot.queryParamMap.get('registered') === '1';
   }
+
 
   onSubmit() {
     if (this.loginForm.invalid) {

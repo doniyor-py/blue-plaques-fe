@@ -53,4 +53,20 @@ export class AuthService {
   logout() {
     return this.http.get<any>(API_URL + '/logout');
   }
+
+  register(username: string, email: string, password: string, captchaToken: string) {
+    const formData = new FormData();
+    formData.append('username', username);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('captcha_token', captchaToken);
+    return this.http.post<any>(API_URL + '/register', formData);
+  }
+
+  verifyRegistration(email: string, code: string) {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('code', code);
+    return this.http.post<any>(API_URL + '/register/verify', formData);
+  }
 }

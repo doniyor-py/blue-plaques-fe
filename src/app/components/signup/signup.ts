@@ -1,0 +1,124 @@
+import { Component, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth-service';
+import { TURNSTILE_SITE_KEY } from '../../api';
+
+declare const turnstile: any;
+
+@Component({
+  selector: 'app-signup',
+  imports: [ReactiveFormsModule, RouterLink],
+  templateUrl: './signup.html',
+  styleUrl: './signup.css'
+})
+export class Signup implements AfterViewInit, OnDestroy {
+  step: 'details' | 'code' = 'details';
+  detailsForm: FormGroup;
+  codeForm: FormGroup;
+  captchaToken: string = '';
+  widgetId: any = null;
+  error: string = '';
+  message: string = '';
+  loading: boolean = false;
+
+  constructor(private formBuilder: FormBuilder,
+              private authService: AuthService,
+              private router: Router,
+              private zone: NgZone) {
+    this.detailsForm = this.formBuilder.group({
+      username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]{3,20}$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]]
+    });
+    this.codeForm = this.formBuilder.group({
+      code: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
+    });
+  }
+
+  ngAfterViewInit() {
+    this.renderCaptcha();
+  }
+
+  ngOnDestroy() {
+    this.removeCaptcha();
+  }
+
+  renderCaptcha() {
+    if (typeof turnstile === 'undefined') {
+      setTimeout(() => this.renderCaptcha(), 300);
+      return;
+    }
+    this.widgetId = turnstile.render('#turnstile-box', {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token: string) => this.zone.run(() => this.captchaToken = token),
+      'expired-callback': () => this.zone.run(() => this.captchaToken = '')
+    });
+  }
+
+  removeCaptcha() {
+    if (this.widgetId !== null && typeof turnstile !== 'undefined') {
+      turnstile.remove(this.widgetId);
+      this.widgetId = null;
+    }
+    this.captchaToken = '';
+  }
+
+  onRegister() {
+    this.error = '';
+    if (this.detailsForm.invalid) {
+      this.detailsForm.markAllAsTouched();
+      return;
+    }
+    if (!this.captchaToken) {
+      this.error = 'Please complete the human check.';
+      return;
+    }
+    this.loading = true;
+    const { username, email, password } = this.detailsForm.value;
+
+    this.authService.register(username, email, password, this.captchaToken).subscribe({
+      next: () => {
+        this.removeCaptcha();
+        this.step = 'code';
+        this.message = 'We have emailed a 6-digit code to ' + email + '. It expires in 10 minutes.';
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Could not sign up. Please try again.';
+        this.loading = false;
+        turnstile.reset(this.widgetId);
+        this.captchaToken = '';
+      }
+    });
+  }
+
+  onVerify() {
+    this.error = '';
+    if (this.codeForm.invalid) {
+      this.codeForm.markAllAsTouched();
+      return;
+    }
+    this.loading = true;
+    this.authService.verifyRegistration(this.detailsForm.value.email, this.codeForm.value.code).subscribe({
+      next: () => this.router.navigate(['/login'], { queryParams: { registered: 1 } }),
+      error: (err) => {
+        this.error = err.error?.error || 'Could not check the code.';
+        this.loading = false;
+      }
+    });
+  }
+
+  startAgain() {
+    this.step = 'details';
+    this.error = '';
+    this.message = '';
+    this.codeForm.reset();
+    setTimeout(() => this.renderCaptcha());
+  }
+
+  isInvalid(form: FormGroup, field: string): boolean {
+    const control = form.get(field)!;
+    return control.invalid && control.touched;
+  }
+}
