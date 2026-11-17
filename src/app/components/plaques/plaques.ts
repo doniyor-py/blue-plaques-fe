@@ -19,7 +19,7 @@ export class Plaques implements OnInit {
   loading: boolean = true;
   error: string = '';
   filters: any = {};
-  filterKeys = ['q', 'borough', 'colour', 'role', 'from_year', 'to_year'];
+  filterKeys = ['q', 'borough', 'colour', 'category', 'from_year', 'to_year'];
 
   boroughs = ['Barnet', 'Bexley', 'Brent', 'Bromley', 'Camden', 'City of London', 'Croydon',
     'Ealing', 'Enfield', 'Greenwich', 'Hackney', 'Hammersmith and Fulham', 'Haringey', 'Harrow',
@@ -27,7 +27,7 @@ export class Plaques implements OnInit {
     'Lambeth', 'Lewisham', 'Merton', 'Newham', 'Redbridge', 'Richmond upon Thames', 'Southwark',
     'Sutton', 'Tower Hamlets', 'Waltham Forest', 'Wandsworth', 'Westminster'];
 
-  roles = [
+  categories = [
     { value: 'literature', label: 'Literature' },
     { value: 'art-design', label: 'Art & design' },
     { value: 'film-tv-theatre', label: 'Film, TV & theatre' },
@@ -48,7 +48,7 @@ export class Plaques implements OnInit {
               private router: Router,
               private formBuilder: FormBuilder) {
     this.filterForm = this.formBuilder.group({
-      q: '', borough: '', colour: '', role: '', from_year: '', to_year: ''
+      q: '', borough: '', colour: '', category: '', from_year: '', to_year: ''
     });
   }
 

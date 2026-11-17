@@ -17,11 +17,11 @@
       </select>
     </div>
     <div class="col-md-3">
-      <label for="role" class="form-label">Category</label>
-      <select id="role" class="form-select" formControlName="role">
+      <label for="category" class="form-label">Category</label>
+      <select id="category" class="form-select" formControlName="category">
         <option value="">Any category</option>
-        @for (role of roles; track role.value) {
-          <option [value]="role.value">{{ role.label }}</option>
+        @for (category of categories; track category.value) {
+          <option [value]="category.value">{{ category.label }}</option>
         }
       </select>
     </div>
