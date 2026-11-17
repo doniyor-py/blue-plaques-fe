@@ -7,6 +7,27 @@
   @if (user) {
     <div class="card">
       <div class="card-body">
+        <section class="mt-4" aria-labelledby="favourites-heading">
+          <h2 id="favourites-heading" class="h4">My favourites</h2>
+          <ul class="list-group">
+            @for (plaque of favourites; track plaque._id) {
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a [routerLink]="['/plaques', plaque._id]">
+                  {{ plaque.title || (plaque.inscription | slice:0:80) }}
+                </a>
+                <span>
+                  <small class="text-muted me-3">{{ plaque.borough }}</small>
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeFavourite(plaque)"
+                          [attr.aria-label]="'Remove ' + (plaque.title || 'plaque') + ' from favourites'">
+                    Remove
+                  </button>
+                </span>
+              </li>
+            } @empty {
+              <li class="list-group-item text-muted">You haven't saved any plaques yet.</li>
+            }
+          </ul>
+        </section>
         <dl class="row mb-0">
           <dt class="col-sm-3">Username</dt>
           <dd class="col-sm-9">{{ user.username }}</dd>
@@ -14,7 +35,7 @@
           <dd class="col-sm-9">{{ user.email }}</dd>
           <dt class="col-sm-3">Account type</dt>
           <dd class="col-sm-9">{{ user.admin ? 'Administrator' : 'Standard user' }}</dd>
-          <dt class="col-sm-3">Favourites</dt>
+          <dt class="col-sm-3">{{ favourites.length }}</dt>
           <dd class="col-sm-9">{{ user.favourites?.length || 0 }}</dd>
         </dl>
       </div>

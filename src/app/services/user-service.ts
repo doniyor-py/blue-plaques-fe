@@ -14,4 +14,16 @@ export class UserService {
     const params = new HttpParams().set('pn', page).set('ps', pageSize);
     return this.http.get<any>(API_URL + '/users', { params });
   }
+
+  getFavourites() {
+    return this.http.get<any[]>(API_URL + '/users/me/favourites');
+  }
+
+  addFavourite(plaqueId: string) {
+    return this.http.post<any>(API_URL + '/users/me/favourites/' + plaqueId, {});
+  }
+
+  removeFavourite(plaqueId: string) {
+    return this.http.delete<any>(API_URL + '/users/me/favourites/' + plaqueId);
+  }
 }

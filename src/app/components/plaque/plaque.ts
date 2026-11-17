@@ -5,6 +5,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { PlaqueService } from '../../services/plaque-service';
 import { VisitService } from '../../services/visit-service';
 import { AuthService } from '../../services/auth-service';
+import { UserService } from '../../services/user-service';
+import { ReportService } from '../../services/report-service';
 
 @Component({
   selector: 'app-plaque',
@@ -15,7 +17,11 @@ import { AuthService } from '../../services/auth-service';
 export class Plaque implements OnInit {
   plaque: any = null;
   loading: boolean = true;
-  error: string = '';
+  error: string = ''
+  isFavourite: boolean = false;
+  favouriteBusy: boolean = false;
+  favouriteError: string = '';
+
 
   plaqueId: string = '';
   visits: any[] = [];
@@ -25,10 +31,23 @@ export class Plaque implements OnInit {
   visitMessage: string = '';
   saving: boolean = false;
 
+  showReportForm: boolean = false;
+  reportForm: FormGroup;
+  reportMessage: string = '';
+  reportError: string = '';
+  reportSending: boolean = false;
+
   ratingFields = [
     { key: 'history', label: 'Historical interest' },
     { key: 'condition', label: 'Condition' },
     { key: 'accessibility', label: 'Accessibility' }
+  ];
+
+  reportTypes = [
+    { value: 'missing', label: 'The plaque is missing' },
+    { value: 'damaged', label: 'The plaque is damaged' },
+    { value: 'wrong_info', label: 'The information is wrong' },
+    { value: 'other', label: 'Something else' }
   ];
 
   constructor(private route: ActivatedRoute,
@@ -36,17 +55,27 @@ export class Plaque implements OnInit {
               private location: Location,
               private visitService: VisitService,
               public authService: AuthService,
-              private formBuilder: FormBuilder) {
+              private formBuilder: FormBuilder,
+              private userService: UserService,
+              private reportService: ReportService) {
     this.visitForm = this.formBuilder.group({
       history: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
       condition: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
       accessibility: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
       note: ['', Validators.maxLength(500)]
     });
+
+    this.reportForm = this.formBuilder.group({
+      type: ['', Validators.required],
+      message: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(500)]]
+    });
   }
 
   ngOnInit() {
     this.plaqueId = this.route.snapshot.paramMap.get('id')!;
+    if (this.authService.isLoggedIn()) {
+      this.checkFavourite();
+    }
     this.plaqueService.getPlaque(this.plaqueId).subscribe({
       next: (response) => {
         this.plaque = response;
@@ -65,7 +94,6 @@ export class Plaque implements OnInit {
   }
 
   loadVisits() {
-    // GET /visits, not GET /plaques/:id, so reloading the list does not add another view
     this.visitService.getVisits(this.plaqueId).subscribe({
       next: (response) => this.visits = response
     });
@@ -129,6 +157,65 @@ export class Plaque implements OnInit {
 
   canChange(visit: any): boolean {
     return visit.username === this.authService.getUsername() || this.authService.isAdmin();
+  }
+
+  checkFavourite() {
+    this.userService.getMe().subscribe({
+      next: (user) => this.isFavourite = (user.favourites || []).includes(this.plaqueId)
+    });
+  }
+
+  toggleFavourite() {
+    this.favouriteBusy = true;
+    this.favouriteError = '';
+    const request = this.isFavourite
+      ? this.userService.removeFavourite(this.plaqueId)
+      : this.userService.addFavourite(this.plaqueId);
+
+    request.subscribe({
+      next: () => {
+        this.isFavourite = !this.isFavourite;
+        this.favouriteBusy = false;
+      },
+      error: (err) => {
+        this.favouriteError = err.error?.error || 'Could not update your favourites.';
+        this.favouriteBusy = false;
+      }
+    });
+  }
+
+  toggleReportForm() {
+    this.showReportForm = !this.showReportForm;
+    this.reportError = '';
+    this.reportMessage = '';
+  }
+
+  onSubmitReport() {
+    if (this.reportForm.invalid) {
+      this.reportForm.markAllAsTouched();
+      return;
+    }
+    this.reportSending = true;
+    this.reportError = '';
+    const { type, message } = this.reportForm.value;
+
+    this.reportService.reportProblem(this.plaqueId, type, message.trim()).subscribe({
+      next: (response) => {
+        this.reportMessage = response.message;     // "Thanks, an admin will check it"
+        this.showReportForm = false;
+        this.reportForm.reset({ type: '', message: '' });
+        this.reportSending = false;
+      },
+      error: (err) => {
+        this.reportError = err.error?.error || 'Could not send your report.';
+        this.reportSending = false;
+      }
+    });
+  }
+
+  isReportInvalid(field: string): boolean {
+    const control = this.reportForm.get(field)!;
+    return control.invalid && control.touched;
   }
 }
 

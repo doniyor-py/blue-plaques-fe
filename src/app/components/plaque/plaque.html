@@ -13,8 +13,21 @@
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h1 class="h4 mb-0">{{ plaque.title }}</h1>
-        <span class="badge bg-secondary">{{ plaque.colour }}</span>
+        <div>
+          <span class="badge bg-secondary me-2">{{ plaque.colour }}</span>
+          @if (authService.isLoggedIn()) {
+            <button type="button" class="btn btn-sm"
+                    [class.btn-warning]="isFavourite" [class.btn-outline-warning]="!isFavourite"
+                    [attr.aria-pressed]="isFavourite" [disabled]="favouriteBusy"
+                    (click)="toggleFavourite()">
+              {{ isFavourite ? '★ Saved' : '☆ Save' }}
+            </button>
+          }
+        </div>
       </div>
+      @if (favouriteError) {
+        <div class="alert alert-danger m-3" role="alert">{{ favouriteError }}</div>
+      }
       <div class="card-body">
         <p class="lead">{{ plaque.inscription }}</p>
 
@@ -117,6 +130,57 @@
         <p>
           <a routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">Log in</a>
           to record your visit.
+        </p>
+      }
+    </section>
+
+    <section class="mt-4 mb-5" aria-labelledby="report-heading">
+      <h2 id="report-heading" class="h5">Something wrong with this plaque?</h2>
+
+      @if (reportMessage) { <div class="alert alert-success" role="status">{{ reportMessage }}</div> }
+      @if (reportError) { <div class="alert alert-danger" role="alert">{{ reportError }}</div> }
+
+      @if (authService.isLoggedIn()) {
+        <button type="button" class="btn btn-outline-secondary btn-sm"
+                [attr.aria-expanded]="showReportForm" aria-controls="report-form"
+                (click)="toggleReportForm()">
+          {{ showReportForm ? 'Cancel' : 'Report a problem' }}
+        </button>
+
+        @if (showReportForm) {
+          <form id="report-form" [formGroup]="reportForm" (ngSubmit)="onSubmitReport()"
+                class="card card-body mt-3" novalidate>
+            <div class="mb-3">
+              <label for="report-type" class="form-label">What is the problem?</label>
+              <select id="report-type" class="form-select" formControlName="type"
+                      [class.is-invalid]="isReportInvalid('type')">
+                <option value="">Choose one...</option>
+                @for (reportType of reportTypes; track reportType.value) {
+                  <option [value]="reportType.value">{{ reportType.label }}</option>
+                }
+              </select>
+              @if (isReportInvalid('type')) {
+                <div class="invalid-feedback">Please choose a problem type.</div>
+              }
+            </div>
+            <div class="mb-3">
+              <label for="report-message" class="form-label">Details</label>
+              <textarea id="report-message" class="form-control" rows="3" formControlName="message"
+                        [class.is-invalid]="isReportInvalid('message')"></textarea>
+              <div class="form-text">{{ reportForm.value.message?.length || 0 }}/500 characters</div>
+              @if (isReportInvalid('message')) {
+                <div class="invalid-feedback">Please write 5–500 characters.</div>
+              }
+            </div>
+            <button type="submit" class="btn btn-danger" [disabled]="reportSending">
+              {{ reportSending ? 'Sending...' : 'Send report' }}
+            </button>
+          </form>
+        }
+      } @else {
+        <p class="text-muted">
+          <a routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">Log in</a>
+          to report a problem.
         </p>
       }
     </section>
