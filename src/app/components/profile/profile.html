@@ -1,0 +1,23 @@
+<div class="container">
+  <h1 class="h3 mb-4">My profile</h1>
+
+  @if (loading) { <div class="alert alert-secondary">Loading...</div> }
+  @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
+
+  @if (user) {
+    <div class="card">
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-3">Username</dt>
+          <dd class="col-sm-9">{{ user.username }}</dd>
+          <dt class="col-sm-3">Email</dt>
+          <dd class="col-sm-9">{{ user.email }}</dd>
+          <dt class="col-sm-3">Account type</dt>
+          <dd class="col-sm-9">{{ user.admin ? 'Administrator' : 'Standard user' }}</dd>
+          <dt class="col-sm-3">Favourites</dt>
+          <dd class="col-sm-9">{{ user.favourites?.length || 0 }}</dd>
+        </dl>
+      </div>
+    </div>
+  }
+</div>

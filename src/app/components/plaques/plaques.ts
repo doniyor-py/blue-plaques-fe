@@ -1,0 +1,111 @@
+import { Component, OnInit } from '@angular/core';
+import { SlicePipe } from '@angular/common';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { PlaqueService } from '../../services/plaque-service';
+
+@Component({
+  selector: 'app-plaques',
+  imports: [SlicePipe, RouterLink, ReactiveFormsModule],
+  templateUrl: './plaques.html',
+  styleUrl: './plaques.css'
+})
+export class Plaques implements OnInit {
+  plaque_list: any[] = [];
+  page: number = 1;
+  pages: number = 1;
+  total: number = 0;
+  pageSize: number = 10;
+  loading: boolean = true;
+  error: string = '';
+  filters: any = {};
+  filterKeys = ['q', 'borough', 'colour', 'role', 'from_year', 'to_year'];
+
+  boroughs = ['Barnet', 'Bexley', 'Brent', 'Bromley', 'Camden', 'City of London', 'Croydon',
+    'Ealing', 'Enfield', 'Greenwich', 'Hackney', 'Hammersmith and Fulham', 'Haringey', 'Harrow',
+    'Havering', 'Hounslow', 'Islington', 'Kensington and Chelsea', 'Kingston upon Thames',
+    'Lambeth', 'Lewisham', 'Merton', 'Newham', 'Redbridge', 'Richmond upon Thames', 'Southwark',
+    'Sutton', 'Tower Hamlets', 'Waltham Forest', 'Wandsworth', 'Westminster'];
+
+  roles = [
+    { value: 'literature', label: 'Literature' },
+    { value: 'art-design', label: 'Art & design' },
+    { value: 'film-tv-theatre', label: 'Film, TV & theatre' },
+    { value: 'music', label: 'Music' },
+    { value: 'politics-military', label: 'Politics & military' },
+    { value: 'science-medicine', label: 'Science & medicine' },
+    { value: 'royalty', label: 'Royalty' },
+    { value: 'sport', label: 'Sport' },
+    { value: 'other', label: 'Other' }
+  ];
+
+  colours = ['blue', 'green', 'brown', 'black', 'red', 'white', 'grey', 'bronze', 'stone'];
+
+  filterForm: FormGroup;
+
+  constructor(private plaqueService: PlaqueService,
+              private route: ActivatedRoute,
+              private router: Router,
+              private formBuilder: FormBuilder) {
+    this.filterForm = this.formBuilder.group({
+      q: '', borough: '', colour: '', role: '', from_year: '', to_year: ''
+    });
+  }
+
+  ngOnInit() {
+    this.route.queryParamMap.subscribe(params => {
+      this.page = Number(params.get('page')) || 1;
+      this.filters = {};
+      const formValues: any = {};
+      for (const key of this.filterKeys) {
+        const value = params.get(key);
+        if (value) { this.filters[key] = value; }
+        formValues[key] = value || '';
+      }
+      this.filterForm.setValue(formValues);
+      this.loadPage();
+    });
+  }
+
+  loadPage() {
+    this.loading = true;
+    this.error = '';
+    this.plaqueService.searchPlaques(this.filters, this.page, this.pageSize).subscribe({
+      next: (response) => {
+        this.plaque_list = response.plaques;
+        this.pages = response.pages;
+        this.total = response.total;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = err.error?.error || 'Could not load plaques. Is the API running?';
+        this.loading = false;
+      }
+    });
+  }
+
+  onSearch() {
+    const queryParams: any = {};
+    for (const key of this.filterKeys) {
+      const value = this.filterForm.value[key];
+      if (value) { queryParams[key] = value; }
+    }
+    this.router.navigate(['/plaques'], { queryParams: queryParams });
+  }
+
+  clearFilters() {
+    this.router.navigate(['/plaques']);
+  }
+
+  goToPage(page: number) {
+    this.router.navigate(['/plaques'], { queryParams: { ...this.filters, page: page } });
+  }
+
+  previousPage() {
+    if (this.page > 1) { this.goToPage(this.page - 1); }
+  }
+
+  nextPage() {
+    if (this.page < this.pages) { this.goToPage(this.page + 1); }
+  }
+}

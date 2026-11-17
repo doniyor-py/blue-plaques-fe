@@ -1,0 +1,124 @@
+<div class="container">
+  <button class="btn btn-link px-0 mb-3" (click)="goBack()">&larr; Back</button>
+
+  @if (loading) {
+    <div class="alert alert-secondary">Loading plaque...</div>
+  }
+  @if (error) {
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  }
+
+  @if (plaque) {
+    <!-- the plaque itself -->
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h1 class="h4 mb-0">{{ plaque.title }}</h1>
+        <span class="badge bg-secondary">{{ plaque.colour }}</span>
+      </div>
+      <div class="card-body">
+        <p class="lead">{{ plaque.inscription }}</p>
+
+        <dl class="row">
+          <dt class="col-sm-3">Address</dt>
+          <dd class="col-sm-9">{{ plaque.address || 'Unknown' }}</dd>
+          <dt class="col-sm-3">Borough</dt>
+          <dd class="col-sm-9">{{ plaque.borough }}</dd>
+          <dt class="col-sm-3">Erected</dt>
+          <dd class="col-sm-9">{{ plaque.erected_year || 'Year unknown' }}</dd>
+          <dt class="col-sm-3">Organisation</dt>
+          <dd class="col-sm-9">{{ plaque.organisation || 'Unknown' }}</dd>
+        </dl>
+
+        @if (plaque.people?.length) {
+          <h2 class="h5">People</h2>
+          <ul class="list-unstyled">
+            @for (person of plaque.people; track person.name) {
+              <li class="mb-2">
+                <strong>{{ person.name }}</strong>
+                @if (person.born) { ({{ person.born }}–{{ person.died }}) }
+                @for (role of person.roles; track role) {
+                  <span class="badge bg-info text-dark ms-1">{{ role }}</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+      </div>
+      <!-- 3a: visits.length instead of plaque.visits?.length -->
+      <div class="card-footer text-muted">
+        {{ plaque.views }} views · {{ visits.length }} visits
+      </div>
+    </div>
+
+    <!-- 3b: visits section -->
+    <section class="mt-4" aria-labelledby="visits-heading">
+      <h2 id="visits-heading" class="h4">Visits ({{ visits.length }})</h2>
+
+      @if (visitMessage) { <div class="alert alert-success" role="status">{{ visitMessage }}</div> }
+      @if (visitError) { <div class="alert alert-danger" role="alert">{{ visitError }}</div> }
+
+      @for (visit of visits; track visit._id) {
+        <div class="card mb-2">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <strong>{{ visit.username }}</strong>
+              <small class="text-muted">{{ visit.date }}</small>
+            </div>
+            <p class="mb-1">
+              History {{ visit.ratings.history }}/5 ·
+              Condition {{ visit.ratings.condition }}/5 ·
+              Accessibility {{ visit.ratings.accessibility }}/5
+            </p>
+            @if (visit.note) { <p class="mb-1">{{ visit.note }}</p> }
+            @if (canChange(visit)) {
+              <button class="btn btn-sm btn-outline-primary me-2" (click)="startEdit(visit)"
+                      [attr.aria-label]="'Edit visit by ' + visit.username">Edit</button>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteVisit(visit)"
+                      [attr.aria-label]="'Delete visit by ' + visit.username">Delete</button>
+            }
+          </div>
+        </div>
+      } @empty {
+        <p class="text-muted">No visits yet. Be the first to check in!</p>
+      }
+
+      @if (authService.isLoggedIn()) {
+        <form [formGroup]="visitForm" (ngSubmit)="onSubmitVisit()" class="card card-body mt-3">
+          <h3 class="h5">{{ editingVisitId ? 'Edit your visit' : 'Check in at this plaque' }}</h3>
+          <div class="row g-3">
+            @for (field of ratingFields; track field.key) {
+              <div class="col-md-4">
+                <label [attr.for]="field.key" class="form-label">{{ field.label }}</label>
+                <select [id]="field.key" class="form-select" [formControlName]="field.key">
+                  @for (n of [1, 2, 3, 4, 5]; track n) {
+                    <option [ngValue]="n">{{ n }}</option>
+                  }
+                </select>
+              </div>
+            }
+            <div class="col-12">
+              <label for="note" class="form-label">Note (optional)</label>
+              <textarea id="note" class="form-control" rows="3" formControlName="note"
+                        [class.is-invalid]="visitForm.get('note')!.invalid"></textarea>
+              <div class="form-text">{{ visitForm.value.note?.length || 0 }}/500 characters</div>
+              <div class="invalid-feedback">The note must be 500 characters or fewer.</div>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary me-2" [disabled]="saving">
+                {{ saving ? 'Saving...' : (editingVisitId ? 'Save changes' : 'Add visit') }}
+              </button>
+              @if (editingVisitId) {
+                <button type="button" class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+              }
+            </div>
+          </div>
+        </form>
+      } @else {
+        <p>
+          <a routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">Log in</a>
+          to record your visit.
+        </p>
+      }
+    </section>
+  }
+</div>

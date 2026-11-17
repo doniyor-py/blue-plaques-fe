@@ -1,0 +1,95 @@
+<div class="container">
+
+  <form [formGroup]="filterForm" (ngSubmit)="onSearch()" class="card card-body mb-4">
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label for="q" class="form-label">Search</label>
+      <input id="q" type="text" class="form-control" formControlName="q"
+             placeholder="A name or words on the plaque">
+    </div>
+    <div class="col-md-3">
+      <label for="borough" class="form-label">Borough</label>
+      <select id="borough" class="form-select" formControlName="borough">
+        <option value="">Any borough</option>
+        @for (borough of boroughs; track borough) {
+          <option [value]="borough">{{ borough }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="role" class="form-label">Category</label>
+      <select id="role" class="form-select" formControlName="role">
+        <option value="">Any category</option>
+        @for (role of roles; track role.value) {
+          <option [value]="role.value">{{ role.label }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="colour" class="form-label">Colour</label>
+      <select id="colour" class="form-select" formControlName="colour">
+        <option value="">Any colour</option>
+        @for (colour of colours; track colour) {
+          <option [value]="colour">{{ colour }}</option>
+        }
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="from_year" class="form-label">Erected from</label>
+      <input id="from_year" type="number" class="form-control" formControlName="from_year" placeholder="e.g. 1900">
+    </div>
+    <div class="col-md-3">
+      <label for="to_year" class="form-label">Erected to</label>
+      <input id="to_year" type="number" class="form-control" formControlName="to_year" placeholder="e.g. 2000">
+    </div>
+    <div class="col-md-3 d-flex align-items-end gap-2">
+      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear</button>
+    </div>
+  </div>
+  </form>
+
+  @if (loading) {
+    <p class="text-muted">Loading plaques...</p>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  <div class="row">
+    @for (plaque of plaque_list; track plaque._id) {
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-header">
+            <a [routerLink]="['/plaques', plaque._id]"><strong>{{ plaque.title }}</strong></a>
+          </div>
+          <div class="card-body">
+            <p class="card-text">{{ plaque.inscription | slice:0:150 }}...</p>
+          </div>
+          <div class="card-footer text-muted">
+            {{ plaque.borough }} · {{ plaque.erected_year || 'Year unknown' }}
+            <span class="badge bg-secondary float-end">{{ plaque.colour }}</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="row align-items-center my-3">
+    <div class="col-4">
+      <button class="btn btn-primary" (click)="previousPage()" [disabled]="page === 1">
+        Previous
+      </button>
+    </div>
+    <div class="col-4 text-center">
+      Page {{ page }} of {{ pages }} ({{ total }} plaques)
+    </div>
+    <div class="col-4 text-end">
+      <button class="btn btn-primary" (click)="nextPage()" [disabled]="page === pages">
+        Next
+      </button>
+    </div>
+  </div>
+
+</div>

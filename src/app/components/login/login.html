@@ -1,0 +1,31 @@
+<div class="container" style="max-width: 420px;">
+  <h1 class="h3 mb-4">Log in</h1>
+
+  @if (error) {
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
+  }
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input id="username" type="text" class="form-control" formControlName="username"
+             autocomplete="username" [class.is-invalid]="isInvalid('username')">
+      @if (isInvalid('username')) {
+        <div class="invalid-feedback">Please enter your username.</div>
+      }
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input id="password" type="password" class="form-control" formControlName="password"
+             autocomplete="current-password" [class.is-invalid]="isInvalid('password')">
+      @if (isInvalid('password')) {
+        <div class="invalid-feedback">Please enter your password.</div>
+      }
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+      {{ loading ? 'Logging in...' : 'Log in' }}
+    </button>
+  </form>
+</div>

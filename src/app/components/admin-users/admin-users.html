@@ -1,0 +1,28 @@
+<div class="container">
+  <h1 class="h3 mb-4">Users</h1>
+
+  @if (loading) { <div class="alert alert-secondary">Loading...</div> }
+  @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
+
+  @if (!loading && !error) {
+    <table class="table table-striped">
+      <caption>{{ total }} registered users</caption>
+      <thead>
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col">Email</th>
+          <th scope="col">Role</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users; track user.username) {
+          <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.admin ? 'Admin' : 'User' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>
