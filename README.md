@@ -1,59 +1,111 @@
-# BluePlaquesFe
+# Blue Plaques Explorer - Front End
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.42.
+Angular front end for the Blue Plaques Explorer, a web app for browsing London's
+commemorative plaques (blue plaques and the other colours) and recording visits to them.
 
-## Development server
+COM661 Full-stack Strategies and Development - Coursework 2.
 
-To start a local development server, run:
+The back end (Flask + MongoDB REST API) was built in Coursework 1 and lives in a
+separate repository: `blue-plaques-api`. This app talks to it over HTTP at
+`http://127.0.0.1:5001/api/v1.0`.
+
+## Technologies
+
+- Angular 20 (standalone components, `@if` / `@for` control flow)
+- TypeScript
+- Bootstrap 5
+- RxJS and Angular `HttpClient`
+- Reactive forms
+- Jasmine / Karma for unit tests
+
+## Current progress
+
+Done:
+
+- Home page with a "Surprise me" random plaque
+- Plaques list with pagination
+- Search and filters (text, borough, category, colour, year range)
+- Page number and filters kept in the URL, e.g. `/plaques?borough=Camden&role=literature&page=2`,
+  so the browser Back button, bookmarks and shared links all work
+- Plaque details page (people, roles, views)
+- Log in / log out with JWT (token sent in the `x-access-token` header by an HTTP interceptor;
+  logging out also blacklists the token on the server)
+- Route guards: "My profile" needs a login, the admin "Users" page needs an admin account
+- Visits: add, edit and delete a visit with ratings and a note (GET, POST, PUT, DELETE)
+
+To do:
+
+- Sign up with email code (OTP)
+- Favourites and reporting a plaque
+- Admin tools (create / edit / delete plaques, handle reports, delete users)
+- Nearby plaques map
+- Profile statistics and admin analytics
+- Plaque photos
+- Final styling and accessibility review
+- Unit tests and Compodoc documentation
+
+## How to run
+
+You need Node.js (20.19+, 22.12+ or 24) and the back-end API running first.
+
+1. Start MongoDB and the Flask API from the `blue-plaques-api` repository
+   (it runs on port 5001).
+2. In this folder:
 
 ```bash
-ng serve
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+3. Open http://localhost:4200
 
-## Code scaffolding
+Test accounts (from the back end's seed data):
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+| Username | Password | Role |
+|---|---|---|
+| user0 ... user9 | UserPass123 | normal user |
+| admin1 | AdminPass123 | admin |
 
-```bash
-ng generate component component-name
+## Project structure
+
+```
+src/app/
+  api.ts                    base URL of the API
+  app.routes.ts             page routes and guards
+  app.config.ts             HttpClient + interceptor setup
+  components/
+    navigation/             top navbar
+    home/                   home page and random plaque
+    plaques/                list, search, filters, pagination
+    plaque/                 plaque details and visits
+    login/                  login form
+    profile/                logged-in user's profile
+    admin-users/            admin list of users
+  services/
+    plaque-service.ts       plaque requests
+    visit-service.ts        visit requests (add / edit / delete)
+    auth-service.ts         login, logout, token handling
+    user-service.ts         profile and users requests
+    auth-interceptor.ts     adds the token to API requests, handles 401
+    auth-guards.ts          authGuard and adminGuard
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## API endpoints used so far
 
-```bash
-ng generate --help
-```
+| Method | Endpoint | Used for |
+|---|---|---|
+| GET | /plaques/search | list, search and filters |
+| GET | /plaques/random | "Surprise me" |
+| GET | /plaques/:id | plaque details |
+| GET | /plaques/:id/visits | reload visits |
+| POST | /plaques/:id/visits | add a visit |
+| PUT | /plaques/:id/visits/:vid | edit a visit |
+| DELETE | /plaques/:id/visits/:vid | delete a visit |
+| GET | /login | log in (Basic Auth) |
+| GET | /logout | log out |
+| GET | /users/me | my profile |
+| GET | /users | admin: list users |
 
-## Building
+## Author
 
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Doniyorbek Mekhmonov - Ulster University London
