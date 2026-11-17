@@ -26,4 +26,7 @@ export class UserService {
   removeFavourite(plaqueId: string) {
     return this.http.delete<any>(API_URL + '/users/me/favourites/' + plaqueId);
   }
+  deleteUser(username: string) {
+    return this.http.delete<any>(API_URL + '/users/' + encodeURIComponent(username));
+  }
 }
