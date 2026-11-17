@@ -10,6 +10,12 @@
 
   @if (plaque) {
     <!-- the plaque itself -->
+     @if (authService.isAdmin()) {
+      <div class="mb-3">
+        <a class="btn btn-sm btn-outline-primary me-2" [routerLink]="['/admin/plaques', plaqueId, 'edit']">Edit plaque</a>
+        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deletePlaque()">Delete plaque</button>
+      </div>
+    }
     <div class="card">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h1 class="h4 mb-0">{{ plaque.title }}</h1>

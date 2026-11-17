@@ -1,0 +1,91 @@
+<div class="container" style="max-width: 760px;">
+  <h1 class="h3 mb-4">{{ plaqueId ? 'Edit plaque' : 'Add a plaque' }}</h1>
+
+  @if (loading) { <div class="alert alert-secondary">Loading plaque...</div> }
+  @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
+
+  <form [formGroup]="plaqueForm" (ngSubmit)="onSubmit()" novalidate>
+    <div class="mb-3">
+      <label for="title" class="form-label">Title (optional)</label>
+      <input id="title" class="form-control" formControlName="title"
+             placeholder="Left empty, it becomes e.g. 'Blue plaque at 12 High Street'">
+    </div>
+
+    <div class="mb-3">
+      <label for="inscription" class="form-label">Inscription</label>
+      <textarea id="inscription" class="form-control" rows="3" formControlName="inscription"
+                [class.is-invalid]="isInvalid('inscription')"></textarea>
+      @if (isInvalid('inscription')) {
+        <div class="invalid-feedback">The inscription is required (up to 5000 characters).</div>
+      }
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-4">
+        <label for="colour" class="form-label">Colour</label>
+        <select id="colour" class="form-select" formControlName="colour">
+          @for (colour of colours; track colour) { <option [value]="colour">{{ colour }}</option> }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="category" class="form-label">Category</label>
+        <select id="category" class="form-select" formControlName="category">
+          @for (category of categories; track category) { <option [value]="category">{{ category }}</option> }
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label for="erected_year" class="form-label">Year erected</label>
+        <input id="erected_year" type="number" class="form-control" formControlName="erected_year"
+               [class.is-invalid]="isInvalid('erected_year')">
+        @if (isInvalid('erected_year')) {
+          <div class="invalid-feedback">Enter a year from 1800 to {{ currentYear }}.</div>
+        }
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="organisation" class="form-label">Organisation</label>
+      <input id="organisation" class="form-control" formControlName="organisation"
+             placeholder="e.g. English Heritage" [class.is-invalid]="isInvalid('organisation')">
+      @if (isInvalid('organisation')) { <div class="invalid-feedback">The organisation is required.</div> }
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-8">
+        <label for="address" class="form-label">Address</label>
+        <input id="address" class="form-control" formControlName="address"
+               [class.is-invalid]="isInvalid('address')">
+        @if (isInvalid('address')) { <div class="invalid-feedback">The address is required.</div> }
+      </div>
+      <div class="col-md-4">
+        <label for="borough" class="form-label">Borough</label>
+        <select id="borough" class="form-select" formControlName="borough"
+                [class.is-invalid]="isInvalid('borough')">
+          <option value="">Choose...</option>
+          @for (borough of boroughs; track borough) { <option [value]="borough">{{ borough }}</option> }
+        </select>
+        @if (isInvalid('borough')) { <div class="invalid-feedback">Please choose a borough.</div> }
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label for="lat" class="form-label">Latitude</label>
+        <input id="lat" type="number" step="any" class="form-control" formControlName="lat"
+               placeholder="e.g. 51.5246" [class.is-invalid]="isInvalid('lat')">
+        @if (isInvalid('lat')) { <div class="invalid-feedback">Enter a London latitude (51.2 to 51.8).</div> }
+      </div>
+      <div class="col-md-6">
+        <label for="lng" class="form-label">Longitude</label>
+        <input id="lng" type="number" step="any" class="form-control" formControlName="lng"
+               placeholder="e.g. -0.1340" [class.is-invalid]="isInvalid('lng')">
+        @if (isInvalid('lng')) { <div class="invalid-feedback">Enter a London longitude (-0.6 to 0.4).</div> }
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary me-2" [disabled]="saving || loading">
+      {{ saving ? 'Saving...' : (plaqueId ? 'Save changes' : 'Add plaque') }}
+    </button>
+    <a class="btn btn-outline-secondary" [routerLink]="plaqueId ? ['/plaques', plaqueId] : ['/plaques']">Cancel</a>
+  </form>
+</div>

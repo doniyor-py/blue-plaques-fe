@@ -7,6 +7,7 @@ import { Profile } from './components/profile/profile';
 import { AdminUsers } from './components/admin-users/admin-users';
 import { authGuard, adminGuard } from './services/auth-guards';
 import { Signup } from './components/signup/signup';
+import { PlaqueForm } from './components/plaque-form/plaque-form';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -15,5 +16,7 @@ export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'profile', component: Profile, canActivate: [authGuard] },
   { path: 'signup', component: Signup },
-  { path: 'admin/users', component: AdminUsers, canActivate: [adminGuard] }
+  { path: 'admin/users', component: AdminUsers, canActivate: [adminGuard] },
+  { path: 'admin/plaques/new', component: PlaqueForm, canActivate: [adminGuard] },
+  { path: 'admin/plaques/:id/edit', component: PlaqueForm, canActivate: [adminGuard] }
 ];

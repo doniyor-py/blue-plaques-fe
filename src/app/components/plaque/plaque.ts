@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlaqueService } from '../../services/plaque-service';
 import { VisitService } from '../../services/visit-service';
@@ -57,7 +57,8 @@ export class Plaque implements OnInit {
               public authService: AuthService,
               private formBuilder: FormBuilder,
               private userService: UserService,
-              private reportService: ReportService) {
+              private reportService: ReportService,
+              private router: Router) {
     this.visitForm = this.formBuilder.group({
       history: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
       condition: [5, [Validators.required, Validators.min(1), Validators.max(5)]],
@@ -216,6 +217,14 @@ export class Plaque implements OnInit {
   isReportInvalid(field: string): boolean {
     const control = this.reportForm.get(field)!;
     return control.invalid && control.touched;
+  }
+
+  deletePlaque() {
+    if (!confirm('Delete this plaque? This also removes its photos, reports and favourites.')) { return; }
+    this.plaqueService.deletePlaque(this.plaqueId).subscribe({
+      next: () => this.router.navigate(['/plaques']),
+      error: (err) => this.error = err.error?.error || 'Could not delete the plaque.'
+    });
   }
 }
 
