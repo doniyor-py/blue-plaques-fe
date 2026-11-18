@@ -302,6 +302,12 @@ export class Nearby implements AfterViewInit, OnDestroy {
     return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
   }
 
+  distanceFromUser(plaque: any): number | null {
+    if (!this.userLocation) { return null; }
+    const [lng, lat] = plaque.location.coordinates;
+    return Math.round(this.userLocation.distanceTo([lat, lng]));
+  }
+
   // ---------- small helpers ----------
 
   titleOf(plaque: any): string {

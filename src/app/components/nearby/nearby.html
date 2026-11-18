@@ -16,8 +16,8 @@
       </div>
       <p class="text-muted small mb-2">
         {{ selected.borough }} · {{ selected.colour }} plaque
-        @if (selected.distance_m !== undefined && searchedFromUser) {
-          · {{ selected.distance_m }} m away
+        @if (distanceFromUser(selected) !== null) {
+          · {{ distanceFromUser(selected) | number }} m from you
         }
       </p>
       <p class="small">
