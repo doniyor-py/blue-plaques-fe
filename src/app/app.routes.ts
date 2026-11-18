@@ -13,6 +13,8 @@ import { Nearby } from './components/nearby/nearby';
 import { Insights } from './components/insights/insights';
 import { Account } from './components/account/account';
 import { ForgotPassword } from './components/forgot-password/forgot-password';
+import { Terms } from './components/terms/terms';
+import { Privacy } from './components/privacy/privacy';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -28,5 +30,7 @@ export const routes: Routes = [
   { path: 'nearby', component: Nearby },
   { path: 'insights', component: Insights },
   { path: 'forgot-password', component: ForgotPassword },
-  { path: 'account', component: Account, canActivate: [authGuard] }
+  { path: 'account', component: Account, canActivate: [authGuard] },
+  { path: 'terms', component: Terms },
+  { path: 'privacy', component: Privacy }
 ];

@@ -14,6 +14,7 @@ export class Login {
   error: string = '';
   loading: boolean = false;
   notice: string = '';
+  showPassword: boolean = false;
 
   // short messages other pages can ask the login page to show, e.g. /login?notice=password-changed
   notices: Record<string, string> = {

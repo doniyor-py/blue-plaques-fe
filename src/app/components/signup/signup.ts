@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { TURNSTILE_SITE_KEY } from '../../api';
 
-declare const turnstile: any;
+declare const turnstile: any;   // comes from the Cloudflare script in index.html
 
 @Component({
   selector: 'app-signup',
@@ -18,6 +18,7 @@ export class Signup implements AfterViewInit, OnDestroy {
   codeForm: FormGroup;
   captchaToken: string = '';
   widgetId: any = null;
+  showPassword: boolean = false;
   error: string = '';
   message: string = '';
   loading: boolean = false;
@@ -29,7 +30,8 @@ export class Signup implements AfterViewInit, OnDestroy {
     this.detailsForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]{3,20}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]]
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+      accept_terms: [false, Validators.requiredTrue]
     });
     this.codeForm = this.formBuilder.group({
       code: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
@@ -64,6 +66,10 @@ export class Signup implements AfterViewInit, OnDestroy {
     this.captchaToken = '';
   }
 
+  passwordLength(): number {
+    return (this.detailsForm.value.password || '').length;
+  }
+
   onRegister() {
     this.error = '';
     if (this.detailsForm.invalid) {
@@ -87,7 +93,7 @@ export class Signup implements AfterViewInit, OnDestroy {
       error: (err) => {
         this.error = err.error?.error || 'Could not sign up. Please try again.';
         this.loading = false;
-        turnstile.reset(this.widgetId);
+        turnstile.reset(this.widgetId);   // a token can only be used once
         this.captchaToken = '';
       }
     });
@@ -101,7 +107,7 @@ export class Signup implements AfterViewInit, OnDestroy {
     }
     this.loading = true;
     this.authService.verifyRegistration(this.detailsForm.value.email, this.codeForm.value.code).subscribe({
-      next: () => this.router.navigate(['/login'], { queryParams: { registered: 1 } }),
+      next: () => this.router.navigate(['/login'], { queryParams: { notice: 'registered' } }),
       error: (err) => {
         this.error = err.error?.error || 'Could not check the code.';
         this.loading = false;

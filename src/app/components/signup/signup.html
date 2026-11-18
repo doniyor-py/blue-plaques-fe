@@ -6,31 +6,63 @@
   @if (step === 'details') {
     <form [formGroup]="detailsForm" (ngSubmit)="onRegister()" novalidate>
       <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
-        <input id="username" type="text" class="form-control" formControlName="username"
-               autocomplete="username" [class.is-invalid]="isInvalid(detailsForm, 'username')">
-        <div class="form-text">3–20 letters, numbers or _</div>
-        @if (isInvalid(detailsForm, 'username')) {
-          <div class="invalid-feedback">Use 3–20 letters, numbers or _.</div>
-        }
-      </div>
-
-      <div class="mb-3">
         <label for="email" class="form-label">Email</label>
         <input id="email" type="email" class="form-control" formControlName="email"
                autocomplete="email" [class.is-invalid]="isInvalid(detailsForm, 'email')">
+        <div class="form-text">We'll send a code here to check it's yours. It's never shown to other users.</div>
         @if (isInvalid(detailsForm, 'email')) {
           <div class="invalid-feedback">Please enter a valid email.</div>
         }
       </div>
 
       <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input id="username" type="text" class="form-control" formControlName="username"
+               autocomplete="username" [class.is-invalid]="isInvalid(detailsForm, 'username')">
+        <div class="form-text">Shown next to your visits and photos. 3–20 letters, numbers or _</div>
+        @if (isInvalid(detailsForm, 'username')) {
+          <div class="invalid-feedback">Use 3–20 letters, numbers or _.</div>
+        }
+      </div>
+
+      <div class="mb-3">
         <label for="password" class="form-label">Password</label>
-        <input id="password" type="password" class="form-control" formControlName="password"
-               autocomplete="new-password" [class.is-invalid]="isInvalid(detailsForm, 'password')">
-        <div class="form-text">At least 8 characters</div>
-        @if (isInvalid(detailsForm, 'password')) {
-          <div class="invalid-feedback">The password must be 8–72 characters.</div>
+        <div class="input-group has-validation">
+          <input id="password" class="form-control" formControlName="password"
+                 [type]="showPassword ? 'text' : 'password'" autocomplete="new-password"
+                 aria-describedby="password-rules" [class.is-invalid]="isInvalid(detailsForm, 'password')">
+          <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword"
+                  [attr.aria-pressed]="showPassword" aria-controls="password">
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+          @if (isInvalid(detailsForm, 'password')) {
+            <div class="invalid-feedback">The password must be 8–72 characters.</div>
+          }
+        </div>
+        <ul id="password-rules" class="list-unstyled small mt-2 mb-1">
+          <li [class.text-success]="passwordLength() >= 8" [class.text-muted]="passwordLength() < 8">
+            <span aria-hidden="true">{{ passwordLength() >= 8 ? '✓' : '○' }}</span>
+            <span class="visually-hidden">{{ passwordLength() >= 8 ? 'Done:' : 'Not yet:' }}</span>
+            At least 8 characters
+          </li>
+          @if (passwordLength() > 72) {
+            <li class="text-danger">No more than 72 characters</li>
+          }
+        </ul>
+        <div class="form-text">
+          Tip: a few random words, like "teapot river lantern", make a strong password that's easy to remember.
+        </div>
+      </div>
+
+      <div class="form-check mb-3">
+        <input id="accept_terms" type="checkbox" class="form-check-input" formControlName="accept_terms"
+               [class.is-invalid]="isInvalid(detailsForm, 'accept_terms')">
+        <label for="accept_terms" class="form-check-label">
+          I agree to the <a routerLink="/terms" target="_blank">Terms of use</a>
+          and the <a routerLink="/privacy" target="_blank">Privacy policy</a>
+        </label>
+        @if (isInvalid(detailsForm, 'accept_terms')) {
+          <div class="invalid-feedback">Please agree to the terms to create an account.</div>
         }
       </div>
 
