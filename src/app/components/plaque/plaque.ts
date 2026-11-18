@@ -7,10 +7,11 @@ import { VisitService } from '../../services/visit-service';
 import { AuthService } from '../../services/auth-service';
 import { UserService } from '../../services/user-service';
 import { ReportService } from '../../services/report-service';
+import { PlaquePhotos } from '../plaque-photos/plaque-photos';
 
 @Component({
   selector: 'app-plaque',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, PlaquePhotos],
   templateUrl: './plaque.html',
   styleUrl: './plaque.css'
 })
