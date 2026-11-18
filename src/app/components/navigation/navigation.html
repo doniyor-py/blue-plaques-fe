@@ -20,6 +20,9 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/nearby" routerLinkActive="active" (click)="closeMenu()">Map</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/insights" routerLinkActive="active">Insights</a>
+        </li>
         @if (authService.isLoggedIn()) {
           <li class="nav-item">
             <a class="nav-link" routerLink="/profile" routerLinkActive="active" (click)="closeMenu()">My profile</a>

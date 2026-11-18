@@ -10,6 +10,7 @@ import { Signup } from './components/signup/signup';
 import { PlaqueForm } from './components/plaque-form/plaque-form';
 import { AdminReports } from './components/admin-reports/admin-reports';
 import { Nearby } from './components/nearby/nearby';
+import { Insights } from './components/insights/insights';
 
 export const routes: Routes = [
   { path: '', component: Home },
@@ -22,5 +23,6 @@ export const routes: Routes = [
   { path: 'admin/plaques/new', component: PlaqueForm, canActivate: [adminGuard] },
   { path: 'admin/plaques/:id/edit', component: PlaqueForm, canActivate: [adminGuard] },
   { path: 'admin/reports', component: AdminReports, canActivate: [adminGuard] },
-  { path: 'nearby', component: Nearby }
+  { path: 'nearby', component: Nearby },
+  { path: 'insights', component: Insights }
 ];

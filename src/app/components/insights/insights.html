@@ -1,0 +1,200 @@
+<div class="container mb-5">
+  <h1 class="h3 mb-1">London's plaques in numbers</h1>
+  <p class="text-muted mb-4">Live statistics from every plaque, person and visit in the database.</p>
+
+  @if (loading) { <div class="alert alert-secondary">Loading statistics...</div> }
+  @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
+
+  @if (!loading && !error) {
+    <!-- headline numbers -->
+    <section aria-labelledby="kpi-heading" class="mb-5">
+      <h2 id="kpi-heading" class="visually-hidden">Headline numbers</h2>
+      <div class="row row-cols-2 row-cols-md-4 g-3">
+        <div class="col">
+          <div class="card h-100"><div class="card-body">
+            <div class="text-muted small">Plaques</div>
+            <div class="stat-number">{{ totalPlaques | number }}</div>
+          </div></div>
+        </div>
+        <div class="col">
+          <div class="card h-100"><div class="card-body">
+            <div class="text-muted small">Boroughs</div>
+            <div class="stat-number">{{ boroughs.length }}</div>
+          </div></div>
+        </div>
+        <div class="col">
+          <div class="card h-100"><div class="card-body">
+            <div class="text-muted small">Check-ins by visitors</div>
+            <div class="stat-number">{{ totalVisits | number }}</div>
+          </div></div>
+        </div>
+        <div class="col">
+          <div class="card h-100"><div class="card-body">
+            <div class="text-muted small">Average age at death</div>
+            <div class="stat-number">{{ ages?.avg_age ?? '–' }}</div>
+            @if (ages?.people) {
+              <div class="text-muted small">youngest {{ ages.youngest }} · oldest {{ ages.oldest }}</div>
+            }
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="row g-4 mb-5">
+      <!-- plaques per borough -->
+      <section class="col-lg-6" aria-labelledby="borough-heading">
+        <div class="card h-100"><div class="card-body">
+          <h2 id="borough-heading" class="h5">Plaques per borough</h2>
+          <p class="text-muted small">{{ showAllBoroughs ? 'All boroughs' : 'Top 10 boroughs' }}, most plaques first</p>
+          <table class="bar-table">
+            <caption class="visually-hidden">Number of plaques in each borough</caption>
+            <thead class="visually-hidden">
+              <tr><th scope="col">Borough</th><th scope="col">Plaques</th></tr>
+            </thead>
+            <tbody>
+              @for (borough of visibleBoroughs(); track borough.borough) {
+                <tr>
+                  <th scope="row">{{ borough.borough }}</th>
+                  <td>
+                    <div class="bar-track">
+                      <div class="bar" [style.width]="barWidth(borough.plaques, maxBorough)"></div>
+                      <span class="bar-value">{{ borough.plaques | number }}</span>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          @if (boroughs.length > 10) {
+            <button type="button" class="btn btn-link btn-sm px-0" [attr.aria-pressed]="showAllBoroughs"
+                    (click)="showAllBoroughs = !showAllBoroughs">
+              {{ showAllBoroughs ? 'Show top 10' : 'Show all ' + boroughs.length + ' boroughs' }}
+            </button>
+          }
+        </div></div>
+      </section>
+
+      <!-- people by profession -->
+      <section class="col-lg-6" aria-labelledby="profession-heading">
+        <div class="card h-100"><div class="card-body">
+          <h2 id="profession-heading" class="h5">Who is remembered</h2>
+          <p class="text-muted small">People on the plaques, by what they were known for</p>
+          <table class="bar-table">
+            <caption class="visually-hidden">Number of people in each category</caption>
+            <thead class="visually-hidden">
+              <tr><th scope="col">Category</th><th scope="col">People</th></tr>
+            </thead>
+            <tbody>
+              @for (profession of professions; track profession.role) {
+                <tr>
+                  <th scope="row">{{ roleLabel(profession.role) }}</th>
+                  <td>
+                    <div class="bar-track">
+                      <div class="bar" [style.width]="barWidth(profession.people, maxProfession)"></div>
+                      <span class="bar-value">{{ profession.people | number }}</span>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div></div>
+      </section>
+    </div>
+
+    <!-- plaques per decade -->
+    <section class="card mb-5" aria-labelledby="decade-heading">
+      <div class="card-body">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start">
+          <div>
+            <h2 id="decade-heading" class="h5">When the plaques went up</h2>
+            <p class="text-muted small">Plaques erected in each decade (plaques with a known year)</p>
+          </div>
+          <button type="button" class="btn btn-outline-secondary btn-sm" [attr.aria-pressed]="showDecadeTable"
+                  (click)="showDecadeTable = !showDecadeTable">
+            {{ showDecadeTable ? 'Show as chart' : 'Show as table' }}
+          </button>
+        </div>
+
+        @if (!showDecadeTable) {
+          <div class="column-chart" role="list" aria-label="Plaques erected per decade">
+            @for (decade of decades; track decade.decade; let i = $index) {
+              <div class="column" role="listitem" tabindex="0"
+                   [attr.aria-label]="decade.decade + 's: ' + decade.plaques + ' plaques'">
+                <div class="column-area">
+                  @if (decade.plaques === maxDecade) {
+                    <span class="column-peak">{{ decade.plaques | number }}</span>
+                  }
+                  <div class="column-bar" [style.height.%]="percentOf(decade.plaques, maxDecade)"></div>
+                </div>
+                <span class="column-label" [class.invisible]="!showDecadeLabel(i)" [class.minor-label]="i % 4 !== 0">{{ decade.decade }}s</span>
+                <span class="column-tip" aria-hidden="true">{{ decade.decade }}s · {{ decade.plaques | number }} plaques</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <table class="table table-sm w-auto">
+            <caption>Plaques erected per decade</caption>
+            <thead><tr><th scope="col">Decade</th><th scope="col" class="text-end">Plaques</th></tr></thead>
+            <tbody>
+              @for (decade of decades; track decade.decade) {
+                <tr><td>{{ decade.decade }}s</td><td class="text-end">{{ decade.plaques | number }}</td></tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </section>
+
+    <div class="row g-4">
+      <!-- ratings by borough -->
+      <section class="col-lg-6" aria-labelledby="ratings-heading">
+        <div class="card"><div class="card-body">
+          <h2 id="ratings-heading" class="h5">Best-rated boroughs</h2>
+          <p class="text-muted small">Average of visitors' history, condition and accessibility ratings (out of 5)</p>
+          <ul class="list-unstyled mb-1">
+            @for (rating of visibleRatings(); track rating.borough) {
+              <li class="meter-row">
+                <div class="d-flex justify-content-between small">
+                  <span class="fw-semibold">{{ rating.borough }}</span>
+                  <span><strong>{{ rating.avg_overall }}</strong><span class="text-muted"> / 5 · {{ rating.visits }} visits</span></span>
+                </div>
+                <div class="meter-track" aria-hidden="true">
+                  <div class="meter-fill" [style.width.%]="percentOf(rating.avg_overall, 5)"></div>
+                </div>
+              </li>
+            } @empty {
+              <li class="text-muted small">No ratings yet.</li>
+            }
+          </ul>
+          @if (ratings.length > 8) {
+            <button type="button" class="btn btn-link btn-sm px-0" [attr.aria-pressed]="showAllRatings"
+                    (click)="showAllRatings = !showAllRatings">
+              {{ showAllRatings ? 'Show top 8' : 'Show all ' + ratings.length + ' boroughs' }}
+            </button>
+          }
+        </div></div>
+      </section>
+
+      <!-- top rated plaques -->
+      <section class="col-lg-6" aria-labelledby="top-heading">
+        <div class="card"><div class="card-body">
+          <h2 id="top-heading" class="h5">Top-rated plaques</h2>
+          <p class="text-muted small">Highest average rating, with at least 3 visits</p>
+          <ol class="top-list">
+            @for (plaque of topRated; track plaque.plaque_id) {
+              <li>
+                <a [routerLink]="['/plaques', plaque.plaque_id]">{{ plaque.title ?? (plaque.inscription | slice:0:70) }}</a>
+                <div class="small text-muted">
+                  {{ plaque.borough }} · <strong class="text-body">{{ plaque.avg_rating }}</strong> / 5 from {{ plaque.visits }} visits
+                </div>
+              </li>
+            } @empty {
+              <li class="text-muted small">Not enough visits yet.</li>
+            }
+          </ol>
+        </div></div>
+      </section>
+    </div>
+  }
+</div>
