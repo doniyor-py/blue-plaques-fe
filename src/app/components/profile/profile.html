@@ -9,7 +9,12 @@
         <h1 class="h3 mb-1">{{ user.username }}</h1>
         <p class="text-muted mb-0">{{ user.email }} · {{ user.admin ? 'Administrator' : 'Plaque explorer' }}</p>
       </div>
-      <a class="btn btn-primary" routerLink="/nearby">Find plaques near me</a>
+
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" routerLink="/account">Account settings</a>
+        <a class="btn btn-primary" routerLink="/nearby">Find plaques near me</a>
+      </div>
+
     </div>
 
     <!-- statistics -->

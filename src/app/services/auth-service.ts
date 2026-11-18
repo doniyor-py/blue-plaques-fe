@@ -69,4 +69,22 @@ export class AuthService {
     formData.append('code', code);
     return this.http.post<any>(API_URL + '/register/verify', formData);
   }
+
+
+  forgotPassword(email: string) {
+    const formData = new FormData();
+    formData.append('email', email);
+    return this.http.post<any>(API_URL + '/password/forgot', formData);
+  }
+
+  resetPassword(email: string, code: string, newPassword: string) {
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('code', code);
+    formData.append('new_password', newPassword);
+    return this.http.post<any>(API_URL + '/password/reset', formData);
+  }
+
+
+
 }

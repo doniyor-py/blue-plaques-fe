@@ -5,7 +5,7 @@ import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -13,7 +13,15 @@ export class Login {
   loginForm: FormGroup;
   error: string = '';
   loading: boolean = false;
-  registered: boolean = false;
+  notice: string = '';
+
+  // short messages other pages can ask the login page to show, e.g. /login?notice=password-changed
+  notices: Record<string, string> = {
+    'registered': 'Account created. You can now log in.',
+    'password-changed': 'Password changed. Please log in with your new password.',
+    'password-reset': 'Password reset. You can now log in with your new password.',
+    'account-deleted': 'Your account has been deleted. Sorry to see you go!'
+  };
 
   constructor(private formBuilder: FormBuilder,
               private authService: AuthService,
@@ -23,9 +31,9 @@ export class Login {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
-    this.registered = this.route.snapshot.queryParamMap.get('registered') === '1';
+    const key = this.route.snapshot.queryParamMap.get('notice');
+    this.notice = key ? (this.notices[key] || '') : '';
   }
-
 
   onSubmit() {
     if (this.loginForm.invalid) {
@@ -39,8 +47,8 @@ export class Login {
     this.authService.login(username, password).subscribe({
       next: (response) => {
         this.authService.saveToken(response.token);
-          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-          this.router.navigateByUrl(returnUrl);
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
+        this.router.navigateByUrl(returnUrl);
       },
       error: (err) => {
         this.error = err.error?.error || 'Could not log in. Is the API running?';

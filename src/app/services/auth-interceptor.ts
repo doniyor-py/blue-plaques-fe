@@ -1,9 +1,11 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpContextToken } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from './auth-service';
 import { API_URL } from '../api';
+
+export const SKIP_LOGIN_REDIRECT = new HttpContextToken<boolean>(() => false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
@@ -17,12 +19,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
-      // a 401 from /login just means "wrong password", so leave that one alone
-      if (err.status === 401 && !req.url.endsWith('/login')) {
+      if (err.status === 401 && !req.url.endsWith('/login') && !req.context.get(SKIP_LOGIN_REDIRECT)) {
         authService.removeToken();
         router.navigate(['/login']);
       }
-      return throwError(() => err);   // pass the error on, so the component can still show a message
+      return throwError(() => err);   // pass the error on
     })
   );
 };

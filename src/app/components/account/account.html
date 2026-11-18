@@ -1,0 +1,87 @@
+<div class="container mb-5" style="max-width: 640px;">
+  <a routerLink="/profile" class="d-inline-block mb-3">&larr; My profile</a>
+  <h1 class="h3 mb-4">Account settings</h1>
+
+  <!-- change password -->
+  <section class="card mb-4" aria-labelledby="password-heading">
+    <div class="card-body">
+      <h2 id="password-heading" class="h5">Change password</h2>
+      <p class="text-muted small">After changing it, you will be asked to log in again.</p>
+
+      @if (passwordError) { <div class="alert alert-danger" role="alert">{{ passwordError }}</div> }
+
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+        <div class="mb-3">
+          <label for="old_password" class="form-label">Current password</label>
+          <input id="old_password" type="password" class="form-control" formControlName="old_password"
+                 autocomplete="current-password" [class.is-invalid]="isInvalid(passwordForm, 'old_password')">
+          @if (isInvalid(passwordForm, 'old_password')) {
+            <div class="invalid-feedback">Please enter your current password.</div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="new_password" class="form-label">New password</label>
+          <input id="new_password" type="password" class="form-control" formControlName="new_password"
+                 autocomplete="new-password" [class.is-invalid]="isInvalid(passwordForm, 'new_password')">
+          <div class="form-text">8–72 characters</div>
+          @if (isInvalid(passwordForm, 'new_password')) {
+            <div class="invalid-feedback">The new password must be 8–72 characters.</div>
+          }
+        </div>
+        <div class="mb-3">
+          <label for="confirm_password" class="form-label">Repeat the new password</label>
+          <input id="confirm_password" type="password" class="form-control" formControlName="confirm_password"
+                 autocomplete="new-password"
+                 [class.is-invalid]="isInvalid(passwordForm, 'confirm_password') || passwordsDontMatch()">
+          @if (passwordsDontMatch()) {
+            <div class="invalid-feedback">The two new passwords don't match.</div>
+          }
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="passwordSaving">
+          {{ passwordSaving ? 'Saving...' : 'Change password' }}
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- delete account -->
+  <section class="card border-danger" aria-labelledby="delete-heading">
+    <div class="card-body">
+      <h2 id="delete-heading" class="h5 text-danger">Delete account</h2>
+
+      @if (authService.isAdmin()) {
+        <p class="text-muted mb-0">Admin accounts can't be deleted here.</p>
+      } @else {
+        <p class="small">
+          This permanently deletes your account, your visits and your photos. It can't be undone.
+        </p>
+
+        @if (deleteError) { <div class="alert alert-danger" role="alert">{{ deleteError }}</div> }
+
+        <form [formGroup]="deleteForm" (ngSubmit)="deleteAccount()" novalidate>
+          <div class="mb-3">
+            <label for="delete_password" class="form-label">Enter your password to confirm</label>
+            <input id="delete_password" type="password" class="form-control" formControlName="password"
+                   autocomplete="current-password" [class.is-invalid]="isInvalid(deleteForm, 'password')">
+            @if (isInvalid(deleteForm, 'password')) {
+              <div class="invalid-feedback">Please enter your password.</div>
+            }
+          </div>
+          <div class="form-check mb-3">
+            <input id="understand" type="checkbox" class="form-check-input" formControlName="understand"
+                   [class.is-invalid]="isInvalid(deleteForm, 'understand')">
+            <label for="understand" class="form-check-label">
+              I understand my visits and photos will be deleted too
+            </label>
+            @if (isInvalid(deleteForm, 'understand')) {
+              <div class="invalid-feedback">Please tick this box to continue.</div>
+            }
+          </div>
+          <button type="submit" class="btn btn-danger" [disabled]="deleting">
+            {{ deleting ? 'Deleting...' : 'Delete my account' }}
+          </button>
+        </form>
+      }
+    </div>
+  </section>
+</div>
