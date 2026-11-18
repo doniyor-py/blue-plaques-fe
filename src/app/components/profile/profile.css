@@ -1,0 +1,11 @@
+.stat-number {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.stat-of {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #6c757d;
+}

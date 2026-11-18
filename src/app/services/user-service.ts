@@ -29,4 +29,12 @@ export class UserService {
   deleteUser(username: string) {
     return this.http.delete<any>(API_URL + '/users/' + encodeURIComponent(username));
   }
+
+  getStats() {
+    return this.http.get<any>(API_URL + '/users/me/stats');
+  }
+
+  getProgress() {
+    return this.http.get<any[]>(API_URL + '/users/me/progress');
+  }
 }

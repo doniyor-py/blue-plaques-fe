@@ -1,44 +1,107 @@
-<div class="container">
-  <h1 class="h3 mb-4">My profile</h1>
-
-  @if (loading) { <div class="alert alert-secondary">Loading...</div> }
+<div class="container mb-5">
+  @if (loading) { <div class="alert alert-secondary">Loading your profile...</div> }
   @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
 
-  @if (user) {
-    <div class="card">
-      <div class="card-body">
-        <section class="mt-4" aria-labelledby="favourites-heading">
-          <h2 id="favourites-heading" class="h4">My favourites</h2>
-          <ul class="list-group">
-            @for (plaque of favourites; track plaque._id) {
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <a [routerLink]="['/plaques', plaque._id]">
-                  {{ plaque.title || (plaque.inscription | slice:0:80) }}
-                </a>
-                <span>
-                  <small class="text-muted me-3">{{ plaque.borough }}</small>
-                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeFavourite(plaque)"
-                          [attr.aria-label]="'Remove ' + (plaque.title || 'plaque') + ' from favourites'">
-                    Remove
-                  </button>
-                </span>
-              </li>
-            } @empty {
-              <li class="list-group-item text-muted">You haven't saved any plaques yet.</li>
-            }
-          </ul>
-        </section>
-        <dl class="row mb-0">
-          <dt class="col-sm-3">Username</dt>
-          <dd class="col-sm-9">{{ user.username }}</dd>
-          <dt class="col-sm-3">Email</dt>
-          <dd class="col-sm-9">{{ user.email }}</dd>
-          <dt class="col-sm-3">Account type</dt>
-          <dd class="col-sm-9">{{ user.admin ? 'Administrator' : 'Standard user' }}</dd>
-          <dt class="col-sm-3">{{ favourites.length }}</dt>
-          <dd class="col-sm-9">{{ user.favourites?.length || 0 }}</dd>
-        </dl>
+  @if (user && stats) {
+    <!-- header -->
+    <div class="d-flex flex-wrap gap-3 justify-content-between align-items-end mb-4">
+      <div>
+        <h1 class="h3 mb-1">{{ user.username }}</h1>
+        <p class="text-muted mb-0">{{ user.email }} · {{ user.admin ? 'Administrator' : 'Plaque explorer' }}</p>
       </div>
+      <a class="btn btn-primary" routerLink="/nearby">Find plaques near me</a>
     </div>
+
+    <!-- statistics -->
+    <section aria-labelledby="stats-heading" class="mb-5">
+      <h2 id="stats-heading" class="visually-hidden">Your statistics</h2>
+      <div class="row row-cols-2 row-cols-md-4 g-3">
+        <div class="col">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <div class="stat-number">{{ stats.visits }}</div>
+              <div class="text-muted small">Check-ins</div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <div class="stat-number">{{ plaquesVisited }}</div>
+              <div class="text-muted small">Plaques visited</div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <div class="stat-number">{{ stats.boroughs_visited }}<span class="stat-of"> / {{ progress.length }}</span></div>
+              <div class="text-muted small">Boroughs explored</div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <div class="stat-number">{{ stats.avg_rating_given ?? '–' }}<span class="stat-of"> / 5</span></div>
+              <div class="text-muted small">Average rating you give</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- borough progress -->
+    <section aria-labelledby="progress-heading" class="mb-5">
+      <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+        <h2 id="progress-heading" class="h4 mb-0">Borough progress</h2>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+                [attr.aria-pressed]="showAllBoroughs" (click)="showAllBoroughs = !showAllBoroughs">
+          {{ showAllBoroughs ? 'Only boroughs I have visited' : 'Show all ' + progress.length + ' boroughs' }}
+        </button>
+      </div>
+
+      @for (borough of visibleBoroughs(); track borough.borough) {
+        <div class="mb-3">
+          <div class="d-flex justify-content-between small mb-1">
+            <span class="fw-semibold">{{ borough.borough }}</span>
+            <span class="text-muted">{{ borough.visited }} of {{ borough.total }} plaques · {{ borough.percent }}%</span>
+          </div>
+          <div class="progress" role="progressbar" style="height: 10px;"
+               [attr.aria-label]="borough.borough + ': ' + borough.percent + ' percent of plaques visited'"
+               [attr.aria-valuenow]="borough.percent" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar" [style.width.%]="barWidth(borough)"></div>
+          </div>
+        </div>
+      } @empty {
+        <p class="text-muted">
+          You haven't checked in at any plaques yet.
+          <a routerLink="/nearby">Open the map</a> to find one near you.
+        </p>
+      }
+    </section>
+
+    <!-- favourites -->
+    <section aria-labelledby="favourites-heading">
+      <h2 id="favourites-heading" class="h4 mb-3">My favourites ({{ favourites.length }})</h2>
+      <ul class="list-group">
+        @for (plaque of favourites; track plaque._id) {
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a [routerLink]="['/plaques', plaque._id]">
+              {{ plaque.title || (plaque.inscription | slice:0:80) }}
+            </a>
+            <span>
+              <small class="text-muted me-3">{{ plaque.borough }}</small>
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeFavourite(plaque)"
+                      [attr.aria-label]="'Remove ' + (plaque.title || 'plaque') + ' from favourites'">
+                Remove
+              </button>
+            </span>
+          </li>
+        } @empty {
+          <li class="list-group-item text-muted">You haven't saved any plaques yet.</li>
+        }
+      </ul>
+    </section>
   }
 </div>
