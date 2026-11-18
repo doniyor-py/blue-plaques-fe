@@ -11,11 +11,11 @@
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
     <div class="mb-3">
-      <label for="username" class="form-label">Username</label>
+      <label for="username" class="form-label">Email or username</label>
       <input id="username" type="text" class="form-control" formControlName="username"
-             autocomplete="username" [class.is-invalid]="isInvalid('username')">
+            autocomplete="username" [class.is-invalid]="isInvalid('username')">
       @if (isInvalid('username')) {
-        <div class="invalid-feedback">Please enter your username.</div>
+        <div class="invalid-feedback">Please enter your email or username.</div>
       }
     </div>
 

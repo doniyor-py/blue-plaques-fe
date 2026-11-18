@@ -81,9 +81,9 @@ export class Signup implements AfterViewInit, OnDestroy {
       return;
     }
     this.loading = true;
-    const { username, email, password } = this.detailsForm.value;
+    const { username, email, password, accept_terms } = this.detailsForm.value;
 
-    this.authService.register(username, email, password, this.captchaToken).subscribe({
+    this.authService.register(username, email, password, this.captchaToken, accept_terms).subscribe({
       next: () => {
         this.removeCaptcha();
         this.step = 'code';

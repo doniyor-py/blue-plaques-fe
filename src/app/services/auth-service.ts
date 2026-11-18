@@ -54,12 +54,13 @@ export class AuthService {
     return this.http.get<any>(API_URL + '/logout');
   }
 
-  register(username: string, email: string, password: string, captchaToken: string) {
+  register(username: string, email: string, password: string, captchaToken: string, acceptTerms: boolean) {
     const formData = new FormData();
     formData.append('username', username);
     formData.append('email', email);
     formData.append('password', password);
     formData.append('captcha_token', captchaToken);
+    formData.append('accept_terms', acceptTerms ? 'true' : 'false');
     return this.http.post<any>(API_URL + '/register', formData);
   }
 
