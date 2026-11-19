@@ -9,3 +9,16 @@
   font-weight: 400;
   color: #6c757d;
 }
+
+.visit-text {
+  min-width: 0;
+}
+
+.rating-pill {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.star-icon {
+  color: #b8860b;
+}

@@ -9,12 +9,7 @@
         <h1 class="h3 mb-1">{{ user.username }}</h1>
         <p class="text-muted mb-0">{{ user.email }} · {{ user.admin ? 'Administrator' : 'Plaque explorer' }}</p>
       </div>
-
       <a class="btn btn-outline-secondary" routerLink="/account">Account settings</a>
-        <a class="btn btn-outline-secondary" routerLink="/account">Account settings</a>
-        <a class="btn btn-primary" routerLink="/nearby">Find plaques near me</a>
-      </div>
-
     </div>
 
     <!-- statistics -->
@@ -25,7 +20,7 @@
           <div class="card h-100 text-center">
             <div class="card-body">
               <div class="stat-number">{{ stats.visits }}</div>
-              <div class="text-muted small">Check-ins</div>
+              <div class="text-muted small">Visits</div>
             </div>
           </div>
         </div>
@@ -56,6 +51,66 @@
       </div>
     </section>
 
+    <!-- my visits and reviews, newest first -->
+    <section aria-labelledby="my-visits-heading" class="mb-5">
+      <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+        <h2 id="my-visits-heading" class="h4 mb-0">My visits</h2>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Which visits to show">
+          <button type="button" class="btn btn-outline-secondary" [class.active]="!reviewedOnly"
+                  [attr.aria-pressed]="!reviewedOnly" (click)="showReviewedOnly(false)">All</button>
+          <button type="button" class="btn btn-outline-secondary" [class.active]="reviewedOnly"
+                  [attr.aria-pressed]="reviewedOnly" (click)="showReviewedOnly(true)">With a review</button>
+        </div>
+      </div>
+
+      <ul class="list-group">
+        @for (visit of myVisits; track visit.visit_id) {
+          <li class="list-group-item d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <div class="me-auto visit-text">
+              <a class="fw-semibold" [routerLink]="['/plaques', visit.plaque_id]"
+                 [queryParams]="{ visit: visit.visit_id }">{{ visit.title }}</a>
+              <div class="small text-muted">{{ visit.date | date:'d MMM y' }} · {{ visit.borough }}</div>
+              @if (visit.note) {
+                <div class="small fst-italic">"{{ visit.note | slice:0:90 }}{{ visit.note.length > 90 ? '…' : '' }}"</div>
+              }
+            </div>
+            @if (visit.ratings) {
+              <span class="rating-pill">
+                <span class="star-icon" aria-hidden="true">★</span>
+                {{ overall(visit) | number:'1.1-1' }}<span class="visually-hidden"> out of 5</span>
+              </span>
+            } @else {
+              <a class="btn btn-sm btn-outline-primary" [routerLink]="['/plaques', visit.plaque_id]"
+                 [queryParams]="{ visit: visit.visit_id, review: 1 }"
+                 [attr.aria-label]="'Add a review for ' + visit.title">Add a review</a>
+            }
+          </li>
+        } @empty {
+          @if (!visitsLoading) {
+            <li class="list-group-item text-muted">
+              @if (reviewedOnly) {
+                You haven't reviewed any plaques yet.
+              } @else {
+                No visits yet. Open a plaque and press "I've visited" when you're there.
+              }
+            </li>
+          }
+        }
+      </ul>
+
+      <div class="d-flex align-items-center gap-3 mt-2">
+        @if (myVisitsPage < myVisitsPages) {
+          <button type="button" class="btn btn-link px-0" [disabled]="visitsLoading"
+                  (click)="loadMyVisits(myVisitsPage + 1)">
+            {{ visitsLoading ? 'Loading...' : 'Show more' }}
+          </button>
+        }
+        @if (myVisitsTotal > 0) {
+          <span class="small text-muted">Showing {{ myVisits.length }} of {{ myVisitsTotal }}</span>
+        }
+      </div>
+    </section>
+
     <!-- borough progress -->
     <section aria-labelledby="progress-heading" class="mb-5">
       <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
@@ -70,8 +125,8 @@
             <span class="text-muted">{{ borough.visited }} of {{ borough.total }} plaques · {{ borough.percent }}%</span>
           </div>
           <div class="progress" role="progressbar" style="height: 10px;"
-              [attr.aria-label]="borough.borough + ': ' + borough.percent + ' percent of plaques visited'"
-              [attr.aria-valuenow]="borough.percent" aria-valuemin="0" aria-valuemax="100">
+               [attr.aria-label]="borough.borough + ': ' + borough.percent + ' percent of plaques visited'"
+               [attr.aria-valuenow]="borough.percent" aria-valuemin="0" aria-valuemax="100">
             <div class="progress-bar" [style.width.%]="barWidth(borough)"></div>
           </div>
         </div>

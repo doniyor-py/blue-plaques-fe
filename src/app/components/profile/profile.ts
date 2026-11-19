@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { SlicePipe } from '@angular/common';
+import { SlicePipe, DatePipe, DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../../services/user-service';
 
 @Component({
   selector: 'app-profile',
-  imports: [RouterLink, SlicePipe],
+  imports: [RouterLink, SlicePipe, DatePipe, DecimalPipe],
   templateUrl: './profile.html',
   styleUrl: './profile.css'
 })
@@ -19,6 +19,14 @@ export class Profile implements OnInit {
   showAllBoroughs: boolean = false;
   loading: boolean = true;
   error: string = '';
+
+  myVisits: any[] = [];
+  myVisitsTotal: number = 0;
+  myVisitsPage: number = 1;
+  myVisitsPages: number = 0;
+  reviewedOnly: boolean = false;
+  visitsLoading: boolean = false;
+  pageSize: number = 5;
 
   constructor(private userService: UserService) {}
 
@@ -41,6 +49,32 @@ export class Profile implements OnInit {
       }
     });
     this.loadFavourites();
+    this.loadMyVisits(1);
+  }
+
+  loadMyVisits(page: number) {
+    this.visitsLoading = true;
+    this.userService.getMyVisits(page, this.pageSize, this.reviewedOnly).subscribe({
+      next: (response) => {
+        this.myVisits = page === 1 ? response.visits : [...this.myVisits, ...response.visits];
+        this.myVisitsTotal = response.total;
+        this.myVisitsPage = response.page;
+        this.myVisitsPages = response.pages;
+        this.visitsLoading = false;
+      },
+      error: () => this.visitsLoading = false
+    });
+  }
+
+  showReviewedOnly(value: boolean) {
+    if (this.reviewedOnly === value) { return; }
+    this.reviewedOnly = value;
+    this.loadMyVisits(1);
+  }
+
+  overall(visit: any): number {
+    const r = visit.ratings;
+    return (r.history + r.condition + r.accessibility) / 3;
   }
 
   loadFavourites() {

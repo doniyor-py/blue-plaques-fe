@@ -24,7 +24,7 @@
         </div>
         <div class="col">
           <div class="card h-100"><div class="card-body">
-            <div class="text-muted small">Check-ins by visitors</div>
+            <div class="text-muted small">Visitor reviews</div>
             <div class="stat-number">{{ totalVisits | number }}</div>
           </div></div>
         </div>
@@ -157,7 +157,7 @@
               <li class="meter-row">
                 <div class="d-flex justify-content-between small">
                   <span class="fw-semibold">{{ rating.borough }}</span>
-                  <span><strong>{{ rating.avg_overall }}</strong><span class="text-muted"> / 5 · {{ rating.visits }} visits</span></span>
+                  <span><strong>{{ rating.avg_overall }}</strong><span class="text-muted"> / 5 · {{ rating.visits }} {{ rating.visits === 1 ? 'review' : 'reviews' }}</span></span>
                 </div>
                 <div class="meter-track" aria-hidden="true">
                   <div class="meter-fill" [style.width.%]="percentOf(rating.avg_overall, 5)"></div>
@@ -180,17 +180,17 @@
       <section class="col-lg-6" aria-labelledby="top-heading">
         <div class="card"><div class="card-body">
           <h2 id="top-heading" class="h5">Top-rated plaques</h2>
-          <p class="text-muted small">Highest average rating, with at least 3 visits</p>
+          <p class="text-muted small">Highest average rating, with at least 3 reviews</p>
           <ol class="top-list">
             @for (plaque of topRated; track plaque.plaque_id) {
               <li>
                 <a [routerLink]="['/plaques', plaque.plaque_id]">{{ plaque.title ?? (plaque.inscription | slice:0:70) }}</a>
                 <div class="small text-muted">
-                  {{ plaque.borough }} · <strong class="text-body">{{ plaque.avg_rating }}</strong> / 5 from {{ plaque.visits }} visits
+                  {{ plaque.borough }} · <strong class="text-body">{{ plaque.avg_rating }}</strong> / 5 from {{ plaque.visits }} reviews
                 </div>
               </li>
             } @empty {
-              <li class="text-muted small">Not enough visits yet.</li>
+              <li class="text-muted small">Not enough reviews yet.</li>
             }
           </ol>
         </div></div>

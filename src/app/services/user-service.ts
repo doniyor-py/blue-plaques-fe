@@ -39,6 +39,15 @@ export class UserService {
     return this.http.get<any[]>(API_URL + '/users/me/progress');
   }
 
+  //  visits, newest first; reviewedOnly = only the ones you rated
+  getMyVisits(page: number, pageSize: number, reviewedOnly: boolean = false) {
+    let params = new HttpParams().set('pn', page).set('ps', pageSize);
+    if (reviewedOnly) {
+      params = params.set('reviewed', 'true');
+    }
+    return this.http.get<any>(API_URL + '/users/me/visits', { params });
+  }
+
   // a wrong old password gives 401, which must not log the user out
   changePassword(oldPassword: string, newPassword: string) {
     const formData = new FormData();

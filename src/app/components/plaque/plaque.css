@@ -1,0 +1,42 @@
+/* a visit opened from a link (or just reviewed) gets a soft outline */
+.visit-card {
+  transition: box-shadow 0.3s ease;
+  scroll-margin-top: 5rem;
+}
+
+.visit-card.highlight {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.35);
+}
+
+.star-icon {
+  color: #b8860b;
+}
+
+/* 1-5 star picker: real radio buttons, shown as stars */
+.star-input {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.star-input .star {
+  font-size: 1.75rem;
+  line-height: 1;
+  padding: 0.1rem 0.15rem;
+  color: #6c757d;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+
+.star-input .star.on {
+  color: #b8860b;
+}
+
+.star-input .star:hover {
+  color: #d4a017;
+}
+
+.star-input .btn-check:focus-visible + .star {
+  outline: 2px solid #0d6efd;
+  outline-offset: 1px;
+}

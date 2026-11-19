@@ -1,34 +1,34 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { API_URL } from '../api';
 
 @Injectable({ providedIn: 'root' })
 export class VisitService {
   constructor(private http: HttpClient) {}
 
-  getVisits(plaqueId: string) {
-    return this.http.get<any[]>(API_URL + '/plaques/' + plaqueId + '/visits');
+  // newest first; the API sends { total, page, page_size, pages, visits }
+  getVisits(plaqueId: string, pageSize: number = 100) {
+    const params = new HttpParams()
+      .set('sort', 'date').set('order', 'desc')
+      .set('pn', 1).set('ps', pageSize);
+    return this.http.get<any>(API_URL + '/plaques/' + plaqueId + '/visits', { params });
   }
 
-  addVisit(plaqueId: string, visit: any) {
-    return this.http.post<any>(API_URL + '/plaques/' + plaqueId + '/visits', this.toFormData(visit));
+  // "I've visited": no ratings needed, the API answers with the new visit's _id
+  checkIn(plaqueId: string) {
+    return this.http.post<any>(API_URL + '/plaques/' + plaqueId + '/visits', new FormData());
   }
 
-  editVisit(plaqueId: string, visitId: string, visit: any) {
-    return this.http.put<any>(API_URL + '/plaques/' + plaqueId + '/visits/' + visitId, this.toFormData(visit));
+  saveReview(plaqueId: string, visitId: string, review: any) {
+    const formData = new FormData();
+    formData.append('history', review.history);
+    formData.append('condition', review.condition);
+    formData.append('accessibility', review.accessibility);
+    formData.append('note', review.note || '');
+    return this.http.put<any>(API_URL + '/plaques/' + plaqueId + '/visits/' + visitId, formData);
   }
 
   deleteVisit(plaqueId: string, visitId: string) {
     return this.http.delete(API_URL + '/plaques/' + plaqueId + '/visits/' + visitId);
-  }
-
-  // Flask reads request.form, so send multipart form data instead of JSON
-  private toFormData(visit: any): FormData {
-    const formData = new FormData();
-    formData.append('history', visit.history);
-    formData.append('condition', visit.condition);
-    formData.append('accessibility', visit.accessibility);
-    formData.append('note', visit.note || '');
-    return formData;
   }
 }
