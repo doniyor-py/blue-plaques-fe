@@ -87,5 +87,12 @@ export class AuthService {
   }
 
 
+  loginWithGoogle(credential: string) {
+    const formData = new FormData();
+    formData.append('credential', credential);
+    formData.append('accept_terms', 'true');      // the Google button shows the terms notice next to it
+    return this.http.post<any>(API_URL + '/login/google', formData);
+  }
+
 
 }

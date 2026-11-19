@@ -7,6 +7,10 @@
     <div class="card-body">
       <h2 id="password-heading" class="h5">Change password</h2>
       <p class="text-muted small">After changing it, you will be asked to log in again.</p>
+      <p class="small text-muted">
+        Signed up with Google? You don't have a password yet. Use
+        <a routerLink="/forgot-password">Forgot password</a> to set one first.
+      </p>
 
       @if (passwordError) { <div class="alert alert-danger" role="alert">{{ passwordError }}</div> }
 

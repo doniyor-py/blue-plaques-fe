@@ -3,12 +3,13 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { TURNSTILE_SITE_KEY } from '../../api';
+import { GoogleButton } from '../google-button/google-button';
 
-declare const turnstile: any;   // comes from the Cloudflare script in index.html
+declare const turnstile: any;
 
 @Component({
   selector: 'app-signup',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, GoogleButton],
   templateUrl: './signup.html',
   styleUrl: './signup.css'
 })

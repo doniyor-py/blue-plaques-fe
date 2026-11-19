@@ -1,0 +1,13 @@
+<div class="mb-3">
+  <div #buttonBox class="google-button-box"></div>
+
+  @if (loading) { <p class="small text-muted mt-2 mb-0" role="status">Signing you in…</p> }
+  @if (error) { <div class="alert alert-danger small mt-2 mb-0" role="alert">{{ error }}</div> }
+
+  <p class="small text-muted mt-2 mb-0">
+    By continuing with Google, you agree to the <a routerLink="/terms" target="_blank">Terms of use</a>
+    and the <a routerLink="/privacy" target="_blank">Privacy policy</a>.
+  </p>
+
+  <div class="or-divider" aria-hidden="true"><span>or</span></div>
+</div>

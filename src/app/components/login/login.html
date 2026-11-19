@@ -9,6 +9,9 @@
     <div class="alert alert-danger" role="alert">{{ error }}</div>
   }
 
+
+  <app-google-button />
+
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
     <div class="mb-3">
       <label for="username" class="form-label">Email or username</label>

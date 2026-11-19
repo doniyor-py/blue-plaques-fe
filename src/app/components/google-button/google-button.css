@@ -1,0 +1,19 @@
+.google-button-box {
+  min-height: 44px;
+}
+
+.or-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid #dee2e6;
+}
