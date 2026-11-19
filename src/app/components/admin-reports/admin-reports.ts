@@ -71,7 +71,10 @@ export class AdminReports implements OnInit {
         this.message = response.message;
         this.loadReports();
       },
-      error: (err) => this.error = err.error?.error || 'Could not update the report.'
+      error: (err) => {
+        this.error = err.error?.error || 'Could not update the report.';
+        this.loadReports();
+      }
     });
   }
 

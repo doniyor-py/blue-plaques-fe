@@ -41,11 +41,11 @@
               <td>
                 <label class="visually-hidden" [attr.for]="'status-' + report._id">Status of report by {{ report.username }}</label>
                 <select class="form-select form-select-sm" [id]="'status-' + report._id"
-                        [value]="report.status" (change)="changeStatus(report, $any($event.target).value)">
-                  @for (status of statuses; track status.value) {
-                    <option [value]="status.value">{{ status.label }}</option>
-                  }
-                </select>
+                      (change)="changeStatus(report, $any($event.target).value)">
+                @for (status of statuses; track status.value) {
+                  <option [value]="status.value" [selected]="status.value === report.status">{{ status.label }}</option>
+                }
+              </select>
               </td>
             </tr>
           } @empty {
