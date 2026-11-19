@@ -5,10 +5,10 @@ import * as L from 'leaflet';
 import { PlaqueService } from '../../services/plaque-service';
 import { RouteService } from '../../services/route-service';
 import { decodePolyline } from '../../services/polyline';
+import { DurationPipe } from '../../pipes/duration-pipe';
 
 const LONDON = L.latLng(51.5074, -0.1278);
 
-// marker colour for each plaque colour (anything else uses the default blue)
 const PLAQUE_COLOURS: Record<string, string> = {
   blue: '#1d4f91', green: '#2e7d4f', brown: '#7b4a2a', black: '#222222', red: '#c62828',
   white: '#ffffff', grey: '#7d7d7d', bronze: '#b0743a', stone: '#a89f88'
@@ -16,7 +16,7 @@ const PLAQUE_COLOURS: Record<string, string> = {
 
 @Component({
   selector: 'app-nearby',
-  imports: [DatePipe, DecimalPipe, SlicePipe, RouterLink],
+  imports: [DatePipe, DecimalPipe, SlicePipe, RouterLink, DurationPipe],
   templateUrl: './nearby.html',
   styleUrl: './nearby.css'
 })
@@ -58,7 +58,6 @@ export class Nearby implements AfterViewInit, OnDestroy {
     this.routeLayer.addTo(this.map);
     this.map.on('moveend', () => this.onMapMoved());
 
-    // wait one tick
     setTimeout(() => {
       const params = this.activatedRoute.snapshot.queryParamMap;
       const plaqueId = params.get('plaque');
@@ -156,7 +155,7 @@ export class Nearby implements AfterViewInit, OnDestroy {
     });
   }
 
-  // the distance from the centre of the map to its corner, so we search what you can see
+  // the distance from the centre of the map to its corner
   visibleRadius(): number {
     const metres = this.map.getCenter().distanceTo(this.map.getBounds().getNorthEast());
     return Math.min(Math.max(Math.round(metres), 300), 5000);

@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth-service';
 import { UserService } from '../../services/user-service';
 import { ReportService } from '../../services/report-service';
 import { PlaquePhotos } from '../plaque-photos/plaque-photos';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-plaque',
@@ -68,7 +69,8 @@ export class Plaque implements OnInit {
               private userService: UserService,
               private reportService: ReportService,
               private router: Router,
-              private injector: Injector) {
+              private injector: Injector,
+              private titleService: Title) {
     this.reviewForm = this.formBuilder.group({
       history: [null, Validators.required],
       condition: [null, Validators.required],
@@ -91,6 +93,7 @@ export class Plaque implements OnInit {
       next: (response) => {
         this.plaque = response;
         this.loading = false;
+        this.titleService.setTitle(response.title + ' | Blue Plaques Explorer');
         this.loadVisits(true);
       },
       error: (err) => {
@@ -120,7 +123,6 @@ export class Plaque implements OnInit {
   }
 
   // /plaques/:id?visit=<id> (from "My visits" on the profile) jumps to that visit;
-  // &review=1 also opens its review form
   openVisitFromLink() {
     const visitId = this.route.snapshot.queryParamMap.get('visit');
     if (!visitId) { return; }

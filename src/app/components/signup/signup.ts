@@ -3,6 +3,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { TURNSTILE_SITE_KEY } from '../../api';
+import { ScriptLoader, TURNSTILE_SCRIPT } from '../../services/script-loader';
 import { GoogleButton } from '../google-button/google-button';
 import { passwordsMatch } from '../../validators/passwords-match';
 
@@ -28,7 +29,8 @@ export class Signup implements AfterViewInit, OnDestroy {
   constructor(private formBuilder: FormBuilder,
               private authService: AuthService,
               private router: Router,
-              private zone: NgZone) {
+              private zone: NgZone,
+              private scriptLoader: ScriptLoader) {
     this.detailsForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]{3,20}$/)]],
       email: ['', [Validators.required, Validators.email]],
@@ -41,8 +43,11 @@ export class Signup implements AfterViewInit, OnDestroy {
     });
   }
 
+  // Cloudflare's script is only downloaded on this page
   ngAfterViewInit() {
-    this.renderCaptcha();
+    this.scriptLoader.load(TURNSTILE_SCRIPT)
+      .then(() => this.renderCaptcha())
+      .catch(() => this.error = 'The human check could not load. Please check your connection and refresh the page.');
   }
 
   ngOnDestroy() {
@@ -50,8 +55,7 @@ export class Signup implements AfterViewInit, OnDestroy {
   }
 
   renderCaptcha() {
-    if (typeof turnstile === 'undefined') {
-      setTimeout(() => this.renderCaptcha(), 300);
+    if (typeof turnstile === 'undefined' || !document.getElementById('turnstile-box')) {
       return;
     }
     this.widgetId = turnstile.render('#turnstile-box', {

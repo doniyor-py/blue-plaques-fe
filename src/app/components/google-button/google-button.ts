@@ -2,6 +2,7 @@ import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone } fr
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { GOOGLE_CLIENT_ID } from '../../api';
+import { ScriptLoader, GOOGLE_SCRIPT } from '../../services/script-loader';
 
 declare const google: any;
 
@@ -16,7 +17,6 @@ export class GoogleButton implements AfterViewInit, OnDestroy {
 
   loading: boolean = false;
   error: string = '';
-  private attempts: number = 0;
   private destroyed: boolean = false;
   private lastWidth: number = 0;
   private resizeObserver: ResizeObserver | null = null;
@@ -25,10 +25,13 @@ export class GoogleButton implements AfterViewInit, OnDestroy {
   constructor(private authService: AuthService,
               private router: Router,
               private route: ActivatedRoute,
-              private zone: NgZone) {}
+              private zone: NgZone,
+              private scriptLoader: ScriptLoader) {}
 
   ngAfterViewInit() {
-    this.renderButton();
+    this.scriptLoader.load(GOOGLE_SCRIPT)
+      .then(() => this.renderButton())
+      .catch(() => this.error = 'Google sign-in could not load. You can still use the form below.');
   }
 
   ngOnDestroy() {
@@ -39,15 +42,6 @@ export class GoogleButton implements AfterViewInit, OnDestroy {
 
   renderButton() {
     if (this.destroyed) { return; }
-    if (typeof google === 'undefined' || !google.accounts?.id) {
-      this.attempts++;
-      if (this.attempts > 30) {
-        this.error = 'Google sign-in could not load. You can still use the form below.';
-        return;
-      }
-      setTimeout(() => this.renderButton(), 300);
-      return;
-    }
     google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: (response: any) => this.zone.run(() => this.signIn(response.credential))
@@ -63,7 +57,7 @@ export class GoogleButton implements AfterViewInit, OnDestroy {
 
   drawButton() {
     const box = this.buttonBox.nativeElement;
-    const width = Math.max(200, Math.min(box.offsetWidth, 400));     // Google allows 200-400 px
+    const width = Math.max(200, Math.min(box.offsetWidth, 400));
     if (width === this.lastWidth) { return; }
     this.lastWidth = width;
     box.innerHTML = '';

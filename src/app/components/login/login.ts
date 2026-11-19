@@ -17,7 +17,6 @@ export class Login {
   notice: string = '';
   showPassword: boolean = false;
 
-  // short messages other pages can ask the login page to show, e.g. /login?notice=password-changed
   notices: Record<string, string> = {
     'registered': 'Account created. You can now log in.',
     'password-changed': 'Password changed. Please log in with your new password.',

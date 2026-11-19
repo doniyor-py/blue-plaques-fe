@@ -12,7 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = authService.getToken();
 
-  // only send our token to our own API, never to other sites (e.g. a maps or weather API later)
+  // only send our token to our own API, never to other sites
   if (token && req.url.startsWith(API_URL)) {
     req = req.clone({ setHeaders: { 'x-access-token': token } });
   }

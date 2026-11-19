@@ -35,7 +35,7 @@
       } @else {
         <section class="route mt-3" aria-labelledby="route-heading">
           <h3 id="route-heading" class="visually-hidden">Walking directions</h3>
-          <div class="route-time">{{ route.minutes }} min</div>
+          <div class="route-time">{{ route.minutes | duration }}</div>
           <div class="text-muted small mb-3">
             {{ route.distanceKm | number:'1.1-1' }} km walk · arrive {{ route.arrival | date:'HH:mm' }}
           </div>
@@ -72,7 +72,7 @@
                   <small class="text-muted">
                     {{ plaque.borough }} ·
                     @if (searchedFromUser) {
-                      {{ plaque.distance_m }} m · {{ plaque.walking_minutes }} min walk
+                      {{ plaque.distance_m }} m · {{ plaque.walking_minutes | duration}} walk
                     } @else {
                       {{ plaque.distance_m }} m from the map centre
                     }

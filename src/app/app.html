@@ -1,2 +1,9 @@
+<a class="skip-link visually-hidden-focusable" href="#main-content" (click)="skipToMain($event)">
+  Skip to main content
+</a>
+
 <app-navigation />
-<router-outlet />
+
+<main id="main-content" tabindex="-1">
+  <router-outlet />
+</main>

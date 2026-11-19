@@ -15,10 +15,10 @@ export function decodePolyline(encoded: string, precision: number = 6): [number,
       let shift = 0;
       let byte: number;
       do {
-        byte = encoded.charCodeAt(index++) - 63;    // each character holds 5 bits of data
+        byte = encoded.charCodeAt(index++) - 63;
         result |= (byte & 0x1f) << shift;
         shift += 5;
-      } while (byte >= 0x20);                       // the 6th bit says "more characters follow"
+      } while (byte >= 0x20);
       const change = (result & 1) ? ~(result >> 1) : (result >> 1);   // undo the sign trick
       if (axis === 'lat') { lat += change; } else { lng += change; }
     }
