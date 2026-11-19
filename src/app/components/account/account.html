@@ -6,45 +6,49 @@
   <section class="card mb-4" aria-labelledby="password-heading">
     <div class="card-body">
       <h2 id="password-heading" class="h5">Change password</h2>
-      <p class="text-muted small">After changing it, you will be asked to log in again.</p>
-      <p class="small text-muted">
-        Signed up with Google? You don't have a password yet. Use
-        <a routerLink="/forgot-password">Forgot password</a> to set one first.
-      </p>
 
-      @if (passwordError) { <div class="alert alert-danger" role="alert">{{ passwordError }}</div> }
+      @if (!hasPassword) {
+        <p class="mb-0">
+          You signed up with Google, so your account doesn't have a password yet.
+          <a routerLink="/forgot-password">Set a password</a> if you'd also like to log in with your email.
+        </p>
+      } @else {
+        <p class="text-muted small">After changing it, you will be asked to log in again.</p>
 
-      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
-        <div class="mb-3">
-          <label for="old_password" class="form-label">Current password</label>
-          <input id="old_password" type="password" class="form-control" formControlName="old_password"
-                 autocomplete="current-password" [class.is-invalid]="isInvalid(passwordForm, 'old_password')">
-          @if (isInvalid(passwordForm, 'old_password')) {
-            <div class="invalid-feedback">Please enter your current password.</div>
-          }
-        </div>
-        <div class="mb-3">
-          <label for="new_password" class="form-label">New password</label>
-          <input id="new_password" type="password" class="form-control" formControlName="new_password"
-                 autocomplete="new-password" [class.is-invalid]="isInvalid(passwordForm, 'new_password')">
-          <div class="form-text">8–72 characters</div>
-          @if (isInvalid(passwordForm, 'new_password')) {
-            <div class="invalid-feedback">The new password must be 8–72 characters.</div>
-          }
-        </div>
-        <div class="mb-3">
-          <label for="confirm_password" class="form-label">Repeat the new password</label>
-          <input id="confirm_password" type="password" class="form-control" formControlName="confirm_password"
-                 autocomplete="new-password"
-                 [class.is-invalid]="isInvalid(passwordForm, 'confirm_password') || passwordsDontMatch()">
-          @if (passwordsDontMatch()) {
-            <div class="invalid-feedback">The two new passwords don't match.</div>
-          }
-        </div>
-        <button type="submit" class="btn btn-primary" [disabled]="passwordSaving">
-          {{ passwordSaving ? 'Saving...' : 'Change password' }}
-        </button>
-      </form>
+        @if (passwordError) { <div class="alert alert-danger" role="alert">{{ passwordError }}</div> }
+
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+          <div class="mb-3">
+            <label for="old_password" class="form-label">Current password</label>
+            <input id="old_password" type="password" class="form-control" formControlName="old_password"
+                   autocomplete="current-password" [class.is-invalid]="isInvalid(passwordForm, 'old_password')">
+            @if (isInvalid(passwordForm, 'old_password')) {
+              <div class="invalid-feedback">Please enter your current password.</div>
+            }
+          </div>
+          <div class="mb-3">
+            <label for="new_password" class="form-label">New password</label>
+            <input id="new_password" type="password" class="form-control" formControlName="new_password"
+                   autocomplete="new-password" [class.is-invalid]="isInvalid(passwordForm, 'new_password')">
+            <div class="form-text">8–72 characters</div>
+            @if (isInvalid(passwordForm, 'new_password')) {
+              <div class="invalid-feedback">The new password must be 8–72 characters.</div>
+            }
+          </div>
+          <div class="mb-3">
+            <label for="confirm_password" class="form-label">Repeat the new password</label>
+            <input id="confirm_password" type="password" class="form-control" formControlName="confirm_password"
+                   autocomplete="new-password"
+                   [class.is-invalid]="isInvalid(passwordForm, 'confirm_password') || passwordsDontMatch()">
+            @if (passwordsDontMatch()) {
+              <div class="invalid-feedback">The two new passwords don't match.</div>
+            }
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="passwordSaving">
+            {{ passwordSaving ? 'Saving...' : 'Change password' }}
+          </button>
+        </form>
+      }
     </div>
   </section>
 
@@ -55,6 +59,11 @@
 
       @if (authService.isAdmin()) {
         <p class="text-muted mb-0">Admin accounts can't be deleted here.</p>
+      } @else if (!hasPassword) {
+        <p class="mb-0">
+          To confirm it's really you, deleting an account needs a password.
+          <a routerLink="/forgot-password">Set a password</a> first, then come back here.
+        </p>
       } @else {
         <p class="small">
           This permanently deletes your account, your visits and your photos. It can't be undone.

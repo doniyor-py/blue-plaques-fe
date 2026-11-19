@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { TURNSTILE_SITE_KEY } from '../../api';
 import { GoogleButton } from '../google-button/google-button';
+import { passwordsMatch } from '../../validators/passwords-match';
 
 declare const turnstile: any;
 
@@ -32,8 +33,9 @@ export class Signup implements AfterViewInit, OnDestroy {
       username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]{3,20}$/)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+      confirm_password: ['', Validators.required],
       accept_terms: [false, Validators.requiredTrue]
-    });
+    }, { validators: passwordsMatch('password', 'confirm_password') });
     this.codeForm = this.formBuilder.group({
       code: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]]
     });
@@ -122,6 +124,10 @@ export class Signup implements AfterViewInit, OnDestroy {
     this.message = '';
     this.codeForm.reset();
     setTimeout(() => this.renderCaptcha());
+  }
+
+  passwordsDontMatch(): boolean {
+    return this.detailsForm.hasError('passwordsDontMatch') && this.detailsForm.get('confirm_password')!.touched;
   }
 
   isInvalid(form: FormGroup, field: string): boolean {

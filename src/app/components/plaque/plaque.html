@@ -51,8 +51,6 @@
         <div class="d-flex flex-wrap gap-2 mb-4">
           <a class="btn btn-primary" routerLink="/nearby"
             [queryParams]="{ plaque: plaqueId, directions: 1 }">Directions</a>
-          <a class="btn btn-outline-primary" routerLink="/nearby"
-            [queryParams]="{ plaque: plaqueId }">View on map</a>
         </div>
 
         @if (plaque.people?.length) {

@@ -18,6 +18,9 @@ export class GoogleButton implements AfterViewInit, OnDestroy {
   error: string = '';
   private attempts: number = 0;
   private destroyed: boolean = false;
+  private lastWidth: number = 0;
+  private resizeObserver: ResizeObserver | null = null;
+  private resizeTimer: any = null;
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -30,11 +33,12 @@ export class GoogleButton implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     this.destroyed = true;
+    this.resizeObserver?.disconnect();
+    clearTimeout(this.resizeTimer);
   }
 
   renderButton() {
     if (this.destroyed) { return; }
-    // Google's script loads in the background: wait for it, but give up after about 10 seconds
     if (typeof google === 'undefined' || !google.accounts?.id) {
       this.attempts++;
       if (this.attempts > 30) {
@@ -48,15 +52,29 @@ export class GoogleButton implements AfterViewInit, OnDestroy {
       client_id: GOOGLE_CLIENT_ID,
       callback: (response: any) => this.zone.run(() => this.signIn(response.credential))
     });
-    google.accounts.id.renderButton(this.buttonBox.nativeElement, {
+    this.drawButton();
+
+    this.resizeObserver = new ResizeObserver(() => {
+      clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(() => this.drawButton(), 150);
+    });
+    this.resizeObserver.observe(this.buttonBox.nativeElement);
+  }
+
+  drawButton() {
+    const box = this.buttonBox.nativeElement;
+    const width = Math.max(200, Math.min(box.offsetWidth, 400));     // Google allows 200-400 px
+    if (width === this.lastWidth) { return; }
+    this.lastWidth = width;
+    box.innerHTML = '';
+    google.accounts.id.renderButton(box, {
       theme: 'outline',
       size: 'large',
       text: 'continue_with',
-      width: Math.min(this.buttonBox.nativeElement.offsetWidth || 300, 400)
+      width: width
     });
   }
 
-  // Google has checked who the person is and given us a signed "ID token" (the credential)
   signIn(credential: string) {
     this.loading = true;
     this.error = '';

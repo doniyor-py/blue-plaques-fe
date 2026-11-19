@@ -4,6 +4,7 @@
   @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
 
   @if (step === 'details') {
+    <app-google-button />
     <form [formGroup]="detailsForm" (ngSubmit)="onRegister()" novalidate>
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
@@ -52,6 +53,17 @@
         <div class="form-text">
           Tip: a few random words, like "teapot river lantern", make a strong password that's easy to remember.
         </div>
+        <div class="mb-3">
+          <label for="confirm_password" class="form-label">Repeat the password</label>
+          <input id="confirm_password" class="form-control" formControlName="confirm_password"
+                [type]="showPassword ? 'text' : 'password'" autocomplete="new-password"
+                [class.is-invalid]="isInvalid(detailsForm, 'confirm_password') || passwordsDontMatch()">
+          @if (isInvalid(detailsForm, 'confirm_password')) {
+            <div class="invalid-feedback">Please type your password again.</div>
+          } @else if (passwordsDontMatch()) {
+            <div class="invalid-feedback">The two passwords don't match.</div>
+          }
+        </div>
       </div>
 
       <div class="form-check mb-3">
@@ -77,7 +89,6 @@
 
   @if (step === 'code') {
     <div class="alert alert-info" role="status">{{ message }}</div>
-    <app-google-button />
     <form [formGroup]="codeForm" (ngSubmit)="onVerify()" novalidate>
       <div class="mb-3">
         <label for="code" class="form-label">6-digit code</label>

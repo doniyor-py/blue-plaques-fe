@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, ElementRef, HostListener } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth-service';
 
 @Component({
@@ -9,20 +10,41 @@ import { AuthService } from '../../services/auth-service';
   styleUrl: './navigation.css'
 })
 export class Navigation {
-  menuOpen: boolean = false;      // the phone menu (hamburger) is open
+  menuOpen: boolean = false;
+  adminOpen: boolean = false;
 
-  constructor(public authService: AuthService, private router: Router) {}
+  constructor(public authService: AuthService,
+              private router: Router,
+              private host: ElementRef) {
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd)).subscribe(() => {
+      this.menuOpen = false;
+      this.adminOpen = false;
+    });
+  }
 
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
 
-  closeMenu() {
+  toggleAdmin() {
+    this.adminOpen = !this.adminOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.host.nativeElement.contains(event.target)) {
+      this.menuOpen = false;
+      this.adminOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
     this.menuOpen = false;
+    this.adminOpen = false;
   }
 
   logout() {
-    this.closeMenu();
     this.authService.logout().subscribe({
       next: () => this.finishLogout(),
       error: () => this.finishLogout()

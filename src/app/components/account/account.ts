@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user-service';
@@ -11,11 +11,12 @@ import { passwordsMatch } from '../../validators/passwords-match';
   templateUrl: './account.html',
   styleUrl: './account.css'
 })
-export class Account {
+export class Account implements OnInit {
   passwordForm: FormGroup;
   deleteForm: FormGroup;
   passwordError: string = '';
   passwordSaving: boolean = false;
+  hasPassword: boolean = true;
   deleteError: string = '';
   deleting: boolean = false;
 
@@ -32,6 +33,12 @@ export class Account {
     this.deleteForm = this.formBuilder.group({
       password: ['', Validators.required],
       understand: [false, Validators.requiredTrue]
+    });
+  }
+
+  ngOnInit() {
+    this.userService.getMe().subscribe({
+      next: (user) => this.hasPassword = user.password_set !== false
     });
   }
 

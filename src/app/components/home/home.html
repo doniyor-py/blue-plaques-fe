@@ -1,11 +1,7 @@
 <div class="container">
-  <div class="p-5 mb-4 bg-light rounded-3">
-    <h1 class="display-5">Discover London's blue plaques</h1>
-    <p class="lead">
-      3,375 plaques marking where famous people lived and worked.
-      Browse them, find ones near you, and share your visits.
-    </p>
-    <a routerLink="/plaques" class="btn btn-primary btn-lg me-2">Browse plaques</a>
+  <div class="d-flex flex-wrap gap-2">
+    <a routerLink="/nearby" class="btn btn-primary btn-lg">Find plaques near me</a>
+    <a routerLink="/plaques" class="btn btn-outline-primary btn-lg">Browse plaques</a>
     <button class="btn btn-outline-primary btn-lg" (click)="surpriseMe()" [disabled]="loading">
       {{ loading ? 'Finding one...' : 'Surprise me' }}
     </button>

@@ -56,8 +56,12 @@ export class Profile implements OnInit {
     });
   }
 
+  visitedBoroughs(): any[] {
+    return this.progress.filter(b => b.visited > 0);
+  }
+
   visibleBoroughs(): any[] {
-    return this.showAllBoroughs ? this.progress : this.progress.filter(b => b.visited > 0);
+    return this.showAllBoroughs ? this.visitedBoroughs() : this.visitedBoroughs().slice(0, 5);
   }
 
   barWidth(borough: any): number {

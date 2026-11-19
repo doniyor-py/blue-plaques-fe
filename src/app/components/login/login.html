@@ -9,30 +9,35 @@
     <div class="alert alert-danger" role="alert">{{ error }}</div>
   }
 
-
   <app-google-button />
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
     <div class="mb-3">
       <label for="username" class="form-label">Email or username</label>
       <input id="username" type="text" class="form-control" formControlName="username"
-            autocomplete="username" [class.is-invalid]="isInvalid('username')">
+             autocomplete="username" [class.is-invalid]="isInvalid('username')">
       @if (isInvalid('username')) {
         <div class="invalid-feedback">Please enter your email or username.</div>
       }
     </div>
 
-    <div class="input-group has-validation">
-      <input id="password" class="form-control" formControlName="password"
-            [type]="showPassword ? 'text' : 'password'" autocomplete="current-password"
-            [class.is-invalid]="isInvalid('password')">
-      <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword"
-              [attr.aria-pressed]="showPassword" aria-controls="password">
-        {{ showPassword ? 'Hide' : 'Show' }}
-      </button>
-      @if (isInvalid('password')) {
-        <div class="invalid-feedback">Please enter your password.</div>
-      }
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <div class="input-group has-validation">
+        <input id="password" class="form-control" formControlName="password"
+               [type]="showPassword ? 'text' : 'password'" autocomplete="current-password"
+               [class.is-invalid]="isInvalid('password')">
+        <button type="button" class="btn btn-outline-secondary" (click)="showPassword = !showPassword"
+                [attr.aria-pressed]="showPassword" aria-controls="password">
+          {{ showPassword ? 'Hide' : 'Show' }}
+        </button>
+        @if (isInvalid('password')) {
+          <div class="invalid-feedback">Please enter your password.</div>
+        }
+      </div>
+      <div class="text-end mt-1">
+        <a routerLink="/forgot-password" class="small">Forgot your password?</a>
+      </div>
     </div>
 
     <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
