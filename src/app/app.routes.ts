@@ -12,7 +12,7 @@ export const routes: Routes = [
     loadComponent: () => import('./components/plaque/plaque').then(m => m.Plaque) },
   { path: 'nearby', title: 'Map' + SITE,
     loadComponent: () => import('./components/nearby/nearby').then(m => m.Nearby) },
-  { path: 'insights', title: 'Insights' + SITE,
+  { path: 'insights', title: 'Insights' + SITE, canActivate: [authGuard],
     loadComponent: () => import('./components/insights/insights').then(m => m.Insights) },
   { path: 'login', title: 'Log in' + SITE,
     loadComponent: () => import('./components/login/login').then(m => m.Login) },
@@ -35,8 +35,6 @@ export const routes: Routes = [
   { path: 'terms', title: 'Terms of use' + SITE,
     loadComponent: () => import('./components/terms/terms').then(m => m.Terms) },
   { path: 'privacy', title: 'Privacy policy' + SITE,
-    loadComponent: () => import('./components/privacy/privacy').then(m => m.Privacy) },
-      { path: 'privacy', title: 'Privacy policy' + SITE,
     loadComponent: () => import('./components/privacy/privacy').then(m => m.Privacy) },
   { path: '**', title: 'Page not found' + SITE,
     loadComponent: () => import('./components/not-found/not-found').then(m => m.NotFound) }

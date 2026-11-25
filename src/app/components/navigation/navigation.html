@@ -19,10 +19,10 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/nearby" routerLinkActive="active">Map</a>
         </li>
+        @if (authService.isLoggedIn()) {
         <li class="nav-item">
           <a class="nav-link" routerLink="/insights" routerLinkActive="active">Insights</a>
         </li>
-        @if (authService.isLoggedIn()) {
           <li class="nav-item">
             <a class="nav-link" routerLink="/profile" routerLinkActive="active">My profile</a>
           </li>
