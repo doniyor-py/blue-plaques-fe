@@ -59,7 +59,7 @@ export class PlaqueForm implements OnInit {
     }
 
     this.loading = true;
-    this.plaqueService.getPlaque(id).subscribe({
+    this.plaqueService.getPlaque(id, false).subscribe({
       next: (plaque) => {
         if (plaque.colour && !this.colours.includes(plaque.colour)) {
           this.colours.push(plaque.colour);      // keep rarer colours like "brass" selectable

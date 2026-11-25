@@ -16,8 +16,9 @@ export class PlaqueService {
     return this.http.get<any>(API_URL + '/plaques', { params });
   }
 
-  getPlaque(id: string) {
-    return this.http.get<any>(API_URL + '/plaques/' + id);
+  getPlaque(id: string, countView: boolean = true) {
+    const params = countView ? new HttpParams() : new HttpParams().set('view', 'false');
+    return this.http.get<any>(API_URL + '/plaques/' + id, { params });
   }
 
   getRandomPlaque() {

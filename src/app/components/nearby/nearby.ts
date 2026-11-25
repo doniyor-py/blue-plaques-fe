@@ -233,7 +233,7 @@ export class Nearby implements AfterViewInit, OnDestroy {
   }
 
   openPlaqueFromLink(id: string, withDirections: boolean) {
-    this.plaqueService.getPlaque(id).subscribe({
+    this.plaqueService.getPlaque(id, false).subscribe({
       next: (plaque) => {
         const [lng, lat] = plaque.location.coordinates;
         this.selected = plaque;
