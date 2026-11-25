@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { maxBytes } from '../../validators/max-bytes';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user-service';
 import { AuthService } from '../../services/auth-service';
@@ -27,7 +28,7 @@ export class Account implements OnInit {
               private router: Router) {
     this.passwordForm = this.formBuilder.group({
       old_password: ['', Validators.required],
-      new_password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+      new_password: ['', [Validators.required, Validators.minLength(8), maxBytes(72)]],
       confirm_password: ['', Validators.required]
     }, { validators: passwordsMatch('new_password', 'confirm_password') });
 
@@ -54,7 +55,6 @@ export class Account implements OnInit {
 
     this.userService.changePassword(old_password, new_password).subscribe({
       next: () => {
-        // the API has logged this token out, so log in again with the new password
         this.authService.removeToken();
         this.router.navigate(['/login'], { queryParams: { notice: 'password-changed' } });
       },

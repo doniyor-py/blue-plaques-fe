@@ -1,5 +1,6 @@
 import { Component, AfterViewInit, OnDestroy, NgZone, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { maxBytes } from '../../validators/max-bytes';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { TURNSTILE_SITE_KEY } from '../../api';
@@ -35,7 +36,7 @@ export class Signup implements AfterViewInit, OnDestroy {
     this.detailsForm = this.formBuilder.group({
       username: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9_]{3,20}$/)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+      password: ['', [Validators.required, Validators.minLength(8), maxBytes(72)]],
       confirm_password: ['', Validators.required],
       accept_terms: [false, Validators.requiredTrue]
     }, { validators: passwordsMatch('password', 'confirm_password') });
@@ -44,7 +45,6 @@ export class Signup implements AfterViewInit, OnDestroy {
     });
   }
 
-  // Cloudflare's script is only downloaded on this page
   ngAfterViewInit() {
     this.scriptLoader.load(TURNSTILE_SCRIPT)
       .then(() => this.renderCaptcha())
@@ -74,6 +74,10 @@ export class Signup implements AfterViewInit, OnDestroy {
     this.captchaToken = '';
   }
 
+  passwordTooLong(): boolean {
+    return this.detailsForm.get('password')!.hasError('maxBytes');
+  }
+
   passwordLength(): number {
     return (this.detailsForm.value.password || '').length;
   }
@@ -101,7 +105,7 @@ export class Signup implements AfterViewInit, OnDestroy {
       error: (err) => {
         this.error = err.error?.error || 'Could not sign up. Please try again.';
         this.loading = false;
-        turnstile.reset(this.widgetId);   // a token can only be used once
+        turnstile.reset(this.widgetId);
         this.captchaToken = '';
       }
     });

@@ -30,9 +30,11 @@
             <label for="new_password" class="form-label">New password</label>
             <input id="new_password" type="password" class="form-control" formControlName="new_password"
                    autocomplete="new-password" [class.is-invalid]="isInvalid(passwordForm, 'new_password')">
-            <div class="form-text">8–72 characters</div>
+            <div class="form-text">At least 8 characters</div>
             @if (isInvalid(passwordForm, 'new_password')) {
-              <div class="invalid-feedback">The new password must be 8–72 characters.</div>
+              <div class="invalid-feedback">
+                {{ passwordForm.get('new_password')!.hasError('maxBytes') ? 'This password is too long. Please use a shorter one.' : 'The new password must be at least 8 characters.' }}
+              </div>
             }
           </div>
           <div class="mb-3">

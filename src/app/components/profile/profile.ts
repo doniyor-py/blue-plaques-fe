@@ -27,6 +27,8 @@ export class Profile implements OnInit {
   myVisitsPages: number = 0;
   reviewedOnly: boolean = false;
   visitsLoading: boolean = false;
+  visitsError: string = '';
+  favouritesError: string = '';
   pageSize: number = 5;
 
   constructor(private userService: UserService) {}
@@ -55,6 +57,7 @@ export class Profile implements OnInit {
 
   loadMyVisits(page: number) {
     this.visitsLoading = true;
+    this.visitsError = '';
     this.userService.getMyVisits(page, this.pageSize, this.reviewedOnly).subscribe({
       next: (response) => {
         this.myVisits = page === 1 ? response.visits : [...this.myVisits, ...response.visits];
@@ -63,7 +66,10 @@ export class Profile implements OnInit {
         this.myVisitsPages = response.pages;
         this.visitsLoading = false;
       },
-      error: () => this.visitsLoading = false
+      error: () => {
+        this.visitsError = 'Could not load your visits. Please try again later.';
+        this.visitsLoading = false;
+      }
     });
   }
 
@@ -79,8 +85,10 @@ export class Profile implements OnInit {
   }
 
   loadFavourites() {
+    this.favouritesError = '';
     this.userService.getFavourites().subscribe({
-      next: (response) => this.favourites = response
+      next: (response) => this.favourites = response,
+      error: () => this.favouritesError = 'Could not load your favourites. Please try again later.'
     });
   }
 

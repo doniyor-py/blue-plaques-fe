@@ -55,7 +55,7 @@
   }
 
   @if (error) {
-    <div class="alert alert-danger">{{ error }}</div>
+    <div class="alert alert-danger" role="alert">{{ error }}</div>
   }
 
   @if (!loading && !error && total === 0) {
@@ -73,7 +73,8 @@
             <a [routerLink]="['/plaques', plaque._id]"><strong>{{ plaque.title }}</strong></a>
           </div>
           <div class="card-body">
-            <p class="card-text">{{ plaque.inscription | slice:0:150 }}{{ plaque.inscription?.length > 150 ? '…' : '' }}</p>          </div>
+            <p class="card-text">{{ plaque.inscription | slice:0:150 }}{{ plaque.inscription?.length > 150 ? '…' : '' }}</p>
+          </div>
           <div class="card-footer text-muted">
             {{ plaque.borough }} · {{ plaque.erected_year || 'Year unknown' }}
             <span class="badge bg-secondary float-end">{{ plaque.colour }}</span>

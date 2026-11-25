@@ -11,7 +11,7 @@ import { PlaqueService } from '../../services/plaque-service';
   styleUrl: './plaque-form.css'
 })
 export class PlaqueForm implements OnInit {
-  plaqueId: string | null = null;      // null = creating a new plaque
+  plaqueId: string | null = null;
   currentYear = new Date().getFullYear();
   plaqueForm: FormGroup;
   boroughs: string[] = [];
@@ -42,7 +42,8 @@ export class PlaqueForm implements OnInit {
 
   ngOnInit() {
     this.plaqueService.getBoroughs().subscribe({
-      next: (response) => this.boroughs = response
+      next: (response) => this.boroughs = response,
+      error: () => this.error = 'Could not load the list of boroughs. Please reload the page.'
     });
 
     this.plaqueId = this.route.snapshot.paramMap.get('id');
@@ -52,7 +53,6 @@ export class PlaqueForm implements OnInit {
   }
 
   loadPlaque(id: string) {
-    // when editing, these can stay empty: the API only changes the fields we send
     for (const field of ['erected_year', 'organisation', 'address', 'borough']) {
       const control = this.plaqueForm.get(field)!;
       control.removeValidators(Validators.required);
@@ -63,7 +63,7 @@ export class PlaqueForm implements OnInit {
     this.plaqueService.getPlaque(id, false).subscribe({
       next: (plaque) => {
         if (plaque.colour && !this.colours.includes(plaque.colour)) {
-          this.colours.push(plaque.colour);      // keep rarer colours like "brass" selectable
+          this.colours.push(plaque.colour);
         }
         this.plaqueForm.patchValue({
           title: plaque.title,
@@ -100,7 +100,6 @@ export class PlaqueForm implements OnInit {
 
     request.subscribe({
       next: (response) => {
-        // the API answers { url: ".../plaques/<id>" }, so the id is the last part
         const id = this.plaqueId || response.url.split('/').pop();
         this.router.navigate(['/plaques', id]);
       },

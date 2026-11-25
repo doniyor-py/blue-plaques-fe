@@ -5,7 +5,6 @@ import { AuthService } from './auth-service';
 import { testProviders } from '../testing/test-providers';
 import { API_URL } from '../api';
 
-// a pretend login token: only the middle part (the payload) matters to AuthService
 function makeToken(payload: object): string {
   return 'header.' + btoa(JSON.stringify(payload)) + '.signature';
 }
@@ -39,6 +38,15 @@ describe('AuthService', () => {
     const req = http.expectOne(API_URL + '/login');
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('Authorization')).toBe('Basic ' + btoa('user0:UserPass123'));
+    req.flush({ token: 'abc' });
+  });
+
+  it('login works with non-Latin passwords (sent as UTF-8, like the API expects)', () => {
+    // btoa('пароль') on its own would throw an error
+    service.login('user0', 'пароль123').subscribe();
+
+    const req = http.expectOne(API_URL + '/login');
+    expect(req.request.headers.get('Authorization')).toBe('Basic dXNlcjA60L/QsNGA0L7Qu9GMMTIz');
     req.flush({ token: 'abc' });
   });
 

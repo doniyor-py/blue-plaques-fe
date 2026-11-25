@@ -37,7 +37,9 @@
             {{ showPassword ? 'Hide' : 'Show' }}
           </button>
           @if (isInvalid(detailsForm, 'password')) {
-            <div class="invalid-feedback">The password must be 8–72 characters.</div>
+            <div class="invalid-feedback">
+              {{ passwordTooLong() ? 'This password is too long. Please use a shorter one.' : 'The password must be at least 8 characters.' }}
+            </div>
           }
         </div>
         <ul id="password-rules" class="list-unstyled small mt-2 mb-1">
@@ -46,8 +48,8 @@
             <span class="visually-hidden">{{ passwordLength() >= 8 ? 'Done:' : 'Not yet:' }}</span>
             At least 8 characters
           </li>
-          @if (passwordLength() > 72) {
-            <li class="text-danger">No more than 72 characters</li>
+          @if (passwordTooLong()) {
+            <li class="text-danger">Too long: please use a shorter password</li>
           }
         </ul>
         <div class="form-text">

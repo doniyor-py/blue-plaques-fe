@@ -133,7 +133,6 @@ export class Plaque implements OnInit {
 
   // ---------- visits ----------
 
-  // GET /visits, not GET /plaques/:id
   loadVisits(openFromLink: boolean = false) {
     this.visitService.getVisits(this.plaqueId).subscribe({
       next: (response) => {
@@ -142,11 +141,11 @@ export class Plaque implements OnInit {
         if (openFromLink) {
           this.openVisitFromLink();
         }
-      }
+      },
+      error: () => this.visitError = 'Could not load the visits. Please try again later.'
     });
   }
 
-  // /plaques/:id?visit=<id> (from "My visits" on the profile) jumps to that visit;
   openVisitFromLink() {
     const visitId = this.route.snapshot.queryParamMap.get('visit');
     if (!visitId) { return; }
@@ -201,7 +200,6 @@ export class Plaque implements OnInit {
     });
   }
 
-  // Rate this plaque
   reviewNewVisit() {
     const visit = this.visits.find(v => v._id === this.justVisitedId);
     this.justVisitedId = null;
@@ -210,7 +208,6 @@ export class Plaque implements OnInit {
     }
   }
 
-  // Add a photo
   goToPhotos() {
     this.justVisitedId = null;
     document.getElementById('photos-heading')?.scrollIntoView({ behavior: 'smooth' });
@@ -295,7 +292,8 @@ export class Plaque implements OnInit {
 
   checkFavourite() {
     this.userService.getMe().subscribe({
-      next: (user) => this.isFavourite = (user.favourites || []).includes(this.plaqueId)
+      next: (user) => this.isFavourite = (user.favourites || []).includes(this.plaqueId),
+      error: () => this.isFavourite = false
     });
   }
 

@@ -8,8 +8,9 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(username: string, password: string) {
+    const bytes = new TextEncoder().encode(username + ':' + password);
     const headers = new HttpHeaders({
-      Authorization: 'Basic ' + btoa(username + ':' + password)
+      Authorization: 'Basic ' + btoa(String.fromCharCode(...bytes))
     });
     return this.http.get<any>(API_URL + '/login', { headers });
   }
@@ -90,7 +91,7 @@ export class AuthService {
   loginWithGoogle(credential: string) {
     const formData = new FormData();
     formData.append('credential', credential);
-    formData.append('accept_terms', 'true');      // the Google button shows the terms notice next to it
+    formData.append('accept_terms', 'true');
     return this.http.post<any>(API_URL + '/login/google', formData);
   }
 

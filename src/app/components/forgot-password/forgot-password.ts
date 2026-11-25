@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { maxBytes } from '../../validators/max-bytes';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { passwordsMatch } from '../../validators/passwords-match';
@@ -27,7 +28,7 @@ export class ForgotPassword {
     });
     this.resetForm = this.formBuilder.group({
       code: ['', [Validators.required, Validators.pattern(/^[0-9]{6}$/)]],
-      new_password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]],
+      new_password: ['', [Validators.required, Validators.minLength(8), maxBytes(72)]],
       confirm_password: ['', Validators.required]
     }, { validators: passwordsMatch('new_password', 'confirm_password') });
   }
