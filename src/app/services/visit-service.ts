@@ -14,7 +14,6 @@ export class VisitService {
     return this.http.get<any>(API_URL + '/plaques/' + plaqueId + '/visits', { params });
   }
 
-  // "I've visited": no ratings needed, the API answers with the new visit's _id
   checkIn(plaqueId: string) {
     return this.http.post<any>(API_URL + '/plaques/' + plaqueId + '/visits', new FormData());
   }

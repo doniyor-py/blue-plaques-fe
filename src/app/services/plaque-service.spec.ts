@@ -7,7 +7,7 @@ import { API_URL } from '../api';
 
 describe('PlaqueService', () => {
   let service: PlaqueService;
-  let http: HttpTestingController;     // the fake back end: lets a test see and answer requests
+  let http: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: testProviders });
@@ -15,7 +15,6 @@ describe('PlaqueService', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
-  // fails the test if the service sent a request that no test checked
   afterEach(() => http.verify());
 
   it('should be created', () => {
@@ -31,25 +30,33 @@ describe('PlaqueService', () => {
     expect(req.request.params.get('ps')).toBe('10');
     expect(req.request.params.get('q')).toBe('dickens');
     expect(req.request.params.get('borough')).toBe('Camden');
-    expect(req.request.params.has('colour')).toBeFalse();      // empty filters are left out
+    expect(req.request.params.has('colour')).toBeFalse();
     req.flush({ total: 0, plaques: [] });
   });
 
   it('getPlaque counts a view by default', () => {
     service.getPlaque('p1').subscribe();
-    http.expectOne(API_URL + '/plaques/p1').flush({});
+    const req = http.expectOne(API_URL + '/plaques/p1');
+    expect(req.request.method).toBe('GET');
+    req.flush({});
   });
 
   it('getPlaque(id, false) asks the API not to count a view', () => {
     service.getPlaque('p1', false).subscribe();
-    http.expectOne(API_URL + '/plaques/p1?view=false').flush({});
+    const req = http.expectOne(API_URL + '/plaques/p1?view=false');
+    expect(req.request.method).toBe('GET');
+    req.flush({});
   });
 
   it('passes the API answer on to whoever subscribed', () => {
     let result: any = null;
     service.getRandomPlaque().subscribe(plaque => result = plaque);
 
-    http.expectOne(API_URL + '/plaques/random').flush({ _id: 'p9', title: 'Ada Lovelace blue plaque' });
+    const req = http.expectOne(API_URL + '/plaques/random');
+
+    expect(req.request.method).toBe('GET');
+
+    req.flush({ _id: 'p9', title: 'Ada Lovelace blue plaque' });
     expect(result.title).toBe('Ada Lovelace blue plaque');
   });
 
@@ -59,9 +66,9 @@ describe('PlaqueService', () => {
     const req = http.expectOne(API_URL + '/plaques/p1');
     expect(req.request.method).toBe('PUT');
     const body = req.request.body as FormData;
-    expect(body.get('title')).toBe('');           // empty title = "clear it"
+    expect(body.get('title')).toBe('');
     expect(body.get('colour')).toBe('blue');
-    expect(body.has('category')).toBeFalse();     // null is not sent
+    expect(body.has('category')).toBeFalse();
     req.flush({});
   });
 
@@ -79,7 +86,7 @@ describe('PlaqueService', () => {
     expect(req.request.params.get('lat')).toBe('51.5');
     expect(req.request.params.get('lng')).toBe('-0.12');
     expect(req.request.params.get('radius')).toBe('800');
-    expect(req.request.params.get('limit')).toBe('20');       // the default
+    expect(req.request.params.get('limit')).toBe('20');
     req.flush([]);
   });
 });

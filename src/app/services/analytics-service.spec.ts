@@ -23,11 +23,15 @@ describe('AnalyticsService', () => {
 
   it('getTopRated uses 3 reviews and 10 plaques by default', () => {
     service.getTopRated().subscribe();
-    http.expectOne(API_URL + '/analytics/top-rated?min_visits=3&limit=10').flush([]);
+    const req = http.expectOne(API_URL + '/analytics/top-rated?min_visits=3&limit=10');
+    expect(req.request.method).toBe('GET');
+    req.flush([]);
   });
 
   it('getTopRated can change both numbers', () => {
     service.getTopRated(1, 5).subscribe();
-    http.expectOne(API_URL + '/analytics/top-rated?min_visits=1&limit=5').flush([]);
+    const req = http.expectOne(API_URL + '/analytics/top-rated?min_visits=1&limit=5');
+    expect(req.request.method).toBe('GET');
+    req.flush([]);
   });
 });

@@ -19,7 +19,7 @@ export function decodePolyline(encoded: string, precision: number = 6): [number,
         result |= (byte & 0x1f) << shift;
         shift += 5;
       } while (byte >= 0x20);
-      const change = (result & 1) ? ~(result >> 1) : (result >> 1);   // undo the sign trick
+      const change = (result & 1) ? ~(result >> 1) : (result >> 1);
       if (axis === 'lat') { lat += change; } else { lng += change; }
     }
     points.push([lat / factor, lng / factor]);

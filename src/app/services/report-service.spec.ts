@@ -23,12 +23,16 @@ describe('ReportService', () => {
 
   it('getReports with "All" sends no status filter', () => {
     service.getReports(1, 10, '').subscribe();
-    http.expectOne(API_URL + '/reports?pn=1&ps=10').flush({ total: 0, reports: [] });
+    const req = http.expectOne(API_URL + '/reports?pn=1&ps=10');
+    expect(req.request.method).toBe('GET');
+    req.flush({ total: 0, reports: [] });
   });
 
   it('getReports can filter by status', () => {
     service.getReports(1, 10, 'resolved').subscribe();
-    http.expectOne(API_URL + '/reports?pn=1&ps=10&status=resolved').flush({ total: 0, reports: [] });
+    const req = http.expectOne(API_URL + '/reports?pn=1&ps=10&status=resolved');
+    expect(req.request.method).toBe('GET');
+    req.flush({ total: 0, reports: [] });
   });
 
   it('reportProblem posts the type and message for that plaque', () => {

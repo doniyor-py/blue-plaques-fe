@@ -24,12 +24,16 @@ describe('UserService', () => {
 
   it('getMyVisits asks for all visits by default', () => {
     service.getMyVisits(1, 5).subscribe();
-    http.expectOne(API_URL + '/users/me/visits?pn=1&ps=5').flush({ total: 0, visits: [] });
+    const req = http.expectOne(API_URL + '/users/me/visits?pn=1&ps=5');
+    expect(req.request.method).toBe('GET');
+    req.flush({ total: 0, visits: [] });
   });
 
   it('getMyVisits can ask for reviewed visits only', () => {
     service.getMyVisits(2, 5, true).subscribe();
-    http.expectOne(API_URL + '/users/me/visits?pn=2&ps=5&reviewed=true').flush({ total: 0, visits: [] });
+    const req = http.expectOne(API_URL + '/users/me/visits?pn=2&ps=5&reviewed=true');
+    expect(req.request.method).toBe('GET');
+    req.flush({ total: 0, visits: [] });
   });
 
   it('changePassword sends both passwords and must not log the user out on a wrong one', () => {
