@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth-service';
 import { UserService } from '../../services/user-service';
 import { ReportService } from '../../services/report-service';
 import { PlaquePhotos } from '../plaque-photos/plaque-photos';
+import { ConfirmService } from '../../services/confirm-service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -71,7 +72,8 @@ export class Plaque implements OnInit {
               private reportService: ReportService,
               private router: Router,
               private injector: Injector,
-              private titleService: Title) {
+              private titleService: Title,
+              private confirmService: ConfirmService) {
     this.reviewForm = this.formBuilder.group({
       history: [null, Validators.required],
       condition: [null, Validators.required],
@@ -261,17 +263,22 @@ export class Plaque implements OnInit {
   }
 
   deleteVisit(visit: any) {
-    const question = visit.ratings ? 'Delete this visit and its review?' : 'Delete this visit?';
-    if (!confirm(question)) { return; }
-    this.visitError = '';
-    this.visitService.deleteVisit(this.plaqueId, visit._id).subscribe({
-      next: () => {
-        this.visitMessage = 'Visit deleted.';
-        if (this.reviewingVisitId === visit._id) { this.reviewingVisitId = null; }
-        if (this.justVisitedId === visit._id) { this.justVisitedId = null; }
-        this.loadVisits();
-      },
-      error: (err) => this.visitError = err.error?.error || 'Could not delete the visit.'
+    this.confirmService.ask({
+      title: visit.ratings ? 'Delete this visit and its review?' : 'Delete this visit?',
+      message: 'It will be removed from this plaque and from your profile.',
+      confirmText: 'Delete visit'
+    }).subscribe(yes => {
+      if (!yes) { return; }
+      this.visitError = '';
+      this.visitService.deleteVisit(this.plaqueId, visit._id).subscribe({
+        next: () => {
+          this.visitMessage = 'Visit deleted.';
+          if (this.reviewingVisitId === visit._id) { this.reviewingVisitId = null; }
+          if (this.justVisitedId === visit._id) { this.justVisitedId = null; }
+          this.loadVisits();
+        },
+        error: (err) => this.visitError = err.error?.error || 'Could not delete the visit.'
+      });
     });
   }
 
@@ -361,10 +368,16 @@ export class Plaque implements OnInit {
   // ---------- admin ----------
 
   deletePlaque() {
-    if (!confirm('Delete this plaque? This also removes its photos, reports and favourites.')) { return; }
-    this.plaqueService.deletePlaque(this.plaqueId).subscribe({
-      next: () => this.router.navigate(['/plaques']),
-      error: (err) => this.error = err.error?.error || 'Could not delete the plaque.'
+    this.confirmService.ask({
+      title: 'Delete this plaque?',
+      message: 'This also removes its visits, photos, reports and favourites. It cannot be undone.',
+      confirmText: 'Delete plaque'
+    }).subscribe(yes => {
+      if (!yes) { return; }
+      this.plaqueService.deletePlaque(this.plaqueId).subscribe({
+        next: () => this.router.navigate(['/plaques']),
+        error: (err) => this.error = err.error?.error || 'Could not delete the plaque.'
+      });
     });
   }
 }

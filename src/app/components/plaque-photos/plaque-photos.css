@@ -32,40 +32,6 @@
   border-radius: 0.375rem;
 }
 
-.lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.85);
-}
-
-.lightbox-inner {
-  margin: 0;
-  max-width: 95vw;
-  text-align: center;
-}
-
-.lightbox-inner img {
-  max-width: 100%;
-  max-height: 80vh;
-  border-radius: 0.375rem;
-}
-
-.lightbox-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .photo-thumb img {
     transition: none;

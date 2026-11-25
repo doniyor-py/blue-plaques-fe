@@ -1,7 +1,10 @@
-import { Component, Input, OnInit, OnDestroy, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Dialog } from '@angular/cdk/dialog';
 import { PhotoService } from '../../services/photo-service';
 import { AuthService } from '../../services/auth-service';
+import { ConfirmService } from '../../services/confirm-service';
+import { PhotoViewer } from '../photo-viewer/photo-viewer';
 
 const MAX_SIZE = 5 * 1024 * 1024;          // 5 MB limit
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -23,10 +26,11 @@ export class PlaquePhotos implements OnInit, OnDestroy {
   uploading: boolean = false;
   error: string = '';
   message: string = '';
-  openPhoto: any = null;          // the photo shown full size
 
   constructor(private photoService: PhotoService,
-              public authService: AuthService) {}
+              public authService: AuthService,
+              private dialog: Dialog,
+              private confirmService: ConfirmService) {}
 
   ngOnInit() {
     this.loadPhotos();
@@ -97,14 +101,20 @@ export class PlaquePhotos implements OnInit, OnDestroy {
   }
 
   deletePhoto(photo: any) {
-    if (!confirm('Delete this photo?')) { return; }
-    this.error = '';
-    this.photoService.deletePhoto(this.plaqueId, photo._id).subscribe({
-      next: () => {
-        this.photos = this.photos.filter(p => p._id !== photo._id);
-        this.message = 'Photo deleted.';
-      },
-      error: (err) => this.error = err.error?.error || 'Could not delete the photo.'
+    this.confirmService.ask({
+      title: 'Delete this photo?',
+      message: 'The photo will be removed from this plaque for everyone.',
+      confirmText: 'Delete photo'
+    }).subscribe(yes => {
+      if (!yes) { return; }
+      this.error = '';
+      this.photoService.deletePhoto(this.plaqueId, photo._id).subscribe({
+        next: () => {
+          this.photos = this.photos.filter(p => p._id !== photo._id);
+          this.message = 'Photo deleted.';
+        },
+        error: (err) => this.error = err.error?.error || 'Could not delete the photo.'
+      });
     });
   }
 
@@ -112,23 +122,16 @@ export class PlaquePhotos implements OnInit, OnDestroy {
     return photo.username === this.authService.getUsername() || this.authService.isAdmin();
   }
 
+  // full-size photo in a dialog: focus stays inside, Escape or a click outside closes it,
+  // and focus goes back to the photo you opened
   showPhoto(photo: any) {
-    this.openPhoto = photo;
-    setTimeout(() => document.getElementById('lightbox-close')?.focus());
-  }
-
-  closePhoto() {
-    this.openPhoto = null;
-  }
-
-  onBackdropClick(event: MouseEvent) {
-    if (event.target === event.currentTarget) {
-      this.closePhoto();
-    }
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape() {
-    if (this.openPhoto) { this.closePhoto(); }
+    this.dialog.open(PhotoViewer, {
+      data: photo,
+      ariaModal: true,
+      ariaLabel: 'Photo, full size',
+      autoFocus: '#photo-close',
+      maxWidth: '95vw',
+      backdropClass: 'photo-backdrop'
+    });
   }
 }

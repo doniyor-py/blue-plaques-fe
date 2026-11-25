@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpTestingController } from '@angular/common/http/testing';
+import { Dialog } from '@angular/cdk/dialog';
 
 import { PlaquePhotos } from './plaque-photos';
 import { testProviders } from '../../testing/test-providers';
@@ -22,6 +23,8 @@ describe('PlaquePhotos', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => TestBed.inject(Dialog).closeAll());
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -38,8 +41,18 @@ describe('PlaquePhotos', () => {
     const grid = [...page.querySelectorAll('.photo-thumb img')].map(img => img.getAttribute('src'));
     expect(grid).toEqual([photos + 'a-thumb.webp', photos + 'b.jpg']);
 
-    page.querySelector<HTMLButtonElement>('.photo-thumb')!.click();
-    fixture.detectChanges();
-    expect(page.querySelector('.lightbox img')!.getAttribute('src')).toBe(photos + 'a.webp');
+    const thumb = page.querySelector<HTMLButtonElement>('.photo-thumb')!;
+    thumb.focus();
+    thumb.click();
+    TestBed.tick();
+    const viewer = document.querySelector<HTMLElement>('[role="dialog"]')!;
+    expect(viewer.getAttribute('aria-label')).toBe('Photo, full size');
+    expect(viewer.querySelector('img')!.getAttribute('src')).toBe(photos + 'a.webp');
+    expect(document.activeElement!.id).toBe('photo-close');        // focus moves into the dialog
+
+    viewer.querySelector<HTMLButtonElement>('#photo-close')!.click();
+    TestBed.tick();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(thumb);                      // and comes back to the photo
   });
 });

@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { UserService } from '../../services/user-service';
+import { ConfirmService } from '../../services/confirm-service';
 
 @Component({
   selector: 'app-admin-users',
@@ -20,7 +21,8 @@ export class AdminUsers implements OnInit {
   actionError: string = '';          // one delete failed: keep showing the list
   deleting: string | null = null;    // username being deleted right now
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService,
+              private confirmService: ConfirmService) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -44,26 +46,30 @@ export class AdminUsers implements OnInit {
   }
 
   deleteUser(user: any) {
-    if (!confirm('Delete ' + user.username + '? Their visits, reviews and photos will be deleted too. This cannot be undone.')) {
-      return;
-    }
-    this.message = '';
-    this.actionError = '';
-    this.deleting = user.username;
-    this.userService.deleteUser(user.username).subscribe({
-      next: () => {
-        this.deleting = null;
-        this.message = user.username + ' was deleted.';
-        // if that was the only user on this page, go back a page
-        if (this.users.length === 1 && this.page > 1) {
-          this.page--;
+    this.confirmService.ask({
+      title: 'Delete ' + user.username + '?',
+      message: 'Their visits, reviews and photos will be deleted too. This cannot be undone.',
+      confirmText: 'Delete user'
+    }).subscribe(yes => {
+      if (!yes) { return; }
+      this.message = '';
+      this.actionError = '';
+      this.deleting = user.username;
+      this.userService.deleteUser(user.username).subscribe({
+        next: () => {
+          this.deleting = null;
+          this.message = user.username + ' was deleted.';
+          // if that was the only user on this page, go back a page
+          if (this.users.length === 1 && this.page > 1) {
+            this.page--;
+          }
+          this.loadUsers();     // reload so the page fills up and the total is right
+        },
+        error: (err) => {
+          this.deleting = null;
+          this.actionError = err.error?.error || 'Could not delete ' + user.username + '.';
         }
-        this.loadUsers();     // reload so the page fills up and the total is right
-      },
-      error: (err) => {
-        this.deleting = null;
-        this.actionError = err.error?.error || 'Could not delete ' + user.username + '.';
-      }
+      });
     });
   }
 

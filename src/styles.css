@@ -19,3 +19,8 @@
 html {
   scrollbar-gutter: stable;
 }
+
+/* darker background behind the full-size photo dialog */
+.photo-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}

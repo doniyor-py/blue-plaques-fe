@@ -70,7 +70,6 @@ export class Account implements OnInit {
       this.deleteForm.markAllAsTouched();
       return;
     }
-    if (!confirm('Delete your account for good? This cannot be undone.')) { return; }
     this.deleting = true;
     this.deleteError = '';
 

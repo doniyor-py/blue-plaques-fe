@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { Dialog } from '@angular/cdk/dialog';
 import { formatDate } from '@angular/common';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -35,6 +36,7 @@ describe('Plaque page', () => {
   });
 
   afterEach(() => {
+    TestBed.inject(Dialog).closeAll();
     http.verify();
     localStorage.removeItem('token');
   });
@@ -190,5 +192,27 @@ describe('Plaque page', () => {
     harness.detectChanges();
 
     expect(page.textContent).toContain('Thanks! Your review is saved.');
+  });
+
+  it('asks in a dialog before deleting a visit, and does nothing on Cancel', async () => {
+    const page = await openPlaque(true);
+    checkIn(page);
+    const deleteButton = page.querySelector<HTMLButtonElement>('[aria-label^="Delete visit by user0"]')!;
+
+    deleteButton.click();
+    TestBed.tick();
+    const dialog = document.querySelector<HTMLElement>('[role="alertdialog"]')!;
+    expect(dialog.textContent).toContain('Delete this visit?');
+    expect(document.activeElement!.id).toBe('confirm-cancel');      // the safe button has focus
+    buttonCalled(dialog, 'Cancel').click();
+    TestBed.tick();
+    http.expectNone(r => r.method === 'DELETE');
+    expect(document.querySelector('[role="alertdialog"]')).toBeNull();
+
+    deleteButton.click();
+    TestBed.tick();
+    buttonCalled(document.querySelector<HTMLElement>('[role="alertdialog"]')!, 'Delete visit').click();
+    http.expectOne(r => r.url === API_URL + '/plaques/p1/visits/v9' && r.method === 'DELETE').flush({});
+    answerVisits([someoneElsesVisit]);
   });
 });

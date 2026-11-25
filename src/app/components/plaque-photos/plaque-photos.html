@@ -58,19 +58,4 @@
       <a routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">Log in</a> to add a photo.
     </p>
   }
-
-  <!-- full-size photo -->
-  @if (openPhoto) {
-    <div class="lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size"
-         (click)="onBackdropClick($event)" (keydown.escape)="closePhoto()">
-      <figure class="lightbox-inner">
-        <img [src]="openPhoto.url" [alt]="openPhoto.caption || 'Photo of the plaque'">
-        <figcaption class="text-white small mt-2">
-          {{ openPhoto.caption }}<span class="opacity-75"> · by {{ openPhoto.username }}</span>
-        </figcaption>
-      </figure>
-      <button id="lightbox-close" type="button" class="btn btn-light lightbox-close"
-              (click)="closePhoto()" aria-label="Close photo">&times;</button>
-    </div>
-  }
 </section>
