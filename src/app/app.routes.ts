@@ -35,5 +35,9 @@ export const routes: Routes = [
   { path: 'terms', title: 'Terms of use' + SITE,
     loadComponent: () => import('./components/terms/terms').then(m => m.Terms) },
   { path: 'privacy', title: 'Privacy policy' + SITE,
-    loadComponent: () => import('./components/privacy/privacy').then(m => m.Privacy) }
+    loadComponent: () => import('./components/privacy/privacy').then(m => m.Privacy) },
+      { path: 'privacy', title: 'Privacy policy' + SITE,
+    loadComponent: () => import('./components/privacy/privacy').then(m => m.Privacy) },
+  { path: '**', title: 'Page not found' + SITE,
+    loadComponent: () => import('./components/not-found/not-found').then(m => m.NotFound) }
 ];
