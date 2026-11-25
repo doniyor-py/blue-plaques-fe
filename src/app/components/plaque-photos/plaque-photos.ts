@@ -120,6 +120,12 @@ export class PlaquePhotos implements OnInit, OnDestroy {
     this.openPhoto = null;
   }
 
+  onBackdropClick(event: MouseEvent) {
+    if (event.target === event.currentTarget) {
+      this.closePhoto();
+    }
+  }
+
   @HostListener('document:keydown.escape')
   onEscape() {
     if (this.openPhoto) { this.closePhoto(); }

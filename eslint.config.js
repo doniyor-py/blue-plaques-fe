@@ -14,6 +14,10 @@ module.exports = tseslint.config(
     ],
     processor: angular.processInlineTemplates,
     rules: {
+      "@angular-eslint/prefer-inject": "off",
+      "@typescript-eslint/no-inferrable-types": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+
       "@angular-eslint/directive-selector": [
         "error",
         {

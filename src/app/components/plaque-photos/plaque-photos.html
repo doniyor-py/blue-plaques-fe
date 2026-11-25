@@ -60,8 +60,9 @@
 
   <!-- full-size photo -->
   @if (openPhoto) {
-    <div class="lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size" (click)="closePhoto()">
-      <figure class="lightbox-inner" (click)="$event.stopPropagation()">
+    <div class="lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size"
+         (click)="onBackdropClick($event)" (keydown.escape)="closePhoto()">
+      <figure class="lightbox-inner">
         <img [src]="openPhoto.url" [alt]="openPhoto.caption || 'Photo of the plaque'">
         <figcaption class="text-white small mt-2">
           {{ openPhoto.caption }}<span class="opacity-75"> · by {{ openPhoto.username }}</span>
