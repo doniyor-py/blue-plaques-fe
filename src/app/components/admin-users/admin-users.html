@@ -2,38 +2,53 @@
   <h1 class="h3 mb-4">Users</h1>
 
   @if (message) { <div class="alert alert-success" role="status">{{ message }}</div> }
+  @if (actionError) { <div class="alert alert-danger" role="alert">{{ actionError }}</div> }
 
-  @if (loading) { <div class="alert alert-secondary">Loading...</div> }
-  @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
-
-  @if (!loading && !error) {
-    <table class="table table-striped">
-      <caption>{{ total }} registered users</caption>
-      <thead>
-        <tr>
-          <th scope="col">Username</th>
-          <th scope="col">Email</th>
-          <th scope="col">Role</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (user of users; track user.username) {
+  @if (loadError) {
+    <div class="alert alert-danger" role="alert">{{ loadError }}</div>
+  } @else if (loading && users.length === 0) {
+    <div class="alert alert-secondary">Loading...</div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-striped align-middle">
+        <caption>{{ total }} registered users</caption>
+        <thead>
           <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>{{ user.admin ? 'Admin' : 'User' }}</td>
-            <td>
-              @if (!user.admin) {
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)"
-                        [attr.aria-label]="'Delete user ' + user.username">Delete</button>
-              } @else {
-                <span class="text-muted">—</span>
-              }
-            </td>
+            <th scope="col">Username</th>
+            <th scope="col">Email</th>
+            <th scope="col">Role</th>
+            <th scope="col">Actions</th>
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (user of users; track user.username) {
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.admin ? 'Admin' : 'User' }}</td>
+              <td>
+                @if (!user.admin) {
+                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)"
+                          [disabled]="deleting === user.username"
+                          [attr.aria-label]="'Delete user ' + user.username">
+                    {{ deleting === user.username ? 'Deleting...' : 'Delete' }}
+                  </button>
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (pages > 1) {
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <button type="button" class="btn btn-outline-primary" (click)="previousPage()" [disabled]="page === 1">Previous</button>
+        <span>Page {{ page }} of {{ pages }}</span>
+        <button type="button" class="btn btn-outline-primary" (click)="nextPage()" [disabled]="page === pages">Next</button>
+      </div>
+    }
   }
 </div>
