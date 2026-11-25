@@ -10,7 +10,8 @@
         <figure class="mb-0">
           <button type="button" class="photo-thumb" (click)="showPhoto(photo)"
                   [attr.aria-label]="'Open photo' + (photo.caption ? ': ' + photo.caption : '')">
-            <img [src]="photo.url" [alt]="photo.caption || 'Photo of the plaque'" loading="lazy">
+            <img [src]="photo.thumb_url || photo.url" [alt]="photo.caption || 'Photo of the plaque'"
+                 loading="lazy" width="480" height="360">
           </button>
           <figcaption class="small mt-1">
             @if (photo.caption) { <span class="d-block">{{ photo.caption }}</span> }

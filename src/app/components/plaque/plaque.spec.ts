@@ -75,6 +75,62 @@ describe('Plaque page', () => {
     harness.detectChanges();
   }
 
+  it('asks for the plaque and its visits at the same time', async () => {
+    await harness.navigateByUrl('/plaques/p1', Plaque);
+    const plaqueRequest = http.expectOne(API_URL + '/plaques/p1');
+    answerVisits([someoneElsesVisit]);
+    plaqueRequest.flush(plaque);
+    harness.detectChanges();
+    http.expectOne(API_URL + '/plaques/p1/photos').flush([]);
+    harness.detectChanges();
+
+    const page = harness.routeNativeElement as HTMLElement;
+    expect(page.querySelector('#visits-heading')!.textContent).toContain('Visits (1)');
+  });
+
+  it('opens the review form from a ?visit=...&review=1 link when the visits arrive first', async () => {
+    localStorage.setItem('token', userToken);
+    await harness.navigateByUrl('/plaques/p1?visit=v9&review=1', Plaque);
+    http.expectOne(API_URL + '/users/me').flush({ username: 'user0', favourites: [] });
+    const plaqueRequest = http.expectOne(API_URL + '/plaques/p1');
+    answerVisits([{ _id: 'v9', username: 'user0', date: today, note: '' }]);
+    plaqueRequest.flush(plaque);
+    harness.detectChanges();
+    http.expectOne(API_URL + '/plaques/p1/photos').flush([]);
+    harness.detectChanges();
+
+    const page = harness.routeNativeElement as HTMLElement;
+    expect(buttonCalled(page, 'Save review')).toBeTruthy();
+  });
+
+  it('shows only "Plaque not found." when the plaque does not exist', async () => {
+    await harness.navigateByUrl('/plaques/p1', Plaque);
+    const notFound = { status: 404, statusText: 'Not Found' };
+    http.expectOne(API_URL + '/plaques/p1').flush({ error: 'Plaque not found' }, notFound);
+    http.expectOne(r => r.url === API_URL + '/plaques/p1/visits').flush({ error: 'Plaque not found' }, notFound);
+    harness.detectChanges();
+
+    const page = harness.routeNativeElement as HTMLElement;
+    expect(page.textContent).toContain('Plaque not found.');
+    expect(harness.routeDebugElement!.componentInstance.visitError).toBe('');
+  });
+
+  it('marks the plaque as saved straight away, and undoes it if saving fails', async () => {
+    const page = await openPlaque(true);
+    buttonCalled(page, '☆ Save').click();
+    harness.detectChanges();
+
+    const button = buttonCalled(page, '★ Saved');
+    expect(button.disabled).toBeTrue();
+
+    http.expectOne(API_URL + '/users/me/favourites/p1')
+      .flush({ error: 'Something went wrong on the server' }, { status: 500, statusText: 'Server Error' });
+    harness.detectChanges();
+
+    expect(buttonCalled(page, '☆ Save').disabled).toBeFalse();
+    expect(page.textContent).toContain('Something went wrong on the server');
+  });
+
   it('shows the plaque and its visits', async () => {
     const page = await openPlaque(false);
     expect(page.querySelector('h1')!.textContent).toContain('Charles Dickens blue plaque');

@@ -13,9 +13,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .you-dot { animation: none; }
+  .placeholder-glow .placeholder { animation: none; }
 }
 
-/* always keep space for the scrollbar */
 html {
   scrollbar-gutter: stable;
 }

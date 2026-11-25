@@ -2,7 +2,23 @@
   <button class="btn btn-link px-0 mb-3" (click)="goBack()">&larr; Back</button>
 
   @if (loading) {
-    <div class="alert alert-secondary">Loading plaque...</div>
+    <div class="card placeholder-glow" aria-busy="true">
+      <span class="visually-hidden">Loading…</span>
+      <div class="card-header" aria-hidden="true"><span class="placeholder placeholder-lg col-6"></span></div>
+      <div class="card-body" aria-hidden="true">
+        <p class="lead">
+          <span class="placeholder col-12"></span>
+          <span class="placeholder col-8"></span>
+        </p>
+        @for (row of [1, 2, 3, 4]; track row) {
+          <div class="row mb-2">
+            <div class="col-sm-3"><span class="placeholder col-6"></span></div>
+            <div class="col-sm-9"><span class="placeholder col-5"></span></div>
+          </div>
+        }
+        <span class="btn btn-primary disabled placeholder col-2 mt-2"></span>
+      </div>
+    </div>
   }
   @if (error) {
     <div class="alert alert-danger" role="alert">{{ error }}</div>

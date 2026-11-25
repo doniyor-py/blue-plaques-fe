@@ -50,10 +50,6 @@
   </div>
   </form>
 
-  @if (loading) {
-    <p class="text-muted">Loading plaques...</p>
-  }
-
   @if (error) {
     <div class="alert alert-danger" role="alert">{{ error }}</div>
   }
@@ -65,24 +61,44 @@
     </div>
   }
 
-  <div class="row">
-    @for (plaque of plaque_list; track plaque._id) {
-      <div class="col-md-6 mb-3">
-        <div class="card h-100">
-          <div class="card-header">
-            <a [routerLink]="['/plaques', plaque._id]"><strong>{{ plaque.title }}</strong></a>
-          </div>
-          <div class="card-body">
-            <p class="card-text">{{ plaque.inscription | slice:0:150 }}{{ plaque.inscription?.length > 150 ? '…' : '' }}</p>
-          </div>
-          <div class="card-footer text-muted">
-            {{ plaque.borough }} · {{ plaque.erected_year || 'Year unknown' }}
-            <span class="badge bg-secondary float-end">{{ plaque.colour }}</span>
+  @if (loading) {
+    <!-- grey cards shaped like the real ones while the page loads -->
+    <div class="row placeholder-glow" aria-busy="true">
+      <span class="visually-hidden">Loading…</span>
+      @for (card of [1, 2, 3, 4]; track card) {
+        <div class="col-md-6 mb-3" aria-hidden="true">
+          <div class="card h-100">
+            <div class="card-header"><span class="placeholder col-7"></span></div>
+            <div class="card-body">
+              <span class="placeholder col-12"></span>
+              <span class="placeholder col-10"></span>
+              <span class="placeholder col-6"></span>
+            </div>
+            <div class="card-footer"><span class="placeholder col-4"></span></div>
           </div>
         </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
+  } @else {
+    <div class="row">
+      @for (plaque of plaque_list; track plaque._id) {
+        <div class="col-md-6 mb-3">
+          <div class="card h-100">
+            <div class="card-header">
+              <a [routerLink]="['/plaques', plaque._id]"><strong>{{ plaque.title }}</strong></a>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ plaque.inscription | slice:0:150 }}{{ plaque.inscription?.length > 150 ? '…' : '' }}</p>
+            </div>
+            <div class="card-footer text-muted">
+              {{ plaque.borough }} · {{ plaque.erected_year || 'Year unknown' }}
+              <span class="badge bg-secondary float-end">{{ plaque.colour }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 
   @if (pages > 1) {
     <div class="row align-items-center my-3">

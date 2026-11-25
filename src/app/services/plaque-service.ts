@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, shareReplay, tap } from 'rxjs';
 import { API_URL } from '../api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlaqueService {
+  private savedLists = new Map<string, Observable<string[]>>();
 
   constructor(private http: HttpClient) {}
 
@@ -36,11 +38,22 @@ export class PlaqueService {
   }
 
   getBoroughs() {
-    return this.http.get<string[]>(API_URL + '/boroughs');
+    return this.getSavedList('/boroughs');
   }
 
   getColours() {
-    return this.http.get<string[]>(API_URL + '/colours');
+    return this.getSavedList('/colours');
+  }
+
+  private getSavedList(path: string): Observable<string[]> {
+    if (!this.savedLists.has(path)) {
+      const request = this.http.get<string[]>(API_URL + path).pipe(
+        tap({ error: () => this.savedLists.delete(path) }),
+        shareReplay(1)
+      );
+      this.savedLists.set(path, request);
+    }
+    return this.savedLists.get(path)!;
   }
 
   createPlaque(plaque: any) {

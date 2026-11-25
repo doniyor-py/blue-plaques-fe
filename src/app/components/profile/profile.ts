@@ -93,9 +93,13 @@ export class Profile implements OnInit {
   }
 
   removeFavourite(plaque: any) {
+    const position = this.favourites.indexOf(plaque);
+    this.favourites = this.favourites.filter(f => f._id !== plaque._id);
     this.userService.removeFavourite(plaque._id).subscribe({
-      next: () => this.favourites = this.favourites.filter(f => f._id !== plaque._id),
-      error: (err) => this.error = err.error?.error || 'Could not remove the favourite.'
+      error: (err) => {
+        this.favourites = [...this.favourites.slice(0, position), plaque, ...this.favourites.slice(position)];
+        this.error = err.error?.error || 'Could not remove the favourite.';
+      }
     });
   }
 

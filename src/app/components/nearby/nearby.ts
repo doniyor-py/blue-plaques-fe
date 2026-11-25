@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { timeout, TimeoutError } from 'rxjs';
 import * as L from 'leaflet';
 import { PlaqueService } from '../../services/plaque-service';
 import { RouteService } from '../../services/route-service';
@@ -35,14 +36,15 @@ export class Nearby implements AfterViewInit, OnDestroy {
   searchedFromUser: boolean = false;
 
   plaques: any[] = [];
-  selected: any = null;      // the plaque whose card is open
-  route: any = null;         // { minutes, distanceKm, arrival, steps }
+  selected: any = null;
+  route: any = null;
 
   loading: boolean = false;
   locating: boolean = false;
   routeLoading: boolean = false;
   showSearchArea: boolean = false;
   error: string = '';
+  locationPermission: string = '';
 
   constructor(private plaqueService: PlaqueService,
               private routeService: RouteService,
@@ -65,9 +67,23 @@ export class Nearby implements AfterViewInit, OnDestroy {
       if (plaqueId) {
         this.openPlaqueFromLink(plaqueId, params.get('directions') === '1');
       } else {
-        this.locateMe();
+        this.startWithoutPrompt();
       }
     });
+  }
+
+  async startWithoutPrompt() {
+    try {
+      const status = await navigator.permissions.query({ name: 'geolocation' });
+      this.locationPermission = status.state;
+    } catch {
+      this.locationPermission = 'prompt';
+    }
+    if (this.locationPermission === 'granted') {
+      this.locateMe();
+    } else {
+      this.searchHere();
+    }
   }
 
   ngOnDestroy() {
@@ -83,7 +99,7 @@ export class Nearby implements AfterViewInit, OnDestroy {
         this.searchHere();
       },
       () => {
-        if (!this.searchCentre) { this.searchHere(); }   // first visit: show central London instead
+        if (!this.searchCentre) { this.searchHere(); }
       }
     );
   }
@@ -105,6 +121,7 @@ export class Nearby implements AfterViewInit, OnDestroy {
       (geoError) => {
         this.locating = false;
         this.error = this.describeGeoError(geoError);
+        if (geoError.code === geoError.PERMISSION_DENIED) { this.locationPermission = 'denied'; }
         onFail?.();
       },
       { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
@@ -156,7 +173,6 @@ export class Nearby implements AfterViewInit, OnDestroy {
     });
   }
 
-  // the distance from the centre of the map to its corner
   visibleRadius(): number {
     const metres = this.map.getCenter().distanceTo(this.map.getBounds().getNorthEast());
     return Math.min(Math.max(Math.round(metres), 300), 5000);
@@ -265,7 +281,9 @@ export class Nearby implements AfterViewInit, OnDestroy {
     this.routeLoading = true;
     this.error = '';
 
-    this.routeService.getWalkingRoute(this.userLocation!.lat, this.userLocation!.lng, lat, lng).subscribe({
+    const request = this.routeService.getWalkingRoute(this.userLocation!.lat, this.userLocation!.lng, lat, lng)
+      .pipe(timeout(15000));
+    request.subscribe({
       next: (response) => {
         const leg = response.trip.legs[0];
         const seconds = response.trip.summary.time;
@@ -277,7 +295,6 @@ export class Nearby implements AfterViewInit, OnDestroy {
         };
         this.showSearchArea = false;
 
-        // a white line under a blue line gives the route an outline, like Google Maps
         const line = decodePolyline(leg.shape, 6);
         this.routeLayer.clearLayers();
         L.polyline(line, { color: '#ffffff', weight: 9, opacity: 0.9 }).addTo(this.routeLayer);
@@ -286,7 +303,9 @@ export class Nearby implements AfterViewInit, OnDestroy {
         this.routeLoading = false;
       },
       error: (err) => {
-        this.error = err.error?.error || 'Could not find a walking route.';
+        this.error = err instanceof TimeoutError
+          ? 'Finding a route took too long. Please try again.'
+          : err.error?.error || 'Could not find a walking route.';
         this.routeLoading = false;
       }
     });

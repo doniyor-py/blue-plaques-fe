@@ -1,5 +1,33 @@
 <div class="container mb-5">
-  @if (loading) { <div class="alert alert-secondary">Loading your profile...</div> }
+  @if (loading) {
+    <div class="placeholder-glow" aria-busy="true">
+      <span class="visually-hidden">Loading…</span>
+      <div class="mb-4" aria-hidden="true">
+        <span class="placeholder placeholder-lg col-4 col-md-2 d-block mb-2"></span>
+        <span class="placeholder col-7 col-md-4"></span>
+      </div>
+      <div class="row row-cols-2 row-cols-md-4 g-3 mb-5" aria-hidden="true">
+        @for (stat of [1, 2, 3, 4]; track stat) {
+          <div class="col">
+            <div class="card h-100 text-center">
+              <div class="card-body">
+                <span class="placeholder placeholder-lg col-4 d-block mx-auto mb-2"></span>
+                <span class="placeholder placeholder-sm col-7"></span>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <ul class="list-group" aria-hidden="true">
+        @for (visit of [1, 2, 3]; track visit) {
+          <li class="list-group-item">
+            <span class="placeholder col-6 d-block mb-1"></span>
+            <span class="placeholder placeholder-sm col-4"></span>
+          </li>
+        }
+      </ul>
+    </div>
+  }
   @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
 
   @if (user && stats) {

@@ -5,6 +5,18 @@
   <aside class="panel" aria-label="Plaque information">
     @if (error) {
       <div class="alert alert-warning small" role="alert">{{ error }}</div>
+    } @else if (locationPermission === 'denied' && !userLocation) {
+      <p class="alert alert-light border small">
+        Location is turned off for this site. To see plaques near you, allow location in your browser settings,
+        then reload the page.
+      </p>
+    }
+
+    <!-- ask for the location only when the user wants it -->
+    @if (locationPermission === 'prompt' && !userLocation) {
+      <button type="button" class="btn btn-primary w-100 mb-3" (click)="locateMe()" [disabled]="locating">
+        {{ locating ? 'Finding your location…' : 'Show plaques near me' }}
+      </button>
     }
 
     @if (selected) {
@@ -60,7 +72,18 @@
       <p class="text-muted small">Tap a plaque on the map or in the list for details and directions.</p>
 
       @if (loading) {
-        <div class="text-muted small py-2">Loading plaques…</div>
+        <div class="placeholder-glow" aria-busy="true">
+          <span class="visually-hidden">Loading…</span>
+          @for (row of [1, 2, 3, 4, 5]; track row) {
+            <div class="plaque-row" aria-hidden="true">
+              <span class="colour-dot placeholder placeholder-xs"></span>
+              <span class="flex-grow-1">
+                <span class="placeholder col-8 d-block mb-1"></span>
+                <span class="placeholder placeholder-sm col-5"></span>
+              </span>
+            </div>
+          }
+        </div>
       } @else {
         <ul class="list-unstyled plaque-list">
           @for (plaque of plaques; track plaque._id) {

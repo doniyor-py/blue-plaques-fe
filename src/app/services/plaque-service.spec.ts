@@ -79,6 +79,39 @@ describe('PlaqueService', () => {
     req.flush(null, { status: 204, statusText: 'No Content' });
   });
 
+  it('fetches the boroughs only once for two subscribers', () => {
+    const answers: string[][] = [];
+    service.getBoroughs().subscribe(list => answers.push(list));
+    service.getBoroughs().subscribe(list => answers.push(list));
+
+    http.expectOne(API_URL + '/boroughs').flush(['Camden', 'Hackney']);
+    expect(answers).toEqual([['Camden', 'Hackney'], ['Camden', 'Hackney']]);
+
+    service.getBoroughs().subscribe(list => answers.push(list));
+    http.expectNone(API_URL + '/boroughs');
+    expect(answers.length).toBe(3);
+  });
+
+  it('fetches the colours only once for two subscribers', () => {
+    let answers = 0;
+    service.getColours().subscribe(() => answers++);
+    service.getColours().subscribe(() => answers++);
+    http.expectOne(API_URL + '/colours').flush(['blue', 'green']);
+    expect(answers).toBe(2);
+  });
+
+  it('asks for the boroughs again after a failed request', () => {
+    let failed = false;
+    service.getBoroughs().subscribe({ error: () => failed = true });
+    http.expectOne(API_URL + '/boroughs').flush('Down', { status: 500, statusText: 'Server Error' });
+    expect(failed).toBeTrue();
+
+    let result: string[] = [];
+    service.getBoroughs().subscribe(list => result = list);
+    http.expectOne(API_URL + '/boroughs').flush(['Camden']);
+    expect(result).toEqual(['Camden']);
+  });
+
   it('getNearby sends the position, radius and limit', () => {
     service.getNearby(51.5, -0.12, 800).subscribe();
 

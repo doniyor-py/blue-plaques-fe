@@ -113,18 +113,20 @@ export class Plaque implements OnInit {
     if (this.authService.isLoggedIn()) {
       this.checkFavourite();
     }
+    // the plaque and its visits load at the same time
     this.plaqueService.getPlaque(this.plaqueId).subscribe({
       next: (response) => {
         this.plaque = response;
         this.loading = false;
         this.titleService.setTitle(response.title + ' | Blue Plaques Explorer');
-        this.loadVisits(true);
+        this.openVisitFromLink();
       },
       error: (err) => {
         this.error = err.status === 404 ? 'Plaque not found.' : 'Could not load this plaque.';
         this.loading = false;
       }
     });
+    this.loadVisits(true);
   }
 
   goBack() {
@@ -142,13 +144,17 @@ export class Plaque implements OnInit {
           this.openVisitFromLink();
         }
       },
-      error: () => this.visitError = 'Could not load the visits. Please try again later.'
+      error: (err) => {
+        if (err.status !== 404) {
+          this.visitError = 'Could not load the visits. Please try again later.';
+        }
+      }
     });
   }
 
   openVisitFromLink() {
     const visitId = this.route.snapshot.queryParamMap.get('visit');
-    if (!visitId) { return; }
+    if (!visitId || !this.plaque) { return; }
     const index = this.visits.findIndex(v => v._id === visitId);
     if (index === -1) { return; }
 
@@ -298,18 +304,18 @@ export class Plaque implements OnInit {
   }
 
   toggleFavourite() {
+    const wasFavourite = this.isFavourite;
+    this.isFavourite = !wasFavourite;
     this.favouriteBusy = true;
     this.favouriteError = '';
-    const request = this.isFavourite
+    const request = wasFavourite
       ? this.userService.removeFavourite(this.plaqueId)
       : this.userService.addFavourite(this.plaqueId);
 
     request.subscribe({
-      next: () => {
-        this.isFavourite = !this.isFavourite;
-        this.favouriteBusy = false;
-      },
+      next: () => this.favouriteBusy = false,
       error: (err) => {
+        this.isFavourite = wasFavourite;
         this.favouriteError = err.error?.error || 'Could not update your favourites.';
         this.favouriteBusy = false;
       }
@@ -335,7 +341,7 @@ export class Plaque implements OnInit {
 
     this.reportService.reportProblem(this.plaqueId, type, message.trim()).subscribe({
       next: (response) => {
-        this.reportMessage = response.message;     // message: "Thanks, an admin will check it"
+        this.reportMessage = response.message;
         this.showReportForm = false;
         this.reportForm.reset({ type: '', message: '' });
         this.reportSending = false;
