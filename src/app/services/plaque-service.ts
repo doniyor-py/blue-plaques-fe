@@ -39,6 +39,10 @@ export class PlaqueService {
     return this.http.get<string[]>(API_URL + '/boroughs');
   }
 
+  getColours() {
+    return this.http.get<string[]>(API_URL + '/colours');
+  }
+
   createPlaque(plaque: any) {
     return this.http.post<any>(API_URL + '/plaques', this.toFormData(plaque));
   }

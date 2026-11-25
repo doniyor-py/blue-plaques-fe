@@ -13,10 +13,13 @@
   </div>
 
   @if (message) { <div class="alert alert-success" role="status">{{ message }}</div> }
-  @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
-  @if (loading) { <div class="alert alert-secondary">Loading reports...</div> }
+  @if (actionError) { <div class="alert alert-danger" role="alert">{{ actionError }}</div> }
 
-  @if (!loading && !error) {
+  @if (loadError) {
+    <div class="alert alert-danger" role="alert">{{ loadError }}</div>
+  } @else if (loading && reports.length === 0) {
+    <div class="alert alert-secondary">Loading reports...</div>
+  } @else {
     <div class="table-responsive">
       <table class="table align-middle">
         <caption>{{ total }} report(s)</caption>
@@ -39,9 +42,9 @@
               <td>{{ typeLabels[report.type] || report.type }}</td>
               <td>{{ report.message }}</td>
               <td>
-                <label class="visually-hidden" [attr.for]="'status-' + report._id">Status of report by {{ report.username }}</label>
                 <select class="form-select form-select-sm" [id]="'status-' + report._id"
-                      (change)="changeStatus(report, $any($event.target).value)">
+                      [attr.aria-label]="'Status of report by ' + report.username"
+                      (change)="changeStatus(report, $event)">
                 @for (status of statuses; track status.value) {
                   <option [value]="status.value" [selected]="status.value === report.status">{{ status.label }}</option>
                 }

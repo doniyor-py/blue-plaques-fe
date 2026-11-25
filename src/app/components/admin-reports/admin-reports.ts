@@ -18,7 +18,8 @@ export class AdminReports implements OnInit {
   pageSize: number = 10;
   statusFilter: string = 'open';
   loading: boolean = true;
-  error: string = '';
+  loadError: string = '';
+  actionError: string = '';
   message: string = '';
 
   statuses = [
@@ -42,7 +43,7 @@ export class AdminReports implements OnInit {
 
   loadReports() {
     this.loading = true;
-    this.error = '';
+    this.loadError = '';
     this.reportService.getReports(this.page, this.pageSize, this.statusFilter).subscribe({
       next: (response) => {
         this.reports = response.reports;
@@ -51,7 +52,7 @@ export class AdminReports implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        this.error = err.error?.error || 'Could not load reports.';
+        this.loadError = err.error?.error || 'Could not load reports.';
         this.loading = false;
       }
     });
@@ -61,20 +62,23 @@ export class AdminReports implements OnInit {
     this.statusFilter = status;
     this.page = 1;
     this.message = '';
+    this.actionError = '';
     this.loadReports();
   }
 
-  changeStatus(report: any, newStatus: string) {
+  changeStatus(report: any, event: Event) {
+    const select = event.target as HTMLSelectElement;
+    const newStatus = select.value;
     this.message = '';
-    this.error = '';
+    this.actionError = '';
     this.reportService.updateStatus(report._id, newStatus).subscribe({
       next: (response) => {
         this.message = response.message;
         this.loadReports();
       },
       error: (err) => {
-        this.error = err.error?.error || 'Could not update the report.';
-        this.loadReports();
+        this.actionError = err.error?.error || 'Could not update the report.';
+        select.value = report.status;
       }
     });
   }

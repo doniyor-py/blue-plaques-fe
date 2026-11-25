@@ -1,12 +1,12 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { SlicePipe } from '@angular/common';
+import { SlicePipe, TitleCasePipe } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { PlaqueService } from '../../services/plaque-service';
 
 @Component({
   selector: 'app-plaques',
-  imports: [SlicePipe, RouterLink, ReactiveFormsModule],
+  imports: [SlicePipe, RouterLink, ReactiveFormsModule, TitleCasePipe],
   templateUrl: './plaques.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plaques.css'
@@ -22,11 +22,7 @@ export class Plaques implements OnInit {
   filters: any = {};
   filterKeys = ['q', 'borough', 'colour', 'category', 'from_year', 'to_year'];
 
-  boroughs = ['Barnet', 'Bexley', 'Brent', 'Bromley', 'Camden', 'City of London', 'Croydon',
-    'Ealing', 'Enfield', 'Greenwich', 'Hackney', 'Hammersmith and Fulham', 'Haringey', 'Harrow',
-    'Havering', 'Hounslow', 'Islington', 'Kensington and Chelsea', 'Kingston upon Thames',
-    'Lambeth', 'Lewisham', 'Merton', 'Newham', 'Redbridge', 'Richmond upon Thames', 'Southwark',
-    'Sutton', 'Tower Hamlets', 'Waltham Forest', 'Wandsworth', 'Westminster'];
+  boroughs: string[] = [];
 
   categories = [
     { value: 'literature', label: 'Literature' },
@@ -40,7 +36,7 @@ export class Plaques implements OnInit {
     { value: 'other', label: 'Other' }
   ];
 
-  colours = ['blue', 'green', 'brown', 'black', 'red', 'white', 'grey', 'bronze', 'stone'];
+  colours: string[] = [];
 
   filterForm: FormGroup;
 
@@ -54,6 +50,8 @@ export class Plaques implements OnInit {
   }
 
   ngOnInit() {
+    this.plaqueService.getBoroughs().subscribe({ next: (list) => this.boroughs = list });
+    this.plaqueService.getColours().subscribe({ next: (list) => this.colours = list });
     this.route.queryParamMap.subscribe(params => {
       this.page = Number(params.get('page')) || 1;
       this.filters = {};
