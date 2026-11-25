@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { UserService } from '../../services/user-service';
 
 @Component({
   selector: 'app-admin-users',
   imports: [],
   templateUrl: './admin-users.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-users.css'
 })
 export class AdminUsers implements OnInit {

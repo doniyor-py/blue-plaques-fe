@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { formatDate } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
@@ -25,7 +25,7 @@ describe('Plaque page', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         provideRouter([{ path: 'plaques/:id', component: Plaque }])
       ]

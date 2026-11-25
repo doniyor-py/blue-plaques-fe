@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Navigation } from './components/navigation/navigation';
 
@@ -6,6 +6,7 @@ import { Navigation } from './components/navigation/navigation';
   selector: 'app-root',
   imports: [RouterOutlet, Navigation],
   templateUrl: './app.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './app.css'
 })
 export class App {

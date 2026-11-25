@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, NgZone } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, NgZone, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
@@ -13,6 +13,7 @@ declare const turnstile: any;
   selector: 'app-signup',
   imports: [ReactiveFormsModule, RouterLink, GoogleButton],
   templateUrl: './signup.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './signup.css'
 })
 export class Signup implements AfterViewInit, OnDestroy {

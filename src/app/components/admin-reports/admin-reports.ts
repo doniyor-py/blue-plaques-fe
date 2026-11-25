@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReportService } from '../../services/report-service';
@@ -7,6 +7,7 @@ import { ReportService } from '../../services/report-service';
   selector: 'app-admin-reports',
   imports: [DatePipe, RouterLink],
   templateUrl: './admin-reports.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './admin-reports.css'
 })
 export class AdminReports implements OnInit {

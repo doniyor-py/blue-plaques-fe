@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../services/user-service';
@@ -9,6 +9,7 @@ import { passwordsMatch } from '../../validators/passwords-match';
   selector: 'app-account',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './account.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './account.css'
 })
 export class Account implements OnInit {

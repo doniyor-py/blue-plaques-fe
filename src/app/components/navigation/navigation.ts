@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth-service';
@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth-service';
   selector: 'app-navigation',
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './navigation.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './navigation.css'
 })
 export class Navigation {

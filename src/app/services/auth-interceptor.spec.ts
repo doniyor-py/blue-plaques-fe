@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, HttpContext, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, HttpContext, provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Router, provideRouter } from '@angular/router';
 
@@ -15,7 +15,7 @@ describe('authInterceptor', () => {
     localStorage.setItem('token', 'test-token');
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withInterceptors([authInterceptor])),    // the real interceptor, as in app.config.ts
+        provideHttpClient(withXhr(), withInterceptors([authInterceptor])),    // the real interceptor, as in app.config.ts
         provideHttpClientTesting(),
         provideRouter([])
       ]

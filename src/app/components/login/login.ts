@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
@@ -8,6 +8,7 @@ import { GoogleButton } from '../google-button/google-button';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink, GoogleButton],
   templateUrl: './login.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './login.css'
 })
 export class Login {

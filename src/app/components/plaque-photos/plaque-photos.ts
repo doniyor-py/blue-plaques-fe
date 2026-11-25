@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PhotoService } from '../../services/photo-service';
 import { AuthService } from '../../services/auth-service';
@@ -10,6 +10,7 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   selector: 'app-plaque-photos',
   imports: [RouterLink],
   templateUrl: './plaque-photos.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plaque-photos.css'
 })
 export class PlaquePhotos implements OnInit, OnDestroy {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SlicePipe, DatePipe, DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
@@ -8,6 +8,7 @@ import { UserService } from '../../services/user-service';
   selector: 'app-profile',
   imports: [RouterLink, SlicePipe, DatePipe, DecimalPipe],
   templateUrl: './profile.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile.css'
 })
 export class Profile implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, Injector, afterNextRender } from '@angular/core';
+import { Component, OnInit, Injector, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
 import { Location, DatePipe, DecimalPipe, formatDate } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -14,6 +14,7 @@ import { Title } from '@angular/platform-browser';
   selector: 'app-plaque',
   imports: [ReactiveFormsModule, RouterLink, PlaquePhotos, DatePipe, DecimalPipe],
   templateUrl: './plaque.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plaque.css'
 })
 export class Plaque implements OnInit {

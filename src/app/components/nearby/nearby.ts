@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import * as L from 'leaflet';
@@ -18,6 +18,7 @@ const PLAQUE_COLOURS: Record<string, string> = {
   selector: 'app-nearby',
   imports: [DatePipe, DecimalPipe, SlicePipe, RouterLink, DurationPipe],
   templateUrl: './nearby.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nearby.css'
 })
 export class Nearby implements AfterViewInit, OnDestroy {

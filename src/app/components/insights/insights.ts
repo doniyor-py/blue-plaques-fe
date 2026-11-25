@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe, SlicePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -8,6 +8,7 @@ import { AnalyticsService } from '../../services/analytics-service';
   selector: 'app-insights',
   imports: [DecimalPipe, SlicePipe, RouterLink],
   templateUrl: './insights.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './insights.css'
 })
 export class Insights implements OnInit {

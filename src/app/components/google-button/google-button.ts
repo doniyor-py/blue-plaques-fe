@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { GOOGLE_CLIENT_ID } from '../../api';
@@ -10,6 +10,7 @@ declare const google: any;
   selector: 'app-google-button',
   imports: [RouterLink],
   templateUrl: './google-button.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './google-button.css'
 })
 export class GoogleButton implements AfterViewInit, OnDestroy {

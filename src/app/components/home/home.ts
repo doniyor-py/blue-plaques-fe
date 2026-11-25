@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SlicePipe } from '@angular/common';
 import { PlaqueService } from '../../services/plaque-service';
@@ -7,6 +7,7 @@ import { PlaqueService } from '../../services/plaque-service';
   selector: 'app-home',
   imports: [RouterLink, SlicePipe],
   templateUrl: './home.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home.css'
 })
 export class Home {

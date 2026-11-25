@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PlaqueService } from '../../services/plaque-service';
@@ -7,6 +7,7 @@ import { PlaqueService } from '../../services/plaque-service';
   selector: 'app-plaque-form',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './plaque-form.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plaque-form.css'
 })
 export class PlaqueForm implements OnInit {

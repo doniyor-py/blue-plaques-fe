@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { SlicePipe } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
@@ -8,6 +8,7 @@ import { PlaqueService } from '../../services/plaque-service';
   selector: 'app-plaques',
   imports: [SlicePipe, RouterLink, ReactiveFormsModule],
   templateUrl: './plaques.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plaques.css'
 })
 export class Plaques implements OnInit {
