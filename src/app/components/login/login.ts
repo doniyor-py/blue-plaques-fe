@@ -21,7 +21,8 @@ export class Login {
     'registered': 'Account created. You can now log in.',
     'password-changed': 'Password changed. Please log in with your new password.',
     'password-reset': 'Password reset. You can now log in with your new password.',
-    'account-deleted': 'Your account has been deleted. Sorry to see you go!'
+    'account-deleted': 'Your account has been deleted. Sorry to see you go!',
+    'session-expired': 'Your session has expired. Please log in again.'
   };
 
   constructor(private formBuilder: FormBuilder,

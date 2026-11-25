@@ -21,7 +21,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((err: HttpErrorResponse) => {
       if (err.status === 401 && !req.url.includes('/login') && !req.context.get(SKIP_LOGIN_REDIRECT)) {
         authService.removeToken();
-        router.navigate(['/login']);
+        const returnUrl = router.url.startsWith('/login') ? null : router.url;
+        router.navigate(['/login'], { queryParams: { notice: 'session-expired', returnUrl } });
       }
       return throwError(() => err);   // pass the error on
     })
