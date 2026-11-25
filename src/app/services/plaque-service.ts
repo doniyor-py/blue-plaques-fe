@@ -53,7 +53,7 @@ export class PlaqueService {
   private toFormData(plaque: any): FormData {
     const formData = new FormData();
     for (const key of Object.keys(plaque)) {
-      if (plaque[key] !== null && plaque[key] !== '') {
+      if (plaque[key] !== null && plaque[key] !== undefined) {
         formData.append(key, plaque[key]);
       }
     }
