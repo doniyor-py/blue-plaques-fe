@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Nearby } from './nearby';
+import { testProviders } from '../../testing/test-providers';
 
 describe('Nearby', () => {
   let component: Nearby;
@@ -8,7 +9,8 @@ describe('Nearby', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Nearby]
+      imports: [Nearby],
+      providers: testProviders
     })
     .compileComponents();
 

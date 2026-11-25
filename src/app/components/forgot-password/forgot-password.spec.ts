@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ForgotPassword } from './forgot-password';
+import { testProviders } from '../../testing/test-providers';
 
 describe('ForgotPassword', () => {
   let component: ForgotPassword;
@@ -8,7 +9,8 @@ describe('ForgotPassword', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ForgotPassword]
+      imports: [ForgotPassword],
+      providers: testProviders
     })
     .compileComponents();
 

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PlaquePhotos } from './plaque-photos';
+import { testProviders } from '../../testing/test-providers';
 
 describe('PlaquePhotos', () => {
   let component: PlaquePhotos;
@@ -8,12 +9,14 @@ describe('PlaquePhotos', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlaquePhotos]
+      imports: [PlaquePhotos],
+      providers: testProviders
     })
     .compileComponents();
 
     fixture = TestBed.createComponent(PlaquePhotos);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('plaqueId', 'p1');     // the parent page normally gives this
     fixture.detectChanges();
   });
 
