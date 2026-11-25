@@ -15,6 +15,7 @@ module.exports = tseslint.config(
     processor: angular.processInlineTemplates,
     rules: {
       "@angular-eslint/prefer-inject": "off",
+      "@angular-eslint/prefer-on-push-component-change-detection": "off",
       "@typescript-eslint/no-inferrable-types": "off",
       "@typescript-eslint/no-explicit-any": "off",
 
