@@ -85,7 +85,30 @@ export class Plaque implements OnInit {
   }
 
   ngOnInit() {
-    this.plaqueId = this.route.snapshot.paramMap.get('id')!;
+    this.route.paramMap.subscribe(params => {
+      this.plaqueId = params.get('id')!;
+      this.loadPlaque();
+    });
+  }
+
+  loadPlaque() {
+    this.plaque = null;
+    this.loading = true;
+    this.error = '';
+    this.isFavourite = false;
+    this.visits = [];
+    this.visitsTotal = 0;
+    this.visitsShown = 5;
+    this.justVisitedId = null;
+    this.highlightedVisitId = null;
+    this.reviewingVisitId = null;
+    this.checkInError = '';
+    this.visitMessage = '';
+    this.visitError = '';
+    this.showReportForm = false;
+    this.reportMessage = '';
+    this.reportError = '';
+
     if (this.authService.isLoggedIn()) {
       this.checkFavourite();
     }
