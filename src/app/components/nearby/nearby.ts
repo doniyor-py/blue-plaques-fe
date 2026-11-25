@@ -299,7 +299,11 @@ export class Nearby implements AfterViewInit, OnDestroy {
 
   googleMapsUrl(plaque: any): string {
     const [lng, lat] = plaque.location.coordinates;
-    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+    let url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+    if (this.userLocation) {
+      url += `&origin=${this.userLocation.lat.toFixed(6)},${this.userLocation.lng.toFixed(6)}`;
+    }
+    return url;
   }
 
   distanceFromUser(plaque: any): number | null {
