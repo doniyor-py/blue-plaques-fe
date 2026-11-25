@@ -12,7 +12,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = authService.getToken();
 
-  // only send our token to our own API, never to other sites
   if (token && req.url.startsWith(API_URL)) {
     req = req.clone({ setHeaders: { 'x-access-token': token } });
   }
@@ -24,7 +23,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         const returnUrl = router.url.startsWith('/login') ? null : router.url;
         router.navigate(['/login'], { queryParams: { notice: 'session-expired', returnUrl } });
       }
-      return throwError(() => err);   // pass the error on
+      return throwError(() => err);
     })
   );
 };

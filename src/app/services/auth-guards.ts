@@ -22,5 +22,5 @@ export const adminGuard: CanActivateFn = (route, state) => {
   if (!authService.isLoggedIn()) {
     return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
   }
-  return router.createUrlTree(['/']);   // logged in, but not an admin
+  return router.createUrlTree(['/']);
 };

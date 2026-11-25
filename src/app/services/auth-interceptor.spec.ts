@@ -15,7 +15,7 @@ describe('authInterceptor', () => {
     localStorage.setItem('token', 'test-token');
     TestBed.configureTestingModule({
       providers: [
-        provideHttpClient(withXhr(), withInterceptors([authInterceptor])),    // the real interceptor, as in app.config.ts
+        provideHttpClient(withXhr(), withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
         provideRouter([])
       ]

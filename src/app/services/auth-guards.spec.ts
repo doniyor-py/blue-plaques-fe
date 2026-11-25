@@ -5,7 +5,6 @@ import { authGuard, adminGuard } from './auth-guards';
 import { AuthService } from './auth-service';
 
 describe('Route guards', () => {
-  // a fake AuthService: each test decides who is "logged in"
   let loggedIn = false;
   let admin = false;
   const fakeAuth = { isLoggedIn: () => loggedIn, isAdmin: () => admin };
@@ -18,13 +17,11 @@ describe('Route guards', () => {
     });
   });
 
-  // guards use inject(), so they must run inside Angular's injection context
   function runGuard(guard: CanActivateFn, url: string) {
     return TestBed.runInInjectionContext(
       () => guard({} as ActivatedRouteSnapshot, { url } as RouterStateSnapshot));
   }
 
-  // turn the guard's answer (a UrlTree) into a readable address
   function addressOf(result: unknown): string {
     return TestBed.inject(Router).serializeUrl(result as UrlTree);
   }

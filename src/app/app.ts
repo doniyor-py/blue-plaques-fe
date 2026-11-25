@@ -10,7 +10,6 @@ import { Navigation } from './components/navigation/navigation';
   styleUrl: './app.css'
 })
 export class App {
-  // move the keyboard focus to <main> ourselves
   skipToMain(event: Event) {
     event.preventDefault();
     document.getElementById('main-content')?.focus();
