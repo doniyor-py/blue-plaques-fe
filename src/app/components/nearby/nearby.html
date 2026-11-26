@@ -1,8 +1,12 @@
-<div class="map-page">
+<div class="map-page" [class.has-selection]="selected">
   <h1 class="visually-hidden">Plaque map</h1>
 
-  <!-- side panel: list of plaques, or the selected plaque's card -->
-  <aside class="panel" aria-label="Plaque information">
+  <aside class="panel" [class.open]="sheetOpen" aria-label="Plaque information">
+    <button type="button" class="sheet-handle" (click)="toggleSheet()" [attr.aria-expanded]="sheetOpen"
+            [attr.aria-label]="sheetOpen ? 'Show less' : 'Show more'">
+      <span aria-hidden="true"></span>
+    </button>
+
     @if (error) {
       <div class="alert alert-warning small" role="alert">{{ error }}</div>
     } @else if (locationPermission === 'denied' && !userLocation) {
@@ -12,121 +16,174 @@
       </p>
     }
 
-    <!-- ask for the location only when the user wants it -->
-    @if (locationPermission === 'prompt' && !userLocation) {
-      <button type="button" class="btn btn-primary w-100 mb-3" (click)="locateMe()" [disabled]="locating">
-        {{ locating ? 'Finding your location…' : 'Show plaques near me' }}
-      </button>
-    }
+    <div class="list-part">
+      @if (userLocation) {
+        <p class="pill"><span class="dot" aria-hidden="true"></span>Location shared</p>
+      }
+      <h2 class="mb-1">Plaques {{ searchedFromUser ? 'near you' : 'in this area' }}</h2>
+      <p class="peek-line text-muted small">{{ visiblePlaques().length }} on the list</p>
 
-    @if (selected) {
-      <button type="button" class="btn btn-link px-0 mb-2" (click)="closePlaque()">&larr; All plaques</button>
-
-      <div class="d-flex align-items-start gap-2">
-        <span class="colour-dot mt-1" [style.background]="colourOf(selected)"></span>
-        <h2 class="h5 mb-1">{{ titleOf(selected) }}</h2>
-      </div>
-      <p class="text-muted small mb-2">
-        {{ selected.borough }} · {{ selected.colour }} plaque
-        @if (distanceFromUser(selected) !== null) {
-          · {{ distanceFromUser(selected) | number }} m from you
-        }
-      </p>
-      <p class="small">
-        {{ selected.inscription | slice:0:220 }}{{ selected.inscription?.length > 220 ? '…' : '' }}
-      </p>
-
-      @if (!route) {
-        <div class="d-flex flex-wrap gap-2">
-          <button type="button" class="btn btn-primary" (click)="startDirections()"
-                  [disabled]="routeLoading || locating">
-            {{ routeLoading || locating ? 'Finding a route…' : 'Directions' }}
+      <div class="sheet-body">
+        @if (locationPermission === 'prompt' && !userLocation) {
+          <p class="text-muted">Share your location to see the nearest plaques and how long it takes to walk there.</p>
+          <button type="button" class="btn btn-main btn-lg w-100" (click)="locateMe()" [disabled]="locating">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+              <circle cx="8" cy="8" r="4.5" /><circle cx="8" cy="8" r="1.5" /><path d="M8 1v2M8 13v2M1 8h2M13 8h2" />
+            </svg>
+            {{ locating ? 'Finding your location…' : 'Show plaques near me' }}
           </button>
-          <a class="btn btn-outline-primary" [routerLink]="['/plaques', selected._id]">Details</a>
-        </div>
-      } @else {
-        <section class="route mt-3" aria-labelledby="route-heading">
-          <h3 id="route-heading" class="visually-hidden">Walking directions</h3>
-          <div class="route-time">{{ route.minutes | duration }}</div>
-          <div class="text-muted small mb-3">
-            {{ route.distanceKm | number:'1.1-1' }} km walk · arrive {{ route.arrival | date:'HH:mm' }}
+          <p class="small text-muted mt-2">Used only to sort plaques by walking distance. We don't store it.</p>
+          <hr>
+          <p class="label text-muted">In view: central London</p>
+        } @else if (searchedFromUser) {
+          <p class="text-muted small">Sorted by walking distance from your location.</p>
+          <ul class="chip-row">
+            <li>
+              <button type="button" class="chip" [attr.aria-pressed]="withinWalk" (click)="withinWalk = !withinWalk">
+                <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="9" cy="2.5" r="1.25" /><path d="M6 14l2-5 2 2v3M8 9l.5-3.5L6 7l-1 2.5M8.5 5.5l2 2.5 2 .5" />
+                </svg>
+                Within 15 min walk
+              </button>
+            </li>
+          </ul>
+        } @else {
+          <p class="text-muted small">Sorted by distance from the middle of the map.</p>
+        }
+
+        @if (loading) {
+          <div class="placeholder-glow" aria-busy="true">
+            <span class="visually-hidden">Loading…</span>
+            @for (row of [1, 2, 3, 4, 5]; track row) {
+              <div class="plaque-row" aria-hidden="true">
+                <span class="placeholder letter-dot"></span>
+                <span class="flex-grow-1">
+                  <span class="placeholder col-8 d-block mb-1"></span>
+                  <span class="placeholder placeholder-sm col-5"></span>
+                </span>
+              </div>
+            }
           </div>
-          <div class="d-flex flex-wrap gap-2 mb-3">
-            <a class="btn btn-primary" [href]="googleMapsUrl(selected)" target="_blank" rel="noopener">
-              Open in Google Maps
-            </a>
-            <button type="button" class="btn btn-outline-secondary" (click)="clearRoute()">Close route</button>
-          </div>
-          <ol class="steps">
-            @for (step of route.steps; track $index) {
+        } @else {
+          <ul class="plaque-list">
+            @for (plaque of visiblePlaques(); track plaque._id) {
               <li>
-                <span>{{ step.text }}</span>
-                @if (step.km > 0) { <small>{{ step.km * 1000 | number:'1.0-0' }} m</small> }
+                <button type="button" class="plaque-row" [id]="'row-' + plaque._id"
+                        [class.selected]="selected?._id === plaque._id"
+                        [attr.aria-current]="selected?._id === plaque._id ? 'true' : null"
+                        (click)="selectPlaque(plaque)">
+                  <span class="letter-dot" [style.background]="colourOf(plaque)" aria-hidden="true">{{ letterOf(plaque) }}</span>
+                  <span class="flex-grow-1">
+                    <span class="d-block fw-semibold">{{ nameOf(plaque) }}</span>
+                    <span class="small text-muted">{{ plaque.borough }}</span>
+                  </span>
+                  <span class="distance">
+                    <strong class="d-block">{{ distanceText(plaque.distance_m) }}</strong>
+                    @if (searchedFromUser) {
+                      <span class="text-muted">{{ plaque.walking_minutes | duration }}</span>
+                    }
+                  </span>
+                </button>
+              </li>
+            } @empty {
+              <li class="text-muted small py-2">
+                @if (withinWalk) { None of these is within 15 minutes' walk. } @else { No plaques here. Move the map and press "Search this area". }
               </li>
             }
-          </ol>
-        </section>
-      }
-    } @else {
-      <h2 class="h5 mb-1">Plaques {{ searchedFromUser ? 'near you' : 'in this area' }}</h2>
-      <p class="text-muted small">Tap a plaque on the map or in the list for details and directions.</p>
+          </ul>
+        }
+      </div>
+    </div>
 
-      @if (loading) {
-        <div class="placeholder-glow" aria-busy="true">
-          <span class="visually-hidden">Loading…</span>
-          @for (row of [1, 2, 3, 4, 5]; track row) {
-            <div class="plaque-row" aria-hidden="true">
-              <span class="colour-dot placeholder placeholder-xs"></span>
-              <span class="flex-grow-1">
-                <span class="placeholder col-8 d-block mb-1"></span>
-                <span class="placeholder placeholder-sm col-5"></span>
-              </span>
+    @if (selected) {
+      <section class="place-card" aria-labelledby="place-name">
+        <div class="d-flex align-items-start gap-2">
+          <div class="flex-grow-1">
+            <p class="label text-muted mb-1">
+              <span class="letter-dot small-dot" [style.background]="colourOf(selected)" aria-hidden="true">{{ letterOf(selected) }}</span>
+              {{ route ? 'Route preview' : (selected.colour | titlecase) + ' plaque' }}
+            </p>
+            <h2 id="place-name" class="h3 mb-1">{{ nameOf(selected) }}</h2>
+            <p class="text-muted small mb-0">
+              {{ selected.borough }}
+              @if (distanceFromUser(selected) !== null) {
+                · {{ distanceText(distanceFromUser(selected)!) }} from you
+              }
+            </p>
+          </div>
+          <button type="button" class="btn close-btn" (click)="closePlaque()" aria-label="Close plaque">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+          </button>
+        </div>
+
+        <div class="sheet-body">
+          @if (!route) {
+            <p class="small mt-3">
+              {{ selected.inscription | slice:0:220 }}{{ selected.inscription?.length > 220 ? '…' : '' }}
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-main" (click)="startDirections()" [disabled]="routeLoading || locating">
+                {{ routeLoading || locating ? 'Finding a route…' : 'Directions' }}
+              </button>
+              <a class="btn btn-outline-primary" [routerLink]="['/plaques', selected._id]">Details</a>
+            </div>
+          } @else {
+            <p class="route-time"><strong>{{ route.minutes | duration }}</strong> walk</p>
+            <p class="text-muted small">{{ route.distanceKm | number:'1.1-1' }} km · arrive {{ route.arrival | date:'HH:mm' }}</p>
+            <ol class="steps">
+              @for (step of route.steps; track $index) {
+                <li>
+                  <span class="flex-grow-1">{{ step.text }}</span>
+                  @if (step.km > 0) { <span class="text-muted">{{ step.km * 1000 | number:'1.0-0' }} m</span> }
+                </li>
+              }
+            </ol>
+            <div class="d-grid gap-2">
+              @if (!routeShown) {
+                <button type="button" class="btn btn-main btn-lg" (click)="startWalking()">
+                  <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M14 2L2 7.5l5 1.5 1.5 5z" /></svg>
+                  Start walking route
+                </button>
+              }
+              <a class="btn btn-outline-primary" [href]="googleMapsUrl(selected)" target="_blank" rel="noopener">
+                Open in Google Maps
+                <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M9 2.5h4.5V7M13.5 2.5L7.5 8.5M11.5 9.5v4h-9v-9h4" /></svg>
+                <span class="visually-hidden">(opens in a new tab)</span>
+              </a>
+              <button type="button" class="btn btn-link" (click)="clearRoute()">Close route</button>
             </div>
           }
         </div>
-      } @else {
-        <ul class="list-unstyled plaque-list">
-          @for (plaque of plaques; track plaque._id) {
-            <li>
-              <button type="button" class="plaque-row" (click)="selectPlaque(plaque)">
-                <span class="colour-dot" [style.background]="colourOf(plaque)"></span>
-                <span class="flex-grow-1">
-                  <span class="d-block fw-semibold">{{ titleOf(plaque) }}</span>
-                  <small class="text-muted">
-                    {{ plaque.borough }} ·
-                    @if (searchedFromUser) {
-                      {{ plaque.distance_m }} m · {{ plaque.walking_minutes | duration}} walk
-                    } @else {
-                      {{ plaque.distance_m }} m from the map centre
-                    }
-                  </small>
-                </span>
-              </button>
-            </li>
-          } @empty {
-            <li class="text-muted small py-2">No plaques here. Move the map and press "Search this area".</li>
-          }
-        </ul>
-      }
+        <p class="visually-hidden" role="status">{{ routeShown ? 'The route is shown on the map.' : '' }}</p>
+      </section>
     }
   </aside>
 
-  <!-- the map with its floating buttons -->
   <div class="map-wrap">
     <div #mapContainer class="map" role="region" aria-label="Map of plaques"></div>
 
+    <div class="map-key">
+      <p class="label mb-1 d-none d-lg-block" aria-hidden="true">Map key</p>
+      <ul aria-label="Map key">
+        <li><span class="letter-dot" style="background: var(--plaque-blue)" aria-hidden="true">B</span>Blue</li>
+        <li><span class="letter-dot" style="background: var(--green-900)" aria-hidden="true">G</span>Green</li>
+        <li><span class="letter-dot" style="background: var(--ink)" aria-hidden="true">K</span>Black</li>
+        <li><span class="letter-dot" style="background: var(--marker-brown)" aria-hidden="true">Br</span>Brown</li>
+        <li><span class="letter-dot" style="background: var(--marker-other)" aria-hidden="true">O</span>Other</li>
+        <li><span class="you-key" aria-hidden="true"></span>You</li>
+      </ul>
+    </div>
+
     @if (showSearchArea) {
-      <button type="button" class="btn btn-light shadow search-area" (click)="searchHere()">
+      <button type="button" class="btn btn-outline-primary search-area" (click)="searchHere()">
         Search this area
       </button>
     }
 
-    <button type="button" class="btn btn-light shadow locate-btn" (click)="locateMe()" [disabled]="locating"
+    <button type="button" class="btn locate-btn" (click)="locateMe()" [disabled]="locating"
             aria-label="Show my location" title="Show my location">
-      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="4" fill="#1a73e8" />
-        <circle cx="12" cy="12" r="8" fill="none" stroke="#5f6368" stroke-width="2" />
-        <path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="#5f6368" stroke-width="2" />
+      <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+        <circle cx="8" cy="8" r="4.5" /><circle cx="8" cy="8" r="1.5" /><path d="M8 1v2M8 13v2M1 8h2M13 8h2" />
       </svg>
     </button>
   </div>

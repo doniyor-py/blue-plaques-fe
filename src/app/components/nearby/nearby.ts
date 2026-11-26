@@ -1,5 +1,5 @@
-import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { DatePipe, DecimalPipe, SlicePipe } from '@angular/common';
+import { Component, AfterViewInit, OnDestroy, ViewChild, ElementRef, Injector, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
+import { DatePipe, DecimalPipe, SlicePipe, TitleCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { timeout, TimeoutError } from 'rxjs';
 import * as L from 'leaflet';
@@ -7,17 +7,15 @@ import { PlaqueService } from '../../services/plaque-service';
 import { RouteService } from '../../services/route-service';
 import { decodePolyline } from '../../services/polyline';
 import { DurationPipe } from '../../pipes/duration-pipe';
+import { plaqueColour } from '../../plaque-text';
 
 const LONDON = L.latLng(51.5074, -0.1278);
 
-const PLAQUE_COLOURS: Record<string, string> = {
-  blue: '#1d4f91', green: '#2e7d4f', brown: '#7b4a2a', black: '#222222', red: '#c62828',
-  white: '#ffffff', grey: '#7d7d7d', bronze: '#b0743a', stone: '#a89f88'
-};
+const MARKER_LETTERS: Record<string, string> = { blue: 'B', green: 'G', black: 'K', brown: 'Br' };
 
 @Component({
   selector: 'app-nearby',
-  imports: [DatePipe, DecimalPipe, SlicePipe, RouterLink, DurationPipe],
+  imports: [DatePipe, DecimalPipe, SlicePipe, TitleCasePipe, RouterLink, DurationPipe],
   templateUrl: './nearby.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './nearby.css'
@@ -28,7 +26,7 @@ export class Nearby implements AfterViewInit, OnDestroy {
   map!: L.Map;
   plaqueLayer = L.layerGroup();
   routeLayer = L.layerGroup();
-  markersById = new Map<string, { marker: L.CircleMarker; plaque: any }>();
+  markersById = new Map<string, { marker: L.Marker; plaque: any }>();
   youMarker: L.Marker | null = null;
 
   userLocation: L.LatLng | null = null;
@@ -38,6 +36,10 @@ export class Nearby implements AfterViewInit, OnDestroy {
   plaques: any[] = [];
   selected: any = null;
   route: any = null;
+  routeLine: L.LatLngExpression[] = [];
+  routeShown: boolean = false;
+  withinWalk: boolean = false;
+  sheetOpen: boolean = true;
 
   loading: boolean = false;
   locating: boolean = false;
@@ -48,7 +50,8 @@ export class Nearby implements AfterViewInit, OnDestroy {
 
   constructor(private plaqueService: PlaqueService,
               private routeService: RouteService,
-              private activatedRoute: ActivatedRoute) {}
+              private activatedRoute: ActivatedRoute,
+              private injector: Injector) {}
 
   ngAfterViewInit() {
     this.map = L.map(this.mapContainer.nativeElement, { zoomControl: false }).setView(LONDON, 15);
@@ -198,38 +201,53 @@ export class Nearby implements AfterViewInit, OnDestroy {
 
   addMarker(plaque: any) {
     const [lng, lat] = plaque.location.coordinates;        // GeoJSON order: [lng, lat]
-    const marker = L.circleMarker([lat, lng], this.markerStyle(plaque, false))
+    const marker = L.marker([lat, lng], { icon: this.markerIcon(plaque, false), title: this.titleOf(plaque) })
       .bindTooltip(this.textElement(this.titleOf(plaque)))
-      .on('click', () => this.selectPlaque(plaque))
+      .on('click', () => this.selectPlaque(plaque, true))
       .addTo(this.plaqueLayer);
     this.markersById.set(plaque._id, { marker: marker, plaque: plaque });
   }
 
-  markerStyle(plaque: any, isSelected: boolean): L.CircleMarkerOptions {
-    return {
-      radius: isSelected ? 11 : 7,
-      color: plaque.colour === 'white' ? '#555555' : '#ffffff',
-      weight: isSelected ? 4 : 2,
-      fillColor: this.colourOf(plaque),
-      fillOpacity: 1
-    };
+  markerIcon(plaque: any, isSelected: boolean): L.DivIcon {
+    const size = isSelected ? 40 : 28;
+    return L.divIcon({
+      className: 'plaque-marker-icon',
+      html: `<span class="plaque-marker${isSelected ? ' selected' : ''}" style="background:${this.colourOf(plaque)}">`
+            + `${this.letterOf(plaque)}</span>`,
+      iconSize: [size, size]
+    });
   }
 
   updateHighlight() {
     this.markersById.forEach(({ marker, plaque }, id) => {
       const isSelected = this.selected?._id === id;
-      marker.setStyle(this.markerStyle(plaque, isSelected));
-      if (isSelected) { marker.bringToFront(); }
+      marker.setIcon(this.markerIcon(plaque, isSelected));
+      marker.setZIndexOffset(isSelected ? 1000 : 0);
     });
+  }
+
+  // "Within 15 min walk" only makes sense when the distances are from the user
+  visiblePlaques(): any[] {
+    if (!this.withinWalk || !this.searchedFromUser) { return this.plaques; }
+    return this.plaques.filter(plaque => plaque.walking_minutes <= 15);
+  }
+
+  toggleSheet(open: boolean = !this.sheetOpen) {
+    this.sheetOpen = open;
+    afterNextRender(() => this.map.invalidateSize(), { injector: this.injector });
   }
 
   // ---------- the plaque card ----------
 
-  selectPlaque(plaque: any) {
+  selectPlaque(plaque: any, fromMarker: boolean = false) {
     this.selected = plaque;
     this.clearRoute();
     this.updateHighlight();
-    this.scrollPanelToTop();
+    this.toggleSheet(true);
+    if (fromMarker) {
+      afterNextRender(() => document.getElementById('row-' + plaque._id)?.scrollIntoView({ block: 'nearest' }),
+                      { injector: this.injector });
+    }
     const [lng, lat] = plaque.location.coordinates;
     if (!this.map.getBounds().contains([lat, lng])) {
       this.map.panTo([lat, lng]);
@@ -240,13 +258,6 @@ export class Nearby implements AfterViewInit, OnDestroy {
     this.selected = null;
     this.clearRoute();
     this.updateHighlight();
-    this.scrollPanelToTop();
-  }
-
-  scrollPanelToTop() {
-    if (window.matchMedia('(max-width: 991px)').matches) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
   }
 
   openPlaqueFromLink(id: string, withDirections: boolean) {
@@ -294,12 +305,7 @@ export class Nearby implements AfterViewInit, OnDestroy {
           steps: leg.maneuvers.map((step: any) => ({ text: step.instruction, km: step.length }))
         };
         this.showSearchArea = false;
-
-        const line = decodePolyline(leg.shape, 6);
-        this.routeLayer.clearLayers();
-        L.polyline(line, { color: '#ffffff', weight: 9, opacity: 0.9 }).addTo(this.routeLayer);
-        const path = L.polyline(line, { color: '#1a73e8', weight: 5 }).addTo(this.routeLayer);
-        this.map.fitBounds(path.getBounds(), { padding: [60, 60] });
+        this.routeLine = decodePolyline(leg.shape, 6);
         this.routeLoading = false;
       },
       error: (err) => {
@@ -311,9 +317,20 @@ export class Nearby implements AfterViewInit, OnDestroy {
     });
   }
 
+  startWalking() {
+    this.routeLayer.clearLayers();
+    L.polyline(this.routeLine, { className: 'route-casing', weight: 9 }).addTo(this.routeLayer);
+    const path = L.polyline(this.routeLine, { className: 'route-line', weight: 5 }).addTo(this.routeLayer);
+    this.map.fitBounds(path.getBounds(), { padding: [60, 60] });
+    this.routeShown = true;
+    this.toggleSheet(false);
+  }
+
   clearRoute() {
     this.routeLayer.clearLayers();
     this.route = null;
+    this.routeLine = [];
+    this.routeShown = false;
   }
 
   googleMapsUrl(plaque: any): string {
@@ -339,8 +356,24 @@ export class Nearby implements AfterViewInit, OnDestroy {
     return text.length > 60 ? text.slice(0, 60) + '…' : text;
   }
 
+  // "Charles Dickens blue plaque" -> "Charles Dickens"
+  nameOf(plaque: any): string {
+    const title = this.titleOf(plaque);
+    const suffix = ' ' + plaque.colour + ' plaque';
+    return title.toLowerCase().endsWith(suffix) ? title.slice(0, -suffix.length) : title;
+  }
+
   colourOf(plaque: any): string {
-    return PLAQUE_COLOURS[plaque.colour] || PLAQUE_COLOURS['blue'];
+    return plaqueColour(plaque);
+  }
+
+  // "40 m" close by, "1.4 km" further away
+  distanceText(metres: number): string {
+    return metres < 1000 ? Math.round(metres / 10) * 10 + ' m' : (metres / 1000).toFixed(1) + ' km';
+  }
+
+  letterOf(plaque: any): string {
+    return MARKER_LETTERS[plaque.colour] || 'O';
   }
 
   textElement(text: string): HTMLElement {

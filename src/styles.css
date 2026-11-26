@@ -442,16 +442,54 @@ b, strong, .fw-bold { font-weight: 600; }
 }
 
 .you-dot {
-  background: #1a73e8;
-  border: 3px solid #ffffff;
+  background: var(--leaf-500);
+  border: 3px solid var(--surface);
   border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--ink);
   animation: you-pulse 2s infinite;
 }
 
 @keyframes you-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0.5); }
-  70%  { box-shadow: 0 0 0 14px rgba(26, 115, 232, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(26, 115, 232, 0); }
+  0%   { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 0 rgba(124, 179, 66, 0.6); }
+  70%  { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 14px rgba(124, 179, 66, 0); }
+  100% { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 0 rgba(124, 179, 66, 0); }
+}
+
+/* map markers (Leaflet adds these outside the component) */
+.plaque-marker-icon {
+  background: none;
+  border: 0;
+}
+
+.plaque-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--surface);
+  border-radius: 50%;
+  color: var(--surface);
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(23, 35, 27, 0.35);
+}
+
+.plaque-marker.selected {
+  font-size: 0.9375rem;
+  border-width: 3px;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.route-casing {
+  stroke: var(--surface);
+  stroke-opacity: 0.9;
+}
+
+.route-line {
+  stroke: var(--green-900);
+  stroke-dasharray: 1 10;
+  stroke-linecap: round;
 }
 
 @media (prefers-reduced-motion: reduce) {
