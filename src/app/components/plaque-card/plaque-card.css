@@ -1,0 +1,114 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.plaque-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 1rem;
+  height: 100%;
+  padding: 0.75rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+}
+
+.plaque-card:focus-within {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.name a:focus-visible {
+  outline: none;
+}
+
+.media img,
+.tile {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green-50);
+}
+
+.tile .roundel {
+  width: 3rem;
+  height: 3rem;
+}
+
+.content p {
+  margin: 0;
+}
+
+.meta {
+  color: var(--muted);
+}
+
+.name {
+  margin: 0.125rem 0;
+}
+
+.name a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.plaque-card:hover .name a {
+  text-decoration: underline;
+}
+
+.street,
+.rating {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.content .rating {
+  margin-top: 0.75rem;
+}
+
+.rating strong {
+  color: var(--ink);
+}
+
+.star {
+  width: 1rem;
+  height: 1rem;
+  vertical-align: -2px;
+  fill: var(--green-900);
+}
+
+@media (min-width: 768px) {
+  .plaque-card {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .media img,
+  .tile {
+    aspect-ratio: 4 / 3;
+    border-radius: 0;
+  }
+  .tile .roundel {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+  .content {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+  .street,
+  .rating {
+    font-size: 0.9375rem;
+    line-height: 1.5rem;
+  }
+}

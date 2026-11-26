@@ -1,26 +1,164 @@
-<div class="container">
-  <h1 class="h2 mb-2">Discover London's blue plaques</h1>
-  <p class="lead text-muted mb-4">
-    Find out who lived and worked on the streets around you, walk to their plaques and keep track of the ones you visit.
-  </p>
+<section class="container hero">
+  <div class="row align-items-center gy-5">
+    <div class="col-lg-7">
+      <p class="label eyebrow">
+        @if (total !== null && boroughCount !== null) {
+          {{ total | number }} plaques · {{ boroughCount }} London boroughs
+        }
+      </p>
+      <h1 class="display-1 hero-title">
+        Every London street has a <span class="story">story</span> fixed to its wall.
+      </h1>
+      <p class="intro">
+        Find the commemorative plaques near you, walk to them, and keep a record of the ones you've visited.
+      </p>
 
-  <div class="d-flex flex-wrap gap-2 mb-4">
-    <a routerLink="/nearby" class="btn btn-primary btn-lg">Find plaques near me</a>
-    <a routerLink="/plaques" class="btn btn-outline-primary btn-lg">Browse plaques</a>
-    <button class="btn btn-outline-primary btn-lg" (click)="surpriseMe()" [disabled]="loading">
-      {{ loading ? 'Finding one...' : 'Surprise me' }}
-    </button>
-  </div>
+      <div class="hero-actions">
+        <a routerLink="/nearby" class="btn btn-main btn-lg">
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="4.5" /><circle cx="8" cy="8" r="1.5" />
+            <path d="M8 1v2M8 13v2M1 8h2M13 8h2" />
+          </svg>
+          Find plaques near me
+        </a>
+        <a routerLink="/plaques" class="btn btn-outline-primary btn-lg">Browse plaques</a>
+        <button type="button" class="btn btn-link btn-lg" (click)="surpriseMe()" [disabled]="loading">
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M2 4.5h2.5l6 7H14M2 11.5h2.5L7 8.6M9.2 6l1.3-1.5H14M12 2.5l2 2-2 2M12 9.5l2 2-2 2" />
+          </svg>
+          {{ loading ? 'Finding one...' : 'Surprise me' }}
+        </button>
+      </div>
+      <p class="privacy small text-muted">We only use your location to sort plaques by walking distance.</p>
+    </div>
 
-  @if (randomPlaque) {
-    <div class="card">
-      <div class="card-body">
-        <h2 class="h5">
-          <a [routerLink]="['/plaques', randomPlaque._id]">{{ randomPlaque.title }}</a>
-        </h2>
-        <p class="mb-1">{{ randomPlaque.inscription | slice:0:200 }}...</p>
-        <small class="text-muted">{{ randomPlaque.borough }}</small>
+    <div class="col-lg-5">
+      <div class="hero-plaque" #roundel>
+        <div class="big-roundel">
+          @if (randomPlaque) {
+            <p class="roundel-name">{{ name(randomPlaque) }}</p>
+            @if (years(randomPlaque)) {
+              <p class="roundel-years">{{ years(randomPlaque) }}</p>
+            }
+            @if (role(randomPlaque)) {
+              <p class="roundel-role">{{ role(randomPlaque) }}</p>
+            }
+          }
+        </div>
+        @if (randomPlaque) {
+          <p class="small text-muted mt-3 mb-1">{{ place(randomPlaque) }}</p>
+          <a class="read-link" [routerLink]="['/plaques', randomPlaque._id]">
+            Read about this plaque<span class="visually-hidden">: {{ name(randomPlaque) }}</span>
+          </a>
+        }
+        <span class="visually-hidden" role="status">{{ announcement }}</span>
       </div>
     </div>
+  </div>
+</section>
+
+<section class="container start" aria-labelledby="start-heading">
+  <div class="d-flex justify-content-between align-items-baseline gap-3 mb-3">
+    <h2 id="start-heading" class="mb-0">Plaques to start with</h2>
+    <a class="d-none d-md-inline fw-semibold" routerLink="/plaques">
+      Browse all {{ total !== null ? (total | number) : 'plaques' }}
+    </a>
+  </div>
+
+  <ul class="chip-row" aria-label="Browse by category">
+    @for (chip of chips; track chip.category) {
+      <li>
+        <a class="chip" routerLink="/plaques" [queryParams]="{ category: chip.category }">
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path [attr.d]="chip.icon" /></svg>
+          {{ chip.label }}
+        </a>
+      </li>
+    }
+  </ul>
+
+  @if (cardsError) {
+    <div class="load-error" role="alert">
+      <p class="mb-0">
+        <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" /><path d="M8 4.5v4M8 11v.5" /></svg>
+        {{ cardsError }}
+      </p>
+      <button type="button" class="btn btn-outline-primary" (click)="loadCards()">Try again</button>
+    </div>
+  } @else if (cardsLoading) {
+    <div class="row g-3 g-lg-4 placeholder-glow" aria-busy="true">
+      <span class="visually-hidden">Loading plaques…</span>
+      @for (card of [1, 2, 3, 4]; track card) {
+        <div class="col-md-6 col-lg-3" aria-hidden="true">
+          <div class="skeleton-card">
+            <span class="placeholder skeleton-media"></span>
+            <div class="p-3">
+              <span class="placeholder col-5"></span>
+              <span class="placeholder placeholder-lg col-8"></span>
+              <span class="placeholder col-6"></span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <ul class="row g-3 g-lg-4 list-unstyled mb-0">
+      @for (plaque of cards; track plaque._id) {
+        <li class="col-md-6 col-lg-3"><app-plaque-card [plaque]="plaque" /></li>
+      }
+    </ul>
   }
-</div>
+
+  <a class="d-inline-block d-md-none fw-semibold mt-4" routerLink="/plaques">
+    Browse all {{ total !== null ? (total | number) : 'plaques' }}
+  </a>
+</section>
+
+<section class="insights-band" aria-labelledby="insights-heading">
+  <div class="container">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-6">
+        @if (!authService.isLoggedIn()) {
+          <p class="label eyebrow">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+              <rect x="3" y="7" width="10" height="7" rx="1.5" /><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+            </svg>
+            Members only
+          </p>
+        }
+        <h2 id="insights-heading">See the whole picture with Insights</h2>
+        <p class="intro">
+          Charts of London's plaques by borough, decade and profession, and the plaques members rate highest.
+          @if (!authService.isLoggedIn()) { Free with an account. }
+        </p>
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          @if (authService.isLoggedIn()) {
+            <a class="btn btn-outline-primary" routerLink="/insights">See Insights</a>
+          } @else {
+            <a class="btn btn-primary" routerLink="/signup">Create a free account</a>
+            <a class="btn btn-link" routerLink="/login">Log in</a>
+          }
+        </div>
+      </div>
+
+      @if (!authService.isLoggedIn()) {
+        <div class="col-lg-6" aria-hidden="true">
+          <div class="locked-preview">
+            <div class="blurred">
+              <p class="preview-title">Plaques by borough</p>
+              @for (width of [90, 70, 55, 40]; track width) {
+                <div class="preview-row"><span></span><span [style.width.%]="width"></span></div>
+              }
+            </div>
+            <div class="preview-lock">
+              <svg class="icon" viewBox="0 0 16 16">
+                <rect x="3" y="7" width="10" height="7" rx="1.5" /><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+              </svg>
+              <p class="preview-heading">Log in to see the charts</p>
+              <p class="small mb-0">Borough, decade and profession</p>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
