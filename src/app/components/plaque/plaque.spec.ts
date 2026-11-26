@@ -7,6 +7,7 @@ import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 
 import { Plaque } from './plaque';
+import { ToastService } from '../../services/toast-service';
 import { API_URL } from '../../api';
 
 const userToken = 'header.' + btoa(JSON.stringify({
@@ -66,6 +67,12 @@ describe('Plaque page', () => {
     const button = [...page.querySelectorAll('button')].find(b => b.textContent!.trim() === text);
     if (!button) { throw new Error('No button called "' + text + '"'); }
     return button;
+  }
+
+  // the toast lives in the app shell, so the test presses its action through the service
+  function rateFromToast() {
+    TestBed.inject(ToastService).current()!.actions![0].run();
+    harness.detectChanges();
   }
 
   function checkIn(page: HTMLElement) {
@@ -137,6 +144,14 @@ describe('Plaque page', () => {
     expect(page.textContent).toContain('Something went wrong on the server');
   });
 
+  it('says "Saved to your favourites" once the save goes through', async () => {
+    const page = await openPlaque(true);
+    buttonCalled(page, 'Save').click();
+    http.expectOne(API_URL + '/users/me/favourites/p1').flush({ message: 'Added to favourites' });
+    harness.detectChanges();
+    expect(TestBed.inject(ToastService).current()!.text).toBe('Saved to your favourites');
+  });
+
   it('shows the plaque and its visits', async () => {
     const page = await openPlaque(false);
     expect(page.querySelector('h1')!.textContent!.trim()).toBe('Charles Dickens');
@@ -162,7 +177,9 @@ describe('Plaque page', () => {
     const page = await openPlaque(true);
     checkIn(page);
 
-    expect(page.querySelector('.app-toast')!.textContent).toContain('Visit saved');
+    const toast = TestBed.inject(ToastService).current()!;
+    expect(toast.text).toBe('Visit saved:');
+    expect(toast.actions!.map(action => action.label)).toEqual(['rate it', 'add a photo']);
     expect(buttonCalled(page, 'Visited today').disabled).toBeTrue();
     expect(page.textContent).toContain('2 visits');
   });
@@ -170,7 +187,7 @@ describe('Plaque page', () => {
   it('will not save a review until all three ratings are chosen', async () => {
     const page = await openPlaque(true);
     checkIn(page);
-    buttonCalled(page, 'rate it').click();
+    rateFromToast();
     harness.detectChanges();
 
     buttonCalled(page, 'Save review').click();
@@ -183,7 +200,7 @@ describe('Plaque page', () => {
   it('saves the chosen stars and the note', async () => {
     const page = await openPlaque(true);
     checkIn(page);
-    buttonCalled(page, 'rate it').click();
+    rateFromToast();
     harness.detectChanges();
 
     (page.querySelector('label[for="history-4"]') as HTMLElement).click();

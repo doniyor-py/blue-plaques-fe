@@ -11,6 +11,7 @@ import { PlaquePhotos } from '../plaque-photos/plaque-photos';
 import { PlaqueRoundel } from '../plaque-roundel/plaque-roundel';
 import { plaqueName, categoryLabel, plaqueColour, initials, CATEGORY_LABELS } from '../../plaque-text';
 import { ConfirmService } from '../../services/confirm-service';
+import { ToastService } from '../../services/toast-service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
@@ -48,7 +49,6 @@ export class Plaque implements OnInit {
 
   showReportForm: boolean = false;
   reportForm: FormGroup;
-  reportMessage: string = '';
   reportError: string = '';
   reportSending: boolean = false;
 
@@ -82,7 +82,8 @@ export class Plaque implements OnInit {
               private router: Router,
               private injector: Injector,
               private titleService: Title,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private toastService: ToastService) {
     this.reviewForm = this.formBuilder.group({
       history: [null, Validators.required],
       condition: [null, Validators.required],
@@ -118,7 +119,6 @@ export class Plaque implements OnInit {
     this.visitMessage = '';
     this.visitError = '';
     this.showReportForm = false;
-    this.reportMessage = '';
     this.reportError = '';
     this.walkMinutes = null;
 
@@ -261,6 +261,10 @@ export class Plaque implements OnInit {
       next: (response) => {
         this.checkingIn = false;
         this.justVisitedId = response._id;
+        this.toastService.show({ text: 'Visit saved:', actions: [
+          { label: 'rate it', run: () => this.reviewNewVisit() },
+          { label: 'add a photo', run: () => this.goToPhotos() }
+        ] });
         this.loadVisits();
       },
       error: (err) => {
@@ -382,7 +386,10 @@ export class Plaque implements OnInit {
       : this.userService.addFavourite(this.plaqueId);
 
     request.subscribe({
-      next: () => this.favouriteBusy = false,
+      next: () => {
+        this.favouriteBusy = false;
+        if (!wasFavourite) { this.toastService.show({ text: 'Saved to your favourites' }); }
+      },
       error: (err) => {
         this.isFavourite = wasFavourite;
         this.favouriteError = err.error?.error || 'Could not update your favourites.';
@@ -396,7 +403,6 @@ export class Plaque implements OnInit {
   toggleReportForm() {
     this.showReportForm = !this.showReportForm;
     this.reportError = '';
-    this.reportMessage = '';
   }
 
   onSubmitReport() {
@@ -410,7 +416,7 @@ export class Plaque implements OnInit {
 
     this.reportService.reportProblem(this.plaqueId, type, message.trim()).subscribe({
       next: (response) => {
-        this.reportMessage = response.message;
+        this.toastService.show({ text: response.message ? 'Report sent. ' + response.message : 'Report sent' });
         this.showReportForm = false;
         this.reportForm.reset({ type: '', message: '' });
         this.reportSending = false;

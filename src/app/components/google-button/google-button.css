@@ -7,7 +7,7 @@
   align-items: center;
   gap: 0.75rem;
   margin-top: 1.25rem;
-  color: #6c757d;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -15,5 +15,5 @@
 .or-divider::after {
   content: "";
   flex: 1;
-  border-top: 1px solid #dee2e6;
+  border-top: 1px solid var(--hairline);
 }

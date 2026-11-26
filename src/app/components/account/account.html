@@ -1,11 +1,11 @@
 <div class="container mb-5" style="max-width: 640px;">
   <a routerLink="/profile" class="d-inline-block mb-3">&larr; My profile</a>
-  <h1 class="h3 mb-4">Account settings</h1>
+  <h1 class="mb-4">Account settings</h1>
 
   <!-- change password -->
   <section class="card mb-4" aria-labelledby="password-heading">
     <div class="card-body">
-      <h2 id="password-heading" class="h5">Change password</h2>
+      <h2 id="password-heading" class="h3">Change password</h2>
 
       @if (!hasPassword) {
         <p class="mb-0">
@@ -55,9 +55,9 @@
   </section>
 
   <!-- delete account -->
-  <section class="card border-danger" aria-labelledby="delete-heading">
+  <section class="card" aria-labelledby="delete-heading">
     <div class="card-body">
-      <h2 id="delete-heading" class="h5 text-danger">Delete account</h2>
+      <h2 id="delete-heading" class="h3 text-danger">Delete account</h2>
 
       @if (authService.isAdmin()) {
         <p class="text-muted mb-0">Admin accounts can't be deleted here.</p>

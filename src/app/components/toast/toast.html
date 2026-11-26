@@ -1,0 +1,19 @@
+<div aria-live="polite" aria-atomic="true">
+  @if (toastService.current(); as toast) {
+    <div class="app-toast" (mouseenter)="toastService.pause()" (mouseleave)="toastService.resume()"
+         (focusin)="toastService.pause()" (focusout)="toastService.resume()">
+      <svg class="icon toast-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" /></svg>
+      <p class="mb-0">
+        @if (toast.actions?.length) {
+          <strong>{{ toast.text }}</strong>
+          @for (action of toast.actions; track action.label) {<span>{{ $first ? ' ' : ' or ' }}</span><button type="button" class="toast-link" (click)="runAction(action)">{{ action.label }}</button>}
+        } @else {
+          {{ toast.text }}
+        }
+      </p>
+      <button type="button" class="toast-close" aria-label="Close message" (click)="toastService.hide()">
+        <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
+      </button>
+    </div>
+  }
+</div>

@@ -6,7 +6,11 @@
 .viewer img {
   max-width: 100%;
   max-height: 80vh;
-  border-radius: 0.375rem;
+  border-radius: var(--radius);
+}
+
+.viewer-caption {
+  color: var(--surface);
 }
 
 .viewer-close {
@@ -18,4 +22,6 @@
   border-radius: 50%;
   font-size: 1.5rem;
   line-height: 1;
+  background: var(--surface);
+  color: var(--ink);
 }

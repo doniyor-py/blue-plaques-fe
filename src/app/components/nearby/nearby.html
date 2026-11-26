@@ -24,7 +24,7 @@
       <p class="peek-line text-muted small">{{ visiblePlaques().length }} on the list</p>
 
       <div class="sheet-body">
-        @if (locationPermission === 'prompt' && !userLocation) {
+        @if (askingForLocation()) {
           <p class="text-muted">Share your location to see the nearest plaques and how long it takes to walk there.</p>
           <button type="button" class="btn btn-main btn-lg w-100" (click)="locateMe()" [disabled]="locating">
             <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
@@ -122,7 +122,9 @@
               {{ selected.inscription | slice:0:220 }}{{ selected.inscription?.length > 220 ? '…' : '' }}
             </p>
             <div class="d-flex flex-wrap gap-2">
-              <button type="button" class="btn btn-main" (click)="startDirections()" [disabled]="routeLoading || locating">
+              <!-- one leaf button per screen: the location button wins while it is showing -->
+              <button type="button" class="btn" [class.btn-main]="!askingForLocation()" [class.btn-primary]="askingForLocation()"
+                      (click)="startDirections()" [disabled]="routeLoading || locating">
                 {{ routeLoading || locating ? 'Finding a route…' : 'Directions' }}
               </button>
               <a class="btn btn-outline-primary" [routerLink]="['/plaques', selected._id]">Details</a>

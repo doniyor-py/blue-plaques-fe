@@ -95,6 +95,10 @@ export class Nearby implements AfterViewInit, OnDestroy {
 
   // ---------- the user's location ----------
 
+  askingForLocation(): boolean {
+    return this.locationPermission === 'prompt' && !this.userLocation;
+  }
+
   locateMe() {
     this.getUserLocation(
       () => {

@@ -1,15 +1,17 @@
-/* chart colours in one place (one blue for every single-series chart) */
+/* chart colours in one place: green-900 bars, leaf for the one being pointed at */
 :host {
-  --series-1: #2a78d6;
-  --track: #cde2fb;
-  --baseline: #c3c2b7;
-  --hover: #f3f7ff;
+  --series-1: var(--green-900);
+  --series-hover: var(--leaf-700);
+  --track: var(--green-50);
+  --baseline: var(--hairline);
+  --hover: var(--green-50);
 }
 
 .stat-number {
-  font-size: 1.9rem;
+  font-family: var(--font-serif);
+  font-size: 2rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 2.5rem;
 }
 
 
@@ -38,6 +40,10 @@
   background: var(--hover);
 }
 
+.bar-table tr:hover .bar {
+  background: var(--series-hover);
+}
+
 .bar-track {
   display: flex;
   align-items: center;
@@ -53,7 +59,7 @@
 
 .bar-value {
   font-size: 0.8rem;
-  color: #52514e;
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
@@ -93,11 +99,11 @@
 
 .column:hover .column-bar,
 .column:focus-visible .column-bar {
-  filter: brightness(1.15);
+  background: var(--series-hover);
 }
 
 .column:focus-visible {
-  box-shadow: 0 0 0 2px var(--series-1);
+  box-shadow: 0 0 0 2px var(--ink);
   border-radius: 4px;
 }
 
@@ -105,14 +111,14 @@
   position: absolute;
   top: -1.3rem;
   font-size: 0.75rem;
-  color: #52514e;
+  color: var(--muted);
 }
 
 .column-label {
   position: absolute;
   top: calc(100% + 4px);
-  font-size: 0.7rem;
-  color: #6c757d;
+  font-size: 0.75rem;
+  color: var(--muted);
   white-space: nowrap;
 }
 
@@ -122,10 +128,10 @@
   bottom: calc(100% - 1rem);
   z-index: 2;
   padding: 0.25rem 0.5rem;
-  background: #ffffff;
-  border: 1px solid rgba(11, 11, 11, 0.1);
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-float);
   font-size: 0.75rem;
   white-space: nowrap;
 }

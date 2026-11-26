@@ -5,6 +5,7 @@ import { Dialog } from '@angular/cdk/dialog';
 import { PhotoService } from '../../services/photo-service';
 import { AuthService } from '../../services/auth-service';
 import { ConfirmService } from '../../services/confirm-service';
+import { ToastService } from '../../services/toast-service';
 import { PhotoViewer } from '../photo-viewer/photo-viewer';
 
 const MAX_SIZE = 5 * 1024 * 1024;          // 5 MB limit
@@ -33,7 +34,8 @@ export class PlaquePhotos implements OnInit, OnDestroy {
               public authService: AuthService,
               private dialog: Dialog,
               private confirmService: ConfirmService,
-              private injector: Injector) {}
+              private injector: Injector,
+              private toastService: ToastService) {}
 
   ngOnInit() {
     this.loadPhotos();
@@ -91,7 +93,7 @@ export class PlaquePhotos implements OnInit, OnDestroy {
     this.photoService.uploadPhoto(this.plaqueId, this.selectedFile, this.caption.trim()).subscribe({
       next: (photo) => {
         this.photos = [...this.photos, photo];
-        this.message = 'Thanks! Your photo was added.';
+        this.toastService.show({ text: 'Photo uploaded' });
         this.showUpload = false;
         fileInput.value = '';
         this.selectedFile = null;

@@ -1,5 +1,5 @@
 <div class="container" style="max-width: 460px;">
-  <h1 class="h3 mb-4">Create an account</h1>
+  <h1 class="mb-4">Create an account</h1>
 
   @if (error) { <div class="alert alert-danger" role="alert">{{ error }}</div> }
 
@@ -43,7 +43,7 @@
           }
         </div>
         <ul id="password-rules" class="list-unstyled small mt-2 mb-1">
-          <li [class.text-success]="passwordLength() >= 8" [class.text-muted]="passwordLength() < 8">
+          <li [class.text-brand]="passwordLength() >= 8" [class.text-muted]="passwordLength() < 8">
             <span aria-hidden="true">{{ passwordLength() >= 8 ? '✓' : '○' }}</span>
             <span class="visually-hidden">{{ passwordLength() >= 8 ? 'Done:' : 'Not yet:' }}</span>
             At least 8 characters
@@ -82,7 +82,7 @@
 
       <div id="turnstile-box" class="mb-3"></div>
 
-      <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+      <button type="submit" class="btn btn-main w-100" [disabled]="loading">
         {{ loading ? 'Sending code...' : 'Sign up' }}
       </button>
     </form>
@@ -101,7 +101,7 @@
           <div class="invalid-feedback">Enter the 6 digits from the email.</div>
         }
       </div>
-      <button type="submit" class="btn btn-primary w-100" [disabled]="loading">
+      <button type="submit" class="btn btn-main w-100" [disabled]="loading">
         {{ loading ? 'Checking...' : 'Create account' }}
       </button>
     </form>

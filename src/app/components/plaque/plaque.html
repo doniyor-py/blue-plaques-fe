@@ -286,7 +286,6 @@
         </section>
 
         <section class="report" aria-label="Report a problem">
-          @if (reportMessage) { <div class="alert alert-success" role="status">{{ reportMessage }}</div> }
           @if (reportError) { <div class="alert alert-danger" role="alert">{{ reportError }}</div> }
 
           @if (authService.isLoggedIn()) {
@@ -337,18 +336,5 @@
       </div>
     </div>
 
-    @if (justVisitedId) {
-      <div class="app-toast" role="status">
-        <svg class="icon toast-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" /></svg>
-        <p class="mb-0">
-          <strong>Visit saved:</strong>
-          <button type="button" class="toast-link" (click)="reviewNewVisit()">rate it</button>
-          or <button type="button" class="toast-link" (click)="goToPhotos()">add a photo</button>
-        </p>
-        <button type="button" class="toast-close" aria-label="Maybe later" (click)="justVisitedId = null">
-          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
-        </button>
-      </div>
-    }
   }
 </div>

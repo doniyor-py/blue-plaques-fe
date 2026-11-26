@@ -1,16 +1,16 @@
 <div class="container">
-  <h1 class="h3 mb-3">Problem reports</h1>
+  <h1 class="mb-3">Problem reports</h1>
 
-  <div class="btn-group mb-3" role="group" aria-label="Filter reports by status">
-    <button type="button" class="btn btn-outline-primary" [class.active]="statusFilter === ''"
-            [attr.aria-pressed]="statusFilter === ''" (click)="setFilter('')">All</button>
+  <ul class="chip-row" aria-label="Filter reports by status">
+    <li><button type="button" class="chip" [attr.aria-pressed]="statusFilter === ''" (click)="setFilter('')">All</button></li>
     @for (status of statuses; track status.value) {
-      <button type="button" class="btn btn-outline-primary" [class.active]="statusFilter === status.value"
-              [attr.aria-pressed]="statusFilter === status.value" (click)="setFilter(status.value)">
-        {{ status.label }}
-      </button>
+      <li>
+        <button type="button" class="chip" [attr.aria-pressed]="statusFilter === status.value" (click)="setFilter(status.value)">
+          {{ status.label }}
+        </button>
+      </li>
     }
-  </div>
+  </ul>
 
   @if (message) { <div class="alert alert-success" role="status">{{ message }}</div> }
   @if (actionError) { <div class="alert alert-danger" role="alert">{{ actionError }}</div> }

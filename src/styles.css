@@ -127,7 +127,7 @@ b, strong, .fw-bold { font-weight: 600; }
 
 .btn:active,
 .btn.active {
-  box-shadow: inset 0 2px 0 rgba(23, 35, 27, 0.2);
+  box-shadow: inset 0 2px 0 color-mix(in srgb, var(--ink) 20%, transparent);
 }
 
 .btn:disabled,
@@ -259,6 +259,90 @@ b, strong, .fw-bold { font-weight: 600; }
 
 .form-text { color: var(--muted); }
 .invalid-feedback { font-weight: 600; }
+
+/* inline errors (page 2): an icon and text next to what failed, drawn in the text colour */
+.invalid-feedback::before,
+.alert-danger::before,
+.alert-warning::before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-right: 0.375rem;
+  vertical-align: -0.125em;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='6.5'/%3E%3Cpath d='M8 4.5v4M8 11v.5'/%3E%3C/svg%3E") no-repeat center / contain;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='6.5'/%3E%3Cpath d='M8 4.5v4M8 11v.5'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+
+/* alerts: errors are inline text, everything else a soft tinted box */
+.alert {
+  --bs-alert-border-color: transparent;
+  --bs-alert-bg: var(--green-50);
+  --bs-alert-color: var(--ink);
+  --bs-alert-link-color: var(--green-900);
+  font-size: 1rem;
+}
+
+.alert-success {
+  --bs-alert-color: var(--green-900);
+}
+
+.alert-light,
+.alert-secondary {
+  --bs-alert-bg: var(--surface);
+}
+
+.alert-danger,
+.alert-warning {
+  --bs-alert-bg: transparent;
+  --bs-alert-color: var(--danger);
+  --bs-alert-padding-x: 0;
+  font-weight: 600;
+}
+
+.alert-warning {
+  --bs-alert-color: var(--warning);
+}
+
+/* cards and tables: white surfaces, hairline dividers, no heavy borders */
+.card {
+  --bs-card-bg: var(--surface);
+  --bs-card-border-color: transparent;
+  --bs-card-cap-bg: transparent;
+  --bs-card-border-radius: var(--radius);
+  --bs-card-inner-border-radius: var(--radius);
+}
+
+.card-header,
+.card-footer {
+  border-color: var(--hairline);
+}
+
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--ink);
+  --bs-table-border-color: var(--hairline);
+  --bs-table-striped-bg: var(--green-50);
+  --bs-table-striped-color: var(--ink);
+  --bs-table-hover-bg: var(--green-50);
+}
+
+.table thead th {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table caption {
+  color: var(--muted);
+}
+
+/* a green tick or highlight inside text */
+.text-brand {
+  color: var(--green-900);
+}
 
 .dropdown-menu { --bs-dropdown-link-active-bg: var(--green-900); }
 .progress { --bs-progress-bar-bg: var(--green-900); }
@@ -450,9 +534,9 @@ b, strong, .fw-bold { font-weight: 600; }
 }
 
 @keyframes you-pulse {
-  0%   { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 0 rgba(124, 179, 66, 0.6); }
-  70%  { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 14px rgba(124, 179, 66, 0); }
-  100% { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 0 rgba(124, 179, 66, 0); }
+  0%   { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 0 color-mix(in srgb, var(--leaf-500) 60%, transparent); }
+  70%  { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 14px transparent; }
+  100% { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 0 transparent; }
 }
 
 /* map markers (Leaflet adds these outside the component) */
@@ -472,7 +556,7 @@ b, strong, .fw-bold { font-weight: 600; }
   color: var(--surface);
   font-size: 0.75rem;
   font-weight: 600;
-  box-shadow: 0 1px 4px rgba(23, 35, 27, 0.35);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--ink) 35%, transparent);
 }
 
 .plaque-marker.selected {
@@ -503,5 +587,5 @@ html {
 
 /* darker background behind the full-size photo dialog */
 .photo-backdrop {
-  background: rgba(0, 0, 0, 0.85);
+  background: color-mix(in srgb, var(--ink) 90%, transparent);
 }
