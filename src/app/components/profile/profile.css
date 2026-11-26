@@ -1,24 +1,132 @@
-.stat-number {
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.1;
+.profile-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
 }
 
-.stat-of {
+.avatar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: var(--green-900);
+  color: var(--surface);
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+.headline {
+  margin-bottom: 3rem;
+}
+
+.display-stat {
+  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+  line-height: 3rem;
+}
+
+.borough {
+  margin-bottom: 1.25rem;
+}
+
+.progress {
+  height: 6px;
+  margin-top: 0.5rem;
+  background: var(--green-50);
+}
+
+.visits {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+
+.visit {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.25rem 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius);
+  background: var(--green-50);
+}
+
+.thumb .roundel {
+  box-shadow: inset 0 0 0 3px transparent, inset 0 0 0 4.5px var(--surface);
+}
+
+.visit-name {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.visit-name:hover {
+  text-decoration: underline;
+}
+
+.rated,
+.rate-link {
+  grid-column: 2;
+  justify-self: start;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.rate-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.star {
+  width: 1rem;
+  height: 1rem;
+  vertical-align: -2px;
+  fill: var(--green-900);
+}
+
+.saved {
+  margin-top: 4rem;
+}
+
+.count {
+  font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 400;
-  color: #6c757d;
+  color: var(--muted);
 }
 
-.visit-text {
-  min-width: 0;
-}
-
-.rating-pill {
-  white-space: nowrap;
-  font-weight: 600;
-}
-
-.star-icon {
-  color: #b8860b;
+@media (min-width: 768px) {
+  .visit {
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+  }
+  .rated,
+  .rate-link {
+    grid-column: 3;
+  }
+  .display-stat {
+    font-size: 3.5rem;
+    line-height: 4rem;
+  }
 }

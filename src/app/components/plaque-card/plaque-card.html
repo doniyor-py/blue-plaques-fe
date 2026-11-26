@@ -5,6 +5,14 @@
     } @else {
       <div class="tile" aria-hidden="true"><span class="roundel"></span></div>
     }
+    @if (saved) {
+      <button type="button" class="heart-button" (click)="unsave.emit()"
+              [attr.aria-label]="'Remove ' + name() + ' from favourites'">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.3a3 3 0 0 1 6 1.5C14 10 8 13.5 8 13.5z" />
+        </svg>
+      </button>
+    }
   </div>
 
   <div class="content">

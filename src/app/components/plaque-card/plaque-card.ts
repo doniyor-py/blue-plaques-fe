@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { plaqueName, street, categoryLabel, averageRating, reviewCount } from '../../plaque-text';
@@ -12,6 +12,8 @@ import { plaqueName, street, categoryLabel, averageRating, reviewCount } from '.
 })
 export class PlaqueCard {
   @Input({ required: true }) plaque!: any;
+  @Input() saved: boolean = false;
+  @Output() unsave = new EventEmitter<void>();
 
   photo(): string | null {
     const first = this.plaque.photos?.[0];

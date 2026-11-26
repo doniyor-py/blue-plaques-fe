@@ -139,7 +139,7 @@ describe('Plaque page', () => {
 
   it('shows the plaque and its visits', async () => {
     const page = await openPlaque(false);
-    expect(page.querySelector('h1')!.textContent).toContain('Charles Dickens blue plaque');
+    expect(page.querySelector('h1')!.textContent!.trim()).toBe('Charles Dickens');
     expect(page.querySelector('#visits-heading')!.textContent).toContain('Visitor notes');
     expect(page.textContent).toContain('1 visit');
   });
@@ -147,9 +147,9 @@ describe('Plaque page', () => {
   it('shows a breadcrumb back to the borough', async () => {
     const page = await openPlaque(false);
     const crumbs = [...page.querySelectorAll('nav[aria-label="Breadcrumb"] li')].map(li => li.textContent!.trim());
-    expect(crumbs).toEqual(['Browse plaques', 'Camden', 'Charles Dickens blue plaque']);
+    expect(crumbs).toEqual(['Browse plaques', 'Camden', 'Charles Dickens']);
     expect(page.querySelector('nav[aria-label="Breadcrumb"] a[href="/plaques?borough=Camden"]')).toBeTruthy();
-    expect(page.querySelector('[aria-current="page"]')!.textContent).toContain('Charles Dickens blue plaque');
+    expect(page.querySelector('[aria-current="page"]')!.textContent).toContain('Charles Dickens');
   });
 
   it('sends a visitor who is not logged in to the login page', async () => {
@@ -216,7 +216,7 @@ describe('Plaque page', () => {
     TestBed.tick();
     const dialog = document.querySelector<HTMLElement>('[role="alertdialog"]')!;
     expect(dialog.textContent).toContain('Delete this visit?');
-    expect(document.activeElement!.id).toBe('confirm-cancel');      // the safe button has focus
+    expect(document.activeElement!.id).toBe('confirm-cancel');
     buttonCalled(dialog, 'Cancel').click();
     TestBed.tick();
     http.expectNone(r => r.method === 'DELETE');

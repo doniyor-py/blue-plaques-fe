@@ -3,10 +3,12 @@ import { RouterLink } from '@angular/router';
 import { SlicePipe, DatePipe, DecimalPipe } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { UserService } from '../../services/user-service';
+import { PlaqueCard } from '../plaque-card/plaque-card';
+import { plaqueName, plaqueColour, initials } from '../../plaque-text';
 
 @Component({
   selector: 'app-profile',
-  imports: [RouterLink, SlicePipe, DatePipe, DecimalPipe],
+  imports: [RouterLink, SlicePipe, DatePipe, DecimalPipe, PlaqueCard],
   templateUrl: './profile.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './profile.css'
@@ -102,6 +104,10 @@ export class Profile implements OnInit {
       }
     });
   }
+
+  initials(): string { return initials(this.user.username); }
+  nameOf(plaque: any): string { return plaqueName(plaque); }
+  colourOf(plaque: any): string { return plaqueColour(plaque); }
 
   visitedBoroughs(): any[] {
     return this.progress.filter(b => b.visited > 0);

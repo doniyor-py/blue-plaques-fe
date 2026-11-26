@@ -12,8 +12,15 @@ export const CATEGORY_LABELS: Record<string, string> = {
 
 export function plaqueName(plaque: any): string {
   const names = (plaque.people || []).map((person: any) => person.name);
-  if (names.length === 0) { return plaque.title; }
+  if (names.length === 0) { return shortTitle(plaque); }
   return names.length === 2 ? names.join(' & ') : names[0];
+}
+
+// "Charles Dickens blue plaque" -> "Charles Dickens"
+function shortTitle(plaque: any): string {
+  const title: string = plaque.title || '';
+  const suffix = ' ' + plaque.colour + ' plaque';
+  return title.length > suffix.length && title.toLowerCase().endsWith(suffix) ? title.slice(0, -suffix.length) : title;
 }
 
 export function lifeYears(plaque: any): string {
