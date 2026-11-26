@@ -1,10 +1,12 @@
 <div class="container plaque-page">
   @if (loading) {
-    <div class="detail-grid placeholder-glow" aria-busy="true">
-      <span class="visually-hidden">Loading…</span>
+    <div class="placeholder-glow" aria-busy="true">
+    <span class="visually-hidden">Loading…</span>
+    <div class="top-row skeleton-top" aria-hidden="true"><span class="placeholder col-4 col-md-3"></span></div>
+    <div class="detail-grid">
       <div class="detail-head" aria-hidden="true">
         <span class="placeholder skeleton-disc"></span>
-        <div class="flex-grow-1">
+        <div class="flex-grow-1 skeleton-head-text">
           <span class="placeholder col-4"></span>
           <span class="placeholder placeholder-lg col-8 my-2"></span>
           <span class="placeholder col-6"></span>
@@ -15,6 +17,7 @@
           <p><span class="placeholder col-3"></span><br><span class="placeholder col-6"></span></p>
         }
       </div>
+    </div>
     </div>
   }
   @if (error) {

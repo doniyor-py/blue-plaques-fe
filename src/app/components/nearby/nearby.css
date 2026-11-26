@@ -21,7 +21,8 @@
 .panel {
   position: relative;
   z-index: 1001;
-  max-height: 60%;
+  flex: 0 0 auto;
+  height: 50%;
   padding: 0 1rem 1rem;
   overflow-y: auto;
   background: var(--surface);
@@ -44,6 +45,10 @@
   height: 0.3rem;
   border-radius: var(--radius);
   background: var(--line);
+}
+
+.panel:not(.open) {
+  height: 8.5rem;
 }
 
 .panel:not(.open) .sheet-body,
@@ -219,14 +224,14 @@
   .map-page {
     display: grid;
     grid-template-columns: 400px 1fr;
-    height: calc(100vh - var(--nav-height) - var(--footer-slim-height));
+    height: calc(100dvh - var(--nav-height) - var(--footer-slim-height));
   }
   .map-wrap {
     order: 0;
   }
   .panel {
     position: static;
-    max-height: none;
+    height: auto;
     margin: 0;
     padding: 2rem 1.5rem;
     border-radius: 0;

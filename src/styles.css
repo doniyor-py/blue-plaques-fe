@@ -1,3 +1,33 @@
+@font-face {
+  font-family: 'Source Serif 4 Fallback';
+  font-weight: 600;
+  src: local('Georgia Bold'), local('Georgia-Bold');
+  size-adjust: 93.27%;
+  ascent-override: 111.07%;
+  descent-override: 35.92%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Source Sans 3 Fallback';
+  font-weight: 400;
+  src: local('Arial'), local('ArialMT');
+  size-adjust: 92.42%;
+  ascent-override: 110.80%;
+  descent-override: 43.28%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Source Sans 3 Fallback';
+  font-weight: 600;
+  src: local('Arial Bold'), local('Arial-BoldMT');
+  size-adjust: 89.09%;
+  ascent-override: 114.94%;
+  descent-override: 44.90%;
+  line-gap-override: 0%;
+}
+
 :root {
   --green-900: #1e5b38;
   --leaf-500: #7cb342;
@@ -15,8 +45,8 @@
   --marker-brown: #7a4a2b;
   --marker-other: #6b7079;
 
-  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-serif: 'Source Serif 4', 'Source Serif 4 Fallback', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Source Sans 3', 'Source Sans 3 Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   --radius: 12px;
   --shadow-float: 0 8px 24px rgba(23, 35, 27, 0.16);
   --nav-height: 72px;
@@ -405,7 +435,13 @@ b, strong, .fw-bold { font-weight: 600; }
   font-weight: 600;
 }
 
+/* loading cards shaped like the plaque card, at the same height, so nothing moves when it arrives:
+   phone 112px square picture beside the text; tablet and up 4:3 picture over a 112px text block */
 .skeleton-card {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 1rem;
+  padding: 0.75rem;
   background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
@@ -414,11 +450,60 @@ b, strong, .fw-bold { font-weight: 600; }
 .skeleton-media {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+}
+
+.skeleton-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.skeleton-text .placeholder {
+  display: block;
+}
+
+/* plaque page while loading: the back link / breadcrumb row, the roundel and the title block */
+.skeleton-top {
+  min-height: 44px;
+}
+
+.skeleton-disc {
+  display: block;
+  width: min(240px, 70vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.skeleton-head-text {
+  min-height: 9rem;
 }
 
 @media (min-width: 768px) {
   .chip-row { flex-wrap: wrap; }
+  .skeleton-card {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+  }
+  .skeleton-media {
+    aspect-ratio: 4 / 3;
+    border-radius: 0;
+  }
+  .skeleton-text {
+    height: calc(7rem + 2.25rem);
+    padding: 1rem 1.25rem 1.25rem;
+  }
+  .skeleton-top {
+    min-height: 1.75rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .skeleton-disc {
+    width: 320px;
+  }
 }
 
 .crumbs {

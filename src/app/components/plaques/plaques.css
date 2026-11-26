@@ -53,6 +53,11 @@
   margin-bottom: 1rem;
 }
 
+/* holds its line while the count loads */
+.status-line {
+  min-height: 1.75rem;
+}
+
 .active-filters {
   display: flex;
   flex-wrap: wrap;

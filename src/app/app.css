@@ -14,10 +14,24 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
 }
+
 
 main {
   flex: 1 0 auto;
+  min-height: calc(100dvh - var(--nav-height));
+}
+
+
+main.map-main {
+  min-height: calc(100dvh - var(--nav-height) - 1.5rem);
+}
+
+@media (min-width: 992px) {
+  main.map-main {
+    min-height: calc(100dvh - var(--nav-height) - var(--footer-slim-height) - 1.5rem);
+  }
 }
 
 main:focus {

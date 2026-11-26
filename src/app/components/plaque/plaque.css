@@ -293,6 +293,10 @@
     flex-direction: row;
     text-align: left;
   }
+  .detail-head,
+  .detail-body {
+    grid-column: 1;
+  }
   .meta {
     justify-content: flex-start;
   }
@@ -323,11 +327,4 @@
   .save-text {
     display: inline;
   }
-}
-
-.skeleton-disc {
-  display: block;
-  width: 240px;
-  aspect-ratio: 1;
-  border-radius: 50%;
 }

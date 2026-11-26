@@ -69,9 +69,11 @@
 }
 
 .preview-title {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  color: var(--muted);
+  display: block;
+  width: 45%;
+  height: 1rem;
+  border-radius: var(--radius);
+  background: var(--hairline);
 }
 
 .preview-row {

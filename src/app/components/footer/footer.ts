@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-footer',
@@ -9,10 +10,9 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './footer.css'
 })
 export class Footer {
-  constructor(private router: Router) {}
+  constructor(private location: Location) {}
 
-  // the map page keeps a one-line footer so the map can fill the screen
   isSlim(): boolean {
-    return this.router.url.startsWith('/nearby');
+    return this.location.path().startsWith('/nearby');
   }
 }

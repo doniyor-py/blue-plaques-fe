@@ -212,6 +212,7 @@ export class Nearby implements AfterViewInit, OnDestroy {
     this.markersById.set(plaque._id, { marker: marker, plaque: plaque });
   }
 
+
   markerIcon(plaque: any, isSelected: boolean): L.DivIcon {
     const size = isSelected ? 40 : 28;
     return L.divIcon({
