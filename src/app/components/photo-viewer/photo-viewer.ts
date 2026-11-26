@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 
-// One photo at full size, opened as a dialog from the photo grid
 @Component({
   selector: 'app-photo-viewer',
   templateUrl: './photo-viewer.html',

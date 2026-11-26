@@ -18,7 +18,6 @@
   line-height: 1.25rem;
 }
 
-/* phone: two columns of underlined links */
 .footer-links {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -37,7 +36,6 @@
   white-space: nowrap;
 }
 
-/* desktop: one row of plain links */
 @media (min-width: 992px) {
   .footer-links {
     display: flex;

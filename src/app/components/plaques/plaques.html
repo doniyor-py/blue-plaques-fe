@@ -106,7 +106,6 @@
       <button type="button" class="btn btn-outline-primary" (click)="loadPage()">Try again</button>
     </div>
   } @else if (loading) {
-    <!-- grey cards shaped like the real ones while the page loads -->
     <div class="row g-3 g-lg-4 placeholder-glow" aria-busy="true">
       <span class="visually-hidden">Loading…</span>
       @for (card of [1, 2, 3, 4, 5, 6]; track card) {

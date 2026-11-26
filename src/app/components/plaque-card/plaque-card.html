@@ -21,7 +21,7 @@
       <a class="stretched-link" [routerLink]="['/plaques', plaque._id]">{{ name() }}</a>
     </h3>
     <p class="street">{{ street() }}</p>
-    @if (plaque.visits) {
+    @if (plaque.review_count !== undefined) {
       <p class="rating">
         @if (rating() !== null) {
           <svg class="star" viewBox="0 0 16 16" aria-hidden="true">

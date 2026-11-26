@@ -31,7 +31,6 @@
   box-shadow: inset 0 0 0 2px var(--plaque-blue), inset 0 0 0 3.5px var(--surface);
 }
 
-/* 44px tall: 10px + 24px line + 10px */
 .nav-link {
   padding-top: 10px;
   padding-bottom: 10px;
@@ -73,7 +72,6 @@
   background: var(--hairline);
 }
 
-/* initials avatar; inline-block so the link underline skips it */
 .avatar {
   display: inline-flex;
   align-items: center;
@@ -114,7 +112,6 @@
   left: auto;
 }
 
-/* phone menu: full-width rows under the bar */
 @media (max-width: 991.98px) {
   .navbar-brand {
     margin-right: 0;

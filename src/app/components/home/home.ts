@@ -57,7 +57,8 @@ export class Home implements OnInit {
   loadCards() {
     this.cardsLoading = true;
     this.cardsError = '';
-    this.plaqueService.getPlaques(1, 4).subscribe({
+    // search with no filters
+    this.plaqueService.searchPlaques({}, 1, 4).subscribe({
       next: (response) => {
         this.cards = response.plaques;
         this.total = response.total;

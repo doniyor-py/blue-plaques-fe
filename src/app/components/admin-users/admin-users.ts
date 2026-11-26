@@ -17,7 +17,7 @@ export class AdminUsers implements OnInit {
   pageSize: number = 20;
   loading: boolean = true;
   message: string = '';
-  loadError: string = '';            // the list couldn't load: nothing to show
+  loadError: string = '';            // the list couldn't load
   actionError: string = '';          // one delete failed: keep showing the list
   deleting: string | null = null;    // username being deleted right now
 
@@ -59,11 +59,10 @@ export class AdminUsers implements OnInit {
         next: () => {
           this.deleting = null;
           this.message = user.username + ' was deleted.';
-          // if that was the only user on this page, go back a page
           if (this.users.length === 1 && this.page > 1) {
             this.page--;
           }
-          this.loadUsers();     // reload so the page fills up and the total is right
+          this.loadUsers();
         },
         error: (err) => {
           this.deleting = null;

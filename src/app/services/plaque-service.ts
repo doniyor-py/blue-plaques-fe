@@ -11,13 +11,6 @@ export class PlaqueService {
 
   constructor(private http: HttpClient) {}
 
-  getPlaques(page: number, pageSize: number) {
-    const params = new HttpParams()
-      .set('pn', page)
-      .set('ps', pageSize);
-    return this.http.get<any>(API_URL + '/plaques', { params });
-  }
-
   getPlaque(id: string, countView: boolean = true) {
     const params = countView ? new HttpParams() : new HttpParams().set('view', 'false');
     return this.http.get<any>(API_URL + '/plaques/' + id, { params });

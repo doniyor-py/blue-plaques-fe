@@ -260,7 +260,6 @@ b, strong, .fw-bold { font-weight: 600; }
 .form-text { color: var(--muted); }
 .invalid-feedback { font-weight: 600; }
 
-/* inline errors (page 2): an icon and text next to what failed, drawn in the text colour */
 .invalid-feedback::before,
 .alert-danger::before,
 .alert-warning::before {
@@ -275,7 +274,6 @@ b, strong, .fw-bold { font-weight: 600; }
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='6.5'/%3E%3Cpath d='M8 4.5v4M8 11v.5'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 
-/* alerts: errors are inline text, everything else a soft tinted box */
 .alert {
   --bs-alert-border-color: transparent;
   --bs-alert-bg: var(--green-50);
@@ -305,7 +303,6 @@ b, strong, .fw-bold { font-weight: 600; }
   --bs-alert-color: var(--warning);
 }
 
-/* cards and tables: white surfaces, hairline dividers, no heavy borders */
 .card {
   --bs-card-bg: var(--surface);
   --bs-card-border-color: transparent;
@@ -339,7 +336,6 @@ b, strong, .fw-bold { font-weight: 600; }
   color: var(--muted);
 }
 
-/* a green tick or highlight inside text */
 .text-brand {
   color: var(--green-900);
 }
@@ -539,7 +535,6 @@ b, strong, .fw-bold { font-weight: 600; }
   100% { box-shadow: 0 0 0 1.5px var(--ink), 0 0 0 0 transparent; }
 }
 
-/* map markers (Leaflet adds these outside the component) */
 .plaque-marker-icon {
   background: none;
   border: 0;

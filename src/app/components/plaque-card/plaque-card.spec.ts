@@ -24,8 +24,7 @@ describe('PlaqueCard', () => {
     const card = render({
       _id: 'p1', title: 'Charles Dickens blue plaque', borough: 'Camden', category: 'literature',
       address: '48 Doughty Street, Camden, WC1', people: [{ name: 'Charles Dickens' }],
-      photos: [{ url: '/full.jpg', thumb_url: '/thumb.jpg' }],
-      visits: [{ ratings: { history: 5, condition: 4, accessibility: 5 } }]
+      photo_thumb: '/thumb.jpg', rating: 4.7, review_count: 1
     });
     expect(card.querySelector('img')?.getAttribute('src')).toBe('/thumb.jpg');
     expect(card.querySelector('.meta')?.textContent).toContain('Camden · Writers');
@@ -36,9 +35,14 @@ describe('PlaqueCard', () => {
   });
 
   it('should show a plain tile and "No reviews yet" without photos or ratings', () => {
-    const card = render({ _id: 'p2', title: 'Stone plaque', people: [], photos: [], visits: [] });
+    const card = render({ _id: 'p2', title: 'Stone plaque', people: [], photo_thumb: null, rating: null, review_count: 0 });
     expect(card.querySelector('img')).toBeNull();
     expect(card.querySelector('.tile')).toBeTruthy();
     expect(card.querySelector('.rating')?.textContent).toContain('No reviews yet');
+  });
+
+  it('should leave out the rating line when the list sends no card summary', () => {
+    const card = render({ _id: 'p3', title: 'Stone plaque', people: [] });
+    expect(card.querySelector('.rating')).toBeNull();
   });
 });

@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { plaqueName, street, categoryLabel, averageRating, reviewCount } from '../../plaque-text';
+import { plaqueName, street, categoryLabel } from '../../plaque-text';
 
 @Component({
   selector: 'app-plaque-card',
@@ -15,9 +15,9 @@ export class PlaqueCard {
   @Input() saved: boolean = false;
   @Output() unsave = new EventEmitter<void>();
 
+  // small card summary: photo_thumb, rating and review_count
   photo(): string | null {
-    const first = this.plaque.photos?.[0];
-    return first ? first.thumb_url || first.url : null;
+    return this.plaque.photo_thumb || null;
   }
 
   meta(): string {
@@ -26,6 +26,6 @@ export class PlaqueCard {
 
   name(): string { return plaqueName(this.plaque); }
   street(): string { return street(this.plaque); }
-  rating(): number | null { return averageRating(this.plaque); }
-  reviews(): number { return reviewCount(this.plaque); }
+  rating(): number | null { return this.plaque.rating ?? null; }
+  reviews(): number { return this.plaque.review_count ?? 0; }
 }

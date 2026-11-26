@@ -7,7 +7,7 @@ import { PlaqueService } from '../../services/plaque-service';
 import { RouteService } from '../../services/route-service';
 import { decodePolyline } from '../../services/polyline';
 import { DurationPipe } from '../../pipes/duration-pipe';
-import { plaqueColour } from '../../plaque-text';
+import { plaqueColour, street, categoryLabel } from '../../plaque-text';
 
 const LONDON = L.latLng(51.5074, -0.1278);
 
@@ -369,6 +369,11 @@ export class Nearby implements AfterViewInit, OnDestroy {
 
   colourOf(plaque: any): string {
     return plaqueColour(plaque);
+  }
+
+  // "48 Doughty Street · Camden · Writers"
+  placeLine(plaque: any): string {
+    return [street(plaque), plaque.borough, categoryLabel(plaque)].filter(part => part).join(' · ');
   }
 
   // "40 m" close by, "1.4 km" further away

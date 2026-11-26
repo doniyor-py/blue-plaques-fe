@@ -44,18 +44,6 @@ export function categoryLabel(plaque: any): string {
   return CATEGORY_LABELS[plaque.category] || '';
 }
 
-export function averageRating(plaque: any): number | null {
-  const rated = (plaque.visits || []).filter((visit: any) => visit.ratings);
-  if (rated.length === 0) { return null; }
-  const total = rated.reduce((sum: number, visit: any) =>
-    sum + (visit.ratings.history + visit.ratings.condition + visit.ratings.accessibility) / 3, 0);
-  return total / rated.length;
-}
-
-export function reviewCount(plaque: any): number {
-  return (plaque.visits || []).filter((visit: any) => visit.ratings).length;
-}
-
 export function plaqueColour(plaque: any): string {
   const colours: Record<string, string> = {
     'blue': 'var(--plaque-blue)', 'green': 'var(--green-900)', 'black': 'var(--ink)', 'brown': 'var(--marker-brown)'

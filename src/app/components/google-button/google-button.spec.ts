@@ -13,7 +13,6 @@ describe('GoogleButton', () => {
       imports: [GoogleButton],
       providers: [
         ...testProviders,
-        // never load the real Google or Cloudflare script in a test: this promise never finishes
         { provide: ScriptLoader, useValue: { load: () => new Promise(() => undefined) } }
       ]
     })

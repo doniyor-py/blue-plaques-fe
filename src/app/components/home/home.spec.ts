@@ -12,7 +12,8 @@ describe('Home', () => {
   const dickens = {
     _id: 'p1', title: 'Charles Dickens blue plaque', borough: 'Camden', category: 'literature',
     inscription: 'Charles Dickens 1812-1870 novelist lived here', address: '48 Doughty Street, Camden, WC1',
-    erected_year: 1903, people: [{ name: 'Charles Dickens', born: 1812, died: 1870 }], photos: [], visits: []
+    erected_year: 1903, people: [{ name: 'Charles Dickens', born: 1812, died: 1870 }],
+    photo_thumb: null, rating: 4.6, review_count: 12
   };
 
   beforeEach(async () => {
@@ -29,10 +30,10 @@ describe('Home', () => {
   });
 
   function answerStartingRequests() {
-    http.expectOne(req => req.url.endsWith('/plaques') && req.params.get('ps') === '4')
+    http.expectOne(req => req.url.endsWith('/plaques/search') && req.params.get('ps') === '4')
       .flush({ total: 3375, pages: 844, page: 1, plaques: [dickens] });
     http.expectOne(req => req.url.endsWith('/boroughs')).flush(new Array(33).fill('B'));
-    http.expectOne(req => req.url.endsWith('/plaques/search'))
+    http.expectOne(req => req.url.endsWith('/plaques/search') && req.params.has('q'))
       .flush({ total: 1, pages: 1, page: 1, plaques: [dickens] });
     fixture.detectChanges();
   }
@@ -46,6 +47,8 @@ describe('Home', () => {
     expect(page.querySelector('.roundel-role')?.textContent).toContain('novelist lived here');
     expect(page.textContent).toContain('48 Doughty Street, Camden · Erected 1903');
     expect(page.querySelectorAll('app-plaque-card').length).toBe(1);
+    expect(page.querySelector('app-plaque-card .rating')!.textContent).toContain('4.6');
+    expect(page.querySelector('app-plaque-card .rating')!.textContent).toContain('12 reviews');
   });
 
   it('should link each category chip to the browse page', () => {
@@ -72,7 +75,7 @@ describe('Home', () => {
   });
 
   it('should offer to try again when the cards fail to load', () => {
-    http.expectOne(req => req.url.endsWith('/plaques') && req.params.get('ps') === '4')
+    http.expectOne(req => req.url.endsWith('/plaques/search') && req.params.get('ps') === '4')
       .flush({ error: 'down' }, { status: 500, statusText: 'Server error' });
     fixture.detectChanges();
     const page = fixture.nativeElement as HTMLElement;

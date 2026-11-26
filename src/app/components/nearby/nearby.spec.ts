@@ -97,6 +97,7 @@ describe('Nearby', () => {
 
   const near = [
     { _id: 'p1', title: 'Charles Dickens blue plaque', colour: 'blue', borough: 'Camden',
+      address: '48 Doughty Street, Camden, WC1', category: 'literature',
       location: { type: 'Point', coordinates: [-0.12, 51.5] }, distance_m: 400, walking_minutes: 6 },
     { _id: 'p2', title: 'Sydney Smith brown plaque', colour: 'brown', borough: 'Camden',
       location: { type: 'Point', coordinates: [-0.13, 51.51] }, distance_m: 1600, walking_minutes: 20 }
@@ -110,6 +111,8 @@ describe('Nearby', () => {
     const icons = [...page.querySelectorAll('.plaque-marker')].map(icon => icon.textContent);
     expect(icons).toEqual(['B', 'Br']);
     expect(page.querySelector('#row-p1')!.textContent).toContain('Charles Dickens');
+    expect(page.querySelector('#row-p1')!.textContent).toContain('48 Doughty Street · Camden · Writers');
+    expect(page.querySelector('#row-p2')!.textContent).toContain('Camden');
 
     (page.querySelector('#row-p2') as HTMLButtonElement).click();
     fixture.detectChanges();
