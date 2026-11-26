@@ -1,3 +1,342 @@
+/* Design tokens (design system, page 1) */
+:root {
+  --green-900: #1e5b38;
+  --leaf-500: #7cb342;
+  --leaf-700: #4e7a2a;
+  --green-50: #e6f2dc;
+  --paper: #f6faf2;
+  --surface: #ffffff;
+  --ink: #17231b;
+  --muted: #56645a;
+  --line: #7d8a80;
+  --hairline: #d6e0d0;
+  --plaque-blue: #1b4f8f;
+  --danger: #b3261e;
+  --warning: #8a5a00;
+
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --radius: 12px;
+  --shadow-float: 0 8px 24px rgba(23, 35, 27, 0.16);
+
+  /* Bootstrap points at the tokens */
+  --bs-body-bg: var(--paper);
+  --bs-body-bg-rgb: 246, 250, 242;
+  --bs-body-color: var(--ink);
+  --bs-body-color-rgb: 23, 35, 27;
+  --bs-emphasis-color: var(--ink);
+  --bs-heading-color: var(--ink);
+  --bs-secondary-color: var(--muted);
+  --bs-primary: var(--green-900);
+  --bs-primary-rgb: 30, 91, 56;
+  --bs-danger: var(--danger);
+  --bs-danger-rgb: 179, 38, 30;
+  --bs-link-color: var(--green-900);
+  --bs-link-color-rgb: 30, 91, 56;
+  --bs-link-hover-color: var(--ink);
+  --bs-link-hover-color-rgb: 23, 35, 27;
+  --bs-border-color: var(--hairline);
+  --bs-border-radius: var(--radius);
+  --bs-border-radius-sm: var(--radius);
+  --bs-border-radius-lg: var(--radius);
+  --bs-border-radius-xl: var(--radius);
+  --bs-form-invalid-color: var(--danger);
+  --bs-form-invalid-border-color: var(--danger);
+  --bs-font-sans-serif: var(--font-sans);
+  --bs-body-font-family: var(--font-sans);
+  --bs-body-font-size: 1rem;
+  --bs-body-line-height: 1.5;
+}
+
+/* Type scale (page 1): phone sizes first, desktop from 768px */
+body {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, .display-1 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+h1, .h1 { font-size: 2rem; line-height: 2.5rem; }
+h2, .h2 { font-size: 1.5rem; line-height: 2rem; }
+h3, .h3, h4, .h4, h5, .h5 { font-size: 1.25rem; line-height: 1.75rem; }
+h6, .h6 { font-size: 1rem; line-height: 1.5rem; }
+.display-1 { font-size: 2.5rem; line-height: 3rem; }
+
+small, .small { font-size: 0.875rem; line-height: 1.25rem; }
+.lead { font-weight: 400; }
+b, strong, .fw-bold { font-weight: 600; }
+
+.label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  body { font-size: 1.125rem; line-height: 1.75rem; }
+  h1, .h1 { font-size: 2.5rem; line-height: 3rem; }
+  h2, .h2 { font-size: 1.75rem; line-height: 2.25rem; }
+  .display-1 { font-size: 3.5rem; line-height: 4rem; }
+  small, .small { font-size: 0.9375rem; line-height: 1.5rem; }
+}
+
+/* Focus: one visible ink ring on everything interactive */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Bootstrap swaps the outline for a blue glow on these */
+.form-check-input:focus-visible,
+.nav-link:focus-visible,
+.navbar-toggler:focus-visible,
+.dropdown-item:focus-visible,
+.btn-close:focus-visible,
+.btn-check:focus-visible + .btn {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* white ring on the dark green navbar, ink again inside its light dropdown */
+.navbar-dark :focus-visible,
+.navbar-dark .btn:focus-visible,
+.navbar-dark .nav-link:focus-visible,
+.navbar-dark .navbar-toggler:focus-visible {
+  outline-color: var(--surface);
+}
+
+.navbar-dark .dropdown-menu .dropdown-item:focus-visible {
+  outline-color: var(--ink);
+}
+
+/* Buttons (page 2) */
+.btn {
+  --bs-btn-font-weight: 600;
+  --bs-btn-padding-x: 1rem;
+  --bs-btn-padding-y: 0.5rem;
+  --bs-btn-font-size: 1rem;
+  --bs-btn-line-height: 1.5rem;
+  --bs-btn-disabled-opacity: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.btn-sm { --bs-btn-font-size: 0.875rem; --bs-btn-padding-x: 0.75rem; }
+.btn-lg { min-height: 52px; --bs-btn-font-size: 1.125rem; --bs-btn-padding-x: 1.5rem; }
+
+.btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.btn:active,
+.btn.active {
+  box-shadow: inset 0 2px 0 rgba(23, 35, 27, 0.2);
+}
+
+.btn:disabled,
+.btn.disabled {
+  --bs-btn-disabled-bg: var(--hairline);
+  --bs-btn-disabled-border-color: var(--hairline);
+  --bs-btn-disabled-color: var(--muted);
+}
+
+/* the one main action per screen */
+.btn-main {
+  --bs-btn-color: var(--ink);
+  --bs-btn-bg: var(--leaf-500);
+  --bs-btn-border-color: var(--leaf-700);
+  --bs-btn-hover-color: var(--ink);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--leaf-500) 88%, var(--ink));
+  --bs-btn-hover-border-color: var(--leaf-700);
+  --bs-btn-active-color: var(--ink);
+  --bs-btn-active-bg: color-mix(in srgb, var(--leaf-500) 80%, var(--ink));
+  --bs-btn-active-border-color: var(--leaf-700);
+}
+
+.btn-primary {
+  --bs-btn-color: var(--surface);
+  --bs-btn-bg: var(--green-900);
+  --bs-btn-border-color: var(--green-900);
+  --bs-btn-hover-color: var(--surface);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--green-900) 80%, var(--ink));
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--green-900) 80%, var(--ink));
+  --bs-btn-active-color: var(--surface);
+  --bs-btn-active-bg: color-mix(in srgb, var(--green-900) 65%, var(--ink));
+  --bs-btn-active-border-color: color-mix(in srgb, var(--green-900) 65%, var(--ink));
+}
+
+/* secondary */
+.btn-outline-primary {
+  --bs-btn-color: var(--green-900);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--green-900);
+  --bs-btn-hover-color: var(--green-900);
+  --bs-btn-hover-bg: var(--green-50);
+  --bs-btn-hover-border-color: var(--green-900);
+  --bs-btn-active-color: var(--green-900);
+  --bs-btn-active-bg: color-mix(in srgb, var(--green-50) 90%, var(--green-900));
+  --bs-btn-active-border-color: var(--green-900);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--ink);
+  --bs-btn-border-color: var(--line);
+  --bs-btn-hover-color: var(--ink);
+  --bs-btn-hover-bg: var(--green-50);
+  --bs-btn-hover-border-color: var(--ink);
+  --bs-btn-active-color: var(--ink);
+  --bs-btn-active-bg: color-mix(in srgb, var(--green-50) 90%, var(--green-900));
+  --bs-btn-active-border-color: var(--ink);
+}
+
+/* text link */
+.btn-link {
+  --bs-btn-color: var(--green-900);
+  --bs-btn-hover-color: var(--ink);
+  --bs-btn-active-color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.btn-link:hover { text-decoration-thickness: 2px; }
+.btn-link:active { box-shadow: none; }
+
+.btn-danger {
+  --bs-btn-color: var(--surface);
+  --bs-btn-bg: var(--danger);
+  --bs-btn-border-color: var(--danger);
+  --bs-btn-hover-color: var(--surface);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--danger) 80%, var(--ink));
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--danger) 80%, var(--ink));
+  --bs-btn-active-color: var(--surface);
+  --bs-btn-active-bg: var(--danger);
+  --bs-btn-active-border-color: var(--danger);
+}
+
+.btn-outline-danger {
+  --bs-btn-color: var(--danger);
+  --bs-btn-border-color: var(--danger);
+  --bs-btn-hover-color: var(--surface);
+  --bs-btn-hover-bg: var(--danger);
+  --bs-btn-hover-border-color: var(--danger);
+  --bs-btn-active-color: var(--surface);
+  --bs-btn-active-bg: var(--danger);
+  --bs-btn-active-border-color: var(--danger);
+}
+
+/* Form fields (page 2): labels above, --line borders */
+.form-label {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  min-height: 44px;
+  background-color: var(--surface);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--green-900);
+  box-shadow: none;
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.form-control::placeholder { color: var(--muted); }
+
+.form-check-input {
+  border-color: var(--line);
+}
+
+.form-check-input:checked {
+  background-color: var(--green-900);
+  border-color: var(--green-900);
+}
+
+.form-check-input:focus {
+  border-color: var(--green-900);
+  box-shadow: none;
+}
+
+.form-text { color: var(--muted); }
+.invalid-feedback { font-weight: 600; }
+
+/* Bootstrap parts that hard-code its old blue */
+.dropdown-menu { --bs-dropdown-link-active-bg: var(--green-900); }
+.progress { --bs-progress-bar-bg: var(--green-900); }
+
+/* Chips (page 2) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25rem;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.chip:hover {
+  background: var(--green-50);
+  border-color: var(--leaf-700);
+  color: var(--ink);
+}
+
+.chip.active,
+.chip[aria-pressed='true'] {
+  background: var(--green-900);
+  border-color: var(--green-900);
+  color: var(--surface);
+}
+
+.chip-removable,
+.chip-removable:hover {
+  background: var(--green-50);
+  border-color: var(--green-50);
+  color: var(--green-900);
+}
+
+.chip-removable:hover { border-color: var(--green-900); }
+
+/* Plaque roundel: blue disc with a thin white ring */
+.roundel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--plaque-blue);
+  box-shadow: inset 0 0 0 3px var(--plaque-blue), inset 0 0 0 5px var(--surface);
+  color: var(--surface);
+}
+
 .you-dot {
   background: #1a73e8;
   border: 3px solid #ffffff;
