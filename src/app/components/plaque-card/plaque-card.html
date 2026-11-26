@@ -13,18 +13,20 @@
       <a class="stretched-link" [routerLink]="['/plaques', plaque._id]">{{ name() }}</a>
     </h3>
     <p class="street">{{ street() }}</p>
-    <p class="rating">
-      @if (rating() !== null) {
-        <svg class="star" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M8 1.5l1.9 4 4.3.5-3.2 3 .9 4.3L8 11.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5z" />
-        </svg>
-        <span class="visually-hidden">Rated</span>
-        <strong>{{ rating() | number: '1.1-1' }}</strong>
-        <span class="visually-hidden">out of 5 from</span>
-        · {{ reviews() }} {{ reviews() === 1 ? 'review' : 'reviews' }}
-      } @else {
-        No reviews yet
-      }
-    </p>
+    @if (plaque.visits) {
+      <p class="rating">
+        @if (rating() !== null) {
+          <svg class="star" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 1.5l1.9 4 4.3.5-3.2 3 .9 4.3L8 11.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5z" />
+          </svg>
+          <span class="visually-hidden">Rated</span>
+          <strong>{{ rating() | number: '1.1-1' }}</strong>
+          <span class="visually-hidden">out of 5 from</span>
+          · {{ reviews() }} {{ reviews() === 1 ? 'review' : 'reviews' }}
+        } @else {
+          No reviews yet
+        }
+      </p>
+    }
   </div>
 </article>

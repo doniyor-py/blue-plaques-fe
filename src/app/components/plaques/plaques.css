@@ -1,0 +1,129 @@
+.search-row {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 44rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+}
+
+.search-box .icon {
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.search-box .form-control {
+  min-height: 52px;
+  padding-left: 2.75rem;
+}
+
+.search-button {
+  min-height: 52px;
+  min-width: 52px;
+}
+
+.filter-row {
+  display: none;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+}
+
+.filter-row.open {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.filter-row > div:nth-child(-n + 2) {
+  grid-column: 1 / -1;
+}
+
+.results-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.empty-state {
+  max-width: 36rem;
+  margin: 3rem auto;
+  text-align: center;
+}
+
+.empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 1.5px solid var(--green-900);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 5px var(--paper), inset 0 0 0 6.5px var(--green-900);
+  color: var(--green-900);
+}
+
+.empty-icon .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+@media (max-width: 575.98px) {
+  .empty-state .btn-main {
+    width: 100%;
+  }
+}
+
+@media (min-width: 992px) {
+  .filter-row,
+  .filter-row.open {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 13rem));
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .filter-row > div:nth-child(-n + 2) {
+    grid-column: auto;
+  }
+  .pager {
+    justify-content: flex-end;
+  }
+
+  .results-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .results-bar,
+  .active-filters {
+    margin-bottom: 0;
+  }
+}
