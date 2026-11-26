@@ -4,13 +4,14 @@ import { DecimalPipe } from '@angular/common';
 import { PlaqueService } from '../../services/plaque-service';
 import { AuthService } from '../../services/auth-service';
 import { PlaqueCard } from '../plaque-card/plaque-card';
-import { plaqueName, lifeYears, roleLine, street } from '../../plaque-text';
+import { PlaqueRoundel } from '../plaque-roundel/plaque-roundel';
+import { plaqueName, street } from '../../plaque-text';
 
 const FEATURED_INSCRIPTION = 'Charles Dickens 1812-1870 novelist lived here';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, DecimalPipe, PlaqueCard],
+  imports: [RouterLink, DecimalPipe, PlaqueCard, PlaqueRoundel],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './home.css'
@@ -76,7 +77,6 @@ export class Home implements OnInit {
         this.randomPlaque = response;
         this.loading = false;
         this.announcement = 'Showing ' + plaqueName(response);
-        // on phones the roundel sits below the buttons
         this.roundel?.nativeElement.scrollIntoView({ block: 'nearest' });
       },
       error: () => {
@@ -86,8 +86,6 @@ export class Home implements OnInit {
   }
 
   name(plaque: any): string { return plaqueName(plaque); }
-  years(plaque: any): string { return lifeYears(plaque); }
-  role(plaque: any): string { return roleLine(plaque); }
 
   place(plaque: any): string {
     const where = [street(plaque), plaque.borough].filter(part => part).join(', ');

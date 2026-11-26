@@ -34,17 +34,7 @@
 
     <div class="col-lg-5">
       <div class="hero-plaque" #roundel>
-        <div class="big-roundel">
-          @if (randomPlaque) {
-            <p class="roundel-name">{{ name(randomPlaque) }}</p>
-            @if (years(randomPlaque)) {
-              <p class="roundel-years">{{ years(randomPlaque) }}</p>
-            }
-            @if (role(randomPlaque)) {
-              <p class="roundel-role">{{ role(randomPlaque) }}</p>
-            }
-          }
-        </div>
+        <app-plaque-roundel [plaque]="randomPlaque" />
         @if (randomPlaque) {
           <p class="small text-muted mt-3 mb-1">{{ place(randomPlaque) }}</p>
           <a class="read-link" [routerLink]="['/plaques', randomPlaque._id]">

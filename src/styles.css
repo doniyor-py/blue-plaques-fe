@@ -12,6 +12,8 @@
   --plaque-blue: #1b4f8f;
   --danger: #b3261e;
   --warning: #8a5a00;
+  --marker-brown: #7a4a2b;
+  --marker-other: #6b7079;
 
   --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
   --font-sans: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -337,6 +339,82 @@ b, strong, .fw-bold { font-weight: 600; }
 
 @media (min-width: 768px) {
   .chip-row { flex-wrap: wrap; }
+}
+
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+}
+
+.crumbs li + li::before {
+  content: '›';
+  padding: 0 0.625rem;
+  color: var(--muted);
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--green-900);
+  text-decoration: underline;
+}
+
+.app-toast {
+  position: fixed;
+  left: 1rem;
+  right: 1rem;
+  bottom: 6rem;
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 32rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: var(--shadow-float);
+}
+
+.app-toast p {
+  flex: 1;
+}
+
+.toast-check {
+  color: var(--leaf-500);
+}
+
+.toast-link,
+.toast-close {
+  min-height: 44px;
+  padding: 0 0.25rem;
+  border: 0;
+  background: none;
+  color: var(--surface);
+}
+
+.toast-link {
+  text-decoration: underline;
+}
+
+.toast-close {
+  min-width: 44px;
+}
+
+.app-toast :focus-visible {
+  outline-color: var(--surface);
+}
+
+@media (min-width: 992px) {
+  .app-toast {
+    left: 1.5rem;
+    bottom: 1.5rem;
+  }
 }
 
 .icon {

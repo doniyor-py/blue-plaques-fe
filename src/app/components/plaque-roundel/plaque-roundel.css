@@ -1,0 +1,72 @@
+:host {
+  display: block;
+}
+
+.big-roundel {
+  --size: min(240px, 70vw);
+  --disc: var(--plaque-blue);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: var(--size);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  padding: calc(var(--size) * 0.16) calc(var(--size) * 0.12);
+  border-radius: 50%;
+  background: var(--disc);
+  box-shadow: inset 0 0 0 8px var(--disc), inset 0 0 0 9.5px var(--surface);
+  color: var(--surface);
+  text-align: center;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.big-roundel p {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.roundel-name {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.625rem;
+  -webkit-line-clamp: 2;
+}
+
+.roundel-years {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  -webkit-line-clamp: 1;
+}
+
+.roundel-role {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  -webkit-line-clamp: 3;
+}
+
+@media (min-width: 992px) {
+  .big-roundel {
+    --size: 320px;
+    box-shadow: inset 0 0 0 10px var(--disc), inset 0 0 0 12px var(--surface);
+  }
+  .roundel-name {
+    font-size: 1.75rem;
+    line-height: 2.125rem;
+  }
+  .roundel-years {
+    font-size: 1.125rem;
+  }
+  .roundel-role {
+    font-size: 0.8125rem;
+    line-height: 1.125rem;
+  }
+}

@@ -48,11 +48,11 @@ describe('PlaquePhotos', () => {
     const viewer = document.querySelector<HTMLElement>('[role="dialog"]')!;
     expect(viewer.getAttribute('aria-label')).toBe('Photo, full size');
     expect(viewer.querySelector('img')!.getAttribute('src')).toBe(photos + 'a.webp');
-    expect(document.activeElement!.id).toBe('photo-close');        // focus moves into the dialog
+    expect(document.activeElement!.id).toBe('photo-close');
 
     viewer.querySelector<HTMLButtonElement>('#photo-close')!.click();
     TestBed.tick();
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(thumb);                      // and comes back to the photo
+    expect(document.activeElement).toBe(thumb);
   });
 });

@@ -87,7 +87,8 @@ describe('Plaque page', () => {
     harness.detectChanges();
 
     const page = harness.routeNativeElement as HTMLElement;
-    expect(page.querySelector('#visits-heading')!.textContent).toContain('Visits (1)');
+    expect(page.querySelector('#visits-heading')!.textContent).toContain('Visitor notes');
+    expect(page.textContent).toContain('1 visit');
   });
 
   it('opens the review form from a ?visit=...&review=1 link when the visits arrive first', async () => {
@@ -119,24 +120,36 @@ describe('Plaque page', () => {
 
   it('marks the plaque as saved straight away, and undoes it if saving fails', async () => {
     const page = await openPlaque(true);
-    buttonCalled(page, '☆ Save').click();
+    buttonCalled(page, 'Save').click();
     harness.detectChanges();
 
-    const button = buttonCalled(page, '★ Saved');
+    const button = buttonCalled(page, 'Saved');
     expect(button.disabled).toBeTrue();
+    expect(button.getAttribute('aria-pressed')).toBe('true');
+    expect(button.getAttribute('aria-label')).toBe('Save');
 
     http.expectOne(API_URL + '/users/me/favourites/p1')
       .flush({ error: 'Something went wrong on the server' }, { status: 500, statusText: 'Server Error' });
     harness.detectChanges();
 
-    expect(buttonCalled(page, '☆ Save').disabled).toBeFalse();
+    expect(buttonCalled(page, 'Save').disabled).toBeFalse();
+    expect(buttonCalled(page, 'Save').getAttribute('aria-pressed')).toBe('false');
     expect(page.textContent).toContain('Something went wrong on the server');
   });
 
   it('shows the plaque and its visits', async () => {
     const page = await openPlaque(false);
     expect(page.querySelector('h1')!.textContent).toContain('Charles Dickens blue plaque');
-    expect(page.querySelector('#visits-heading')!.textContent).toContain('Visits (1)');
+    expect(page.querySelector('#visits-heading')!.textContent).toContain('Visitor notes');
+    expect(page.textContent).toContain('1 visit');
+  });
+
+  it('shows a breadcrumb back to the borough', async () => {
+    const page = await openPlaque(false);
+    const crumbs = [...page.querySelectorAll('nav[aria-label="Breadcrumb"] li')].map(li => li.textContent!.trim());
+    expect(crumbs).toEqual(['Browse plaques', 'Camden', 'Charles Dickens blue plaque']);
+    expect(page.querySelector('nav[aria-label="Breadcrumb"] a[href="/plaques?borough=Camden"]')).toBeTruthy();
+    expect(page.querySelector('[aria-current="page"]')!.textContent).toContain('Charles Dickens blue plaque');
   });
 
   it('sends a visitor who is not logged in to the login page', async () => {
@@ -149,15 +162,15 @@ describe('Plaque page', () => {
     const page = await openPlaque(true);
     checkIn(page);
 
-    expect(page.textContent).toContain('Visit saved!');
-    expect(buttonCalled(page, '✓ Visited today').disabled).toBeTrue();
-    expect(page.querySelector('#visits-heading')!.textContent).toContain('Visits (2)');
+    expect(page.querySelector('.app-toast')!.textContent).toContain('Visit saved');
+    expect(buttonCalled(page, 'Visited today').disabled).toBeTrue();
+    expect(page.textContent).toContain('2 visits');
   });
 
   it('will not save a review until all three ratings are chosen', async () => {
     const page = await openPlaque(true);
     checkIn(page);
-    buttonCalled(page, 'Rate this plaque').click();
+    buttonCalled(page, 'rate it').click();
     harness.detectChanges();
 
     buttonCalled(page, 'Save review').click();
@@ -170,7 +183,7 @@ describe('Plaque page', () => {
   it('saves the chosen stars and the note', async () => {
     const page = await openPlaque(true);
     checkIn(page);
-    buttonCalled(page, 'Rate this plaque').click();
+    buttonCalled(page, 'rate it').click();
     harness.detectChanges();
 
     (page.querySelector('label[for="history-4"]') as HTMLElement).click();

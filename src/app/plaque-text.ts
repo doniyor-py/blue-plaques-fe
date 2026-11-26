@@ -48,3 +48,16 @@ export function averageRating(plaque: any): number | null {
 export function reviewCount(plaque: any): number {
   return (plaque.visits || []).filter((visit: any) => visit.ratings).length;
 }
+
+export function plaqueColour(plaque: any): string {
+  const colours: Record<string, string> = {
+    'blue': 'var(--plaque-blue)', 'green': 'var(--green-900)', 'black': 'var(--ink)', 'brown': 'var(--marker-brown)'
+  };
+  return colours[plaque?.colour] || 'var(--marker-other)';
+}
+
+export function initials(name: string): string {
+  const parts = (name || '').split(/[\s._-]+/).filter(part => part);
+  const letters = parts.length > 1 ? parts[0][0] + parts[1][0] : (parts[0] ?? '').slice(0, 2);
+  return letters.toUpperCase();
+}

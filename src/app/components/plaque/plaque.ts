@@ -1,4 +1,4 @@
-import { Component, OnInit, Injector, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Injector, ViewChild, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
 import { Location, DatePipe, DecimalPipe, formatDate } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -8,17 +8,21 @@ import { AuthService } from '../../services/auth-service';
 import { UserService } from '../../services/user-service';
 import { ReportService } from '../../services/report-service';
 import { PlaquePhotos } from '../plaque-photos/plaque-photos';
+import { PlaqueRoundel } from '../plaque-roundel/plaque-roundel';
+import { plaqueName, categoryLabel, plaqueColour, initials, CATEGORY_LABELS } from '../../plaque-text';
 import { ConfirmService } from '../../services/confirm-service';
 import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-plaque',
-  imports: [ReactiveFormsModule, RouterLink, PlaquePhotos, DatePipe, DecimalPipe],
+  imports: [ReactiveFormsModule, RouterLink, PlaquePhotos, PlaqueRoundel, DatePipe, DecimalPipe],
   templateUrl: './plaque.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plaque.css'
 })
 export class Plaque implements OnInit {
+  @ViewChild(PlaquePhotos) photosSection?: PlaquePhotos;
+
   plaque: any = null;
   loading: boolean = true;
   error: string = '';
@@ -48,10 +52,15 @@ export class Plaque implements OnInit {
   reportError: string = '';
   reportSending: boolean = false;
 
+  // walking time, only when the browser already has permission to share the location
+  walkMinutes: number | null = null;
+  walkKm: string = '';
+  arriveAt: Date | null = null;
+
   ratingFields = [
-    { key: 'history', label: 'Historical interest' },
-    { key: 'condition', label: 'Condition' },
-    { key: 'accessibility', label: 'Accessibility' }
+    { key: 'history', label: 'Historical interest', short: 'Interest' },
+    { key: 'condition', label: 'Condition', short: 'Condition' },
+    { key: 'accessibility', label: 'Accessibility', short: 'Access' }
   ];
   stars = [1, 2, 3, 4, 5];
 
@@ -111,17 +120,18 @@ export class Plaque implements OnInit {
     this.showReportForm = false;
     this.reportMessage = '';
     this.reportError = '';
+    this.walkMinutes = null;
 
     if (this.authService.isLoggedIn()) {
       this.checkFavourite();
     }
-    // the plaque and its visits load at the same time
     this.plaqueService.getPlaque(this.plaqueId).subscribe({
       next: (response) => {
         this.plaque = response;
         this.loading = false;
         this.titleService.setTitle(response.title + ' | Blue Plaques Explorer');
         this.openVisitFromLink();
+        this.loadWalkTime();
       },
       error: (err) => {
         this.error = err.status === 404 ? 'Plaque not found.' : 'Could not load this plaque.';
@@ -133,6 +143,52 @@ export class Plaque implements OnInit {
 
   goBack() {
     this.location.back();
+  }
+
+  name(): string { return plaqueName(this.plaque); }
+  category(): string { return categoryLabel(this.plaque); }
+  colour(): string { return plaqueColour(this.plaque); }
+  initials(name: string): string { return initials(name); }
+
+  personLine(person: any): string {
+    const years = person.born && person.died ? `${person.born}–${person.died}` : '';
+    const roles = (person.roles || []).map((role: string) => CATEGORY_LABELS[role] || role);
+    return [years, ...roles].filter(part => part).join(' · ');
+  }
+
+  scrollToNotes() {
+    const heading = document.getElementById('visits-heading');
+    heading?.scrollIntoView({ behavior: 'smooth' });
+    heading?.focus({ preventScroll: true });
+  }
+
+  colourName(): string {
+    const colour: string = this.plaque.colour || '';
+    return colour ? colour.charAt(0).toUpperCase() + colour.slice(1) + ' plaque' : 'Plaque';
+  }
+
+  async loadWalkTime() {
+    const coordinates = this.plaque?.location?.coordinates;
+    if (!coordinates || !navigator.geolocation || !navigator.permissions) { return; }
+    try {
+      const status = await navigator.permissions.query({ name: 'geolocation' });
+      if (status.state !== 'granted') { return; }
+    } catch {
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(position => {
+      const metres = this.distance(position.coords.latitude, position.coords.longitude, coordinates[1], coordinates[0]);
+      this.walkMinutes = Math.max(1, Math.ceil(metres / 80));
+      this.walkKm = (metres / 1000).toFixed(1);
+      this.arriveAt = new Date(Date.now() + this.walkMinutes * 60000);
+    }, () => this.walkMinutes = null, { maximumAge: 300000 });
+  }
+
+  private distance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const toRad = (degrees: number) => degrees * Math.PI / 180;
+    const a = Math.sin(toRad(lat2 - lat1) / 2) ** 2 +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(toRad(lng2 - lng1) / 2) ** 2;
+    return 6371000 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
   // ---------- visits ----------
@@ -183,6 +239,12 @@ export class Plaque implements OnInit {
     return reviewed.reduce((sum, v) => sum + v.overall, 0) / reviewed.length;
   }
 
+  // average of one rating (history, condition or accessibility) across all reviews
+  fieldAverage(key: string): number {
+    const reviewed = this.visits.filter(v => v.ratings);
+    return reviewed.reduce((sum, v) => sum + v.ratings[key], 0) / reviewed.length;
+  }
+
   today(): string {
     return formatDate(new Date(), 'yyyy-MM-dd', 'en-US');
   }
@@ -219,7 +281,7 @@ export class Plaque implements OnInit {
   goToPhotos() {
     this.justVisitedId = null;
     document.getElementById('photos-heading')?.scrollIntoView({ behavior: 'smooth' });
-    document.getElementById('photo-file')?.focus({ preventScroll: true });
+    this.photosSection?.openUpload();
   }
 
   startReview(visit: any) {

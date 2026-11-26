@@ -1,5 +1,6 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, Injector, afterNextRender, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { Dialog } from '@angular/cdk/dialog';
 import { PhotoService } from '../../services/photo-service';
 import { AuthService } from '../../services/auth-service';
@@ -11,13 +12,13 @@ const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 @Component({
   selector: 'app-plaque-photos',
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './plaque-photos.html',
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './plaque-photos.css'
 })
 export class PlaquePhotos implements OnInit, OnDestroy {
-  @Input({ required: true }) plaqueId!: string;     // given by the parent page: <app-plaque-photos [plaqueId]="...">
+  @Input({ required: true }) plaqueId!: string;
 
   photos: any[] = [];
   selectedFile: File | null = null;
@@ -26,11 +27,13 @@ export class PlaquePhotos implements OnInit, OnDestroy {
   uploading: boolean = false;
   error: string = '';
   message: string = '';
+  showUpload: boolean = false;
 
   constructor(private photoService: PhotoService,
               public authService: AuthService,
               private dialog: Dialog,
-              private confirmService: ConfirmService) {}
+              private confirmService: ConfirmService,
+              private injector: Injector) {}
 
   ngOnInit() {
     this.loadPhotos();
@@ -45,6 +48,15 @@ export class PlaquePhotos implements OnInit, OnDestroy {
       next: (response) => this.photos = response,
       error: () => this.error = 'Could not load the photos.'
     });
+  }
+
+  openUpload() {
+    this.showUpload = true;
+    afterNextRender(() => document.getElementById('photo-file')?.focus(), { injector: this.injector });
+  }
+
+  isMine(photo: any): boolean {
+    return photo.username === this.authService.getUsername();
   }
 
   onFileChosen(event: Event) {
@@ -67,7 +79,7 @@ export class PlaquePhotos implements OnInit, OnDestroy {
       return;
     }
     this.selectedFile = file;
-    this.previewUrl = URL.createObjectURL(file);      // a temporary local link
+    this.previewUrl = URL.createObjectURL(file);
   }
 
   upload(fileInput: HTMLInputElement) {
@@ -80,6 +92,7 @@ export class PlaquePhotos implements OnInit, OnDestroy {
       next: (photo) => {
         this.photos = [...this.photos, photo];
         this.message = 'Thanks! Your photo was added.';
+        this.showUpload = false;
         fileInput.value = '';
         this.selectedFile = null;
         this.caption = '';
@@ -95,7 +108,7 @@ export class PlaquePhotos implements OnInit, OnDestroy {
 
   clearPreview() {
     if (this.previewUrl) {
-      URL.revokeObjectURL(this.previewUrl);       // free the memory the preview used
+      URL.revokeObjectURL(this.previewUrl);
       this.previewUrl = null;
     }
   }
@@ -122,8 +135,6 @@ export class PlaquePhotos implements OnInit, OnDestroy {
     return photo.username === this.authService.getUsername() || this.authService.isAdmin();
   }
 
-  // full-size photo in a dialog: focus stays inside, Escape or a click outside closes it,
-  // and focus goes back to the photo you opened
   showPhoto(photo: any) {
     this.dialog.open(PhotoViewer, {
       data: photo,

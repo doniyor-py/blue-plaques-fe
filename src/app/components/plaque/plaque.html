@@ -1,22 +1,19 @@
-<div class="container">
-  <button class="btn btn-link px-0 mb-3" (click)="goBack()">&larr; Back</button>
-
+<div class="container plaque-page">
   @if (loading) {
-    <div class="card placeholder-glow" aria-busy="true">
+    <div class="detail-grid placeholder-glow" aria-busy="true">
       <span class="visually-hidden">Loading…</span>
-      <div class="card-header" aria-hidden="true"><span class="placeholder placeholder-lg col-6"></span></div>
-      <div class="card-body" aria-hidden="true">
-        <p class="lead">
-          <span class="placeholder col-12"></span>
-          <span class="placeholder col-8"></span>
-        </p>
+      <div class="detail-head" aria-hidden="true">
+        <span class="placeholder skeleton-disc"></span>
+        <div class="flex-grow-1">
+          <span class="placeholder col-4"></span>
+          <span class="placeholder placeholder-lg col-8 my-2"></span>
+          <span class="placeholder col-6"></span>
+        </div>
+      </div>
+      <div class="detail-body" aria-hidden="true">
         @for (row of [1, 2, 3, 4]; track row) {
-          <div class="row mb-2">
-            <div class="col-sm-3"><span class="placeholder col-6"></span></div>
-            <div class="col-sm-9"><span class="placeholder col-5"></span></div>
-          </div>
+          <p><span class="placeholder col-3"></span><br><span class="placeholder col-6"></span></p>
         }
-        <span class="btn btn-primary disabled placeholder col-2 mt-2"></span>
       </div>
     </div>
   }
@@ -25,260 +22,333 @@
   }
 
   @if (plaque) {
-    @if (authService.isAdmin()) {
-      <div class="mb-3">
-        <a class="btn btn-sm btn-outline-primary me-2" [routerLink]="['/admin/plaques', plaqueId, 'edit']">Edit plaque</a>
-        <button type="button" class="btn btn-sm btn-outline-danger" (click)="deletePlaque()">Delete plaque</button>
-      </div>
-    }
+    <div class="top-row">
+      <nav aria-label="Breadcrumb" class="d-none d-md-block">
+        <ol class="crumbs">
+          <li><a routerLink="/plaques">Browse plaques</a></li>
+          @if (plaque.borough) {
+            <li><a routerLink="/plaques" [queryParams]="{ borough: plaque.borough }">{{ plaque.borough }}</a></li>
+          }
+          <li aria-current="page">{{ name() }}</li>
+        </ol>
+      </nav>
+      <button type="button" class="btn btn-link px-0 d-md-none" (click)="goBack()">
+        <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 4l-4 4 4 4" /></svg>
+        Back
+      </button>
 
-    <!-- the plaque itself -->
-    <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h1 class="h4 mb-0">{{ plaque.title }}</h1>
+      @if (authService.isAdmin()) {
+        <div class="admin-links">
+          <a class="btn btn-link btn-sm fw-normal" [routerLink]="['/admin/plaques', plaqueId, 'edit']">Edit plaque</a>
+          <button type="button" class="btn btn-link btn-sm fw-normal text-danger" (click)="deletePlaque()">Delete plaque</button>
+        </div>
+      }
+    </div>
+
+    <div class="detail-grid">
+      <header class="detail-head">
+        <app-plaque-roundel [plaque]="plaque" />
         <div>
-          <span class="badge bg-secondary me-2">{{ plaque.colour }}</span>
-          @if (authService.isLoggedIn()) {
-            <button type="button" class="btn btn-sm"
-                    [class.btn-warning]="isFavourite" [class.btn-outline-warning]="!isFavourite"
-                    [attr.aria-pressed]="isFavourite" [disabled]="favouriteBusy"
-                    (click)="toggleFavourite()">
-              {{ isFavourite ? '★ Saved' : '☆ Save' }}
-            </button>
+          <p class="label meta">
+            <span class="colour-dot" [style.background]="colour()" aria-hidden="true"></span>
+            {{ colourName() }}{{ plaque.borough ? ' · ' + plaque.borough : '' }}{{ category() ? ' · ' + category() : '' }}
+          </p>
+          <h1>{{ name() }}</h1>
+          @if (plaque.address) { <p class="address">{{ plaque.address }}</p> }
+          <p class="rating-line">
+            @if (averageRating() !== null) {
+              <svg class="star" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 1.5l1.9 4 4.3.5-3.2 3 .9 4.3L8 11.2l-3.9 2.1.9-4.3-3.2-3 4.3-.5z" />
+              </svg>
+              <strong>{{ averageRating() | number:'1.1-1' }}</strong><span class="visually-hidden"> out of 5</span> ·
+              <button type="button" class="link-button" (click)="scrollToNotes()">{{ reviewCount() }} {{ reviewCount() === 1 ? 'review' : 'reviews' }}</button>
+            } @else {
+              <button type="button" class="link-button" (click)="scrollToNotes()">No reviews yet</button>
+            }
+          </p>
+          @if (walkMinutes !== null) {
+            <p class="walk-inline d-lg-none">
+              <strong>{{ walkMinutes }} min</strong> walk · {{ walkKm }} km · arrive {{ arriveAt | date:'HH:mm' }}
+            </p>
           }
         </div>
-      </div>
-      @if (favouriteError) {
-        <div class="alert alert-danger m-3" role="alert">{{ favouriteError }}</div>
-      }
-      <div class="card-body">
-        <p class="lead">{{ plaque.inscription }}</p>
+      </header>
 
-        <dl class="row">
-          <dt class="col-sm-3">Address</dt>
-          <dd class="col-sm-9">{{ plaque.address || 'Unknown' }}</dd>
-          <dt class="col-sm-3">Borough</dt>
-          <dd class="col-sm-9">{{ plaque.borough }}</dd>
-          <dt class="col-sm-3">Erected</dt>
-          <dd class="col-sm-9">{{ plaque.erected_year || 'Year unknown' }}</dd>
-          <dt class="col-sm-3">Organisation</dt>
-          <dd class="col-sm-9">{{ plaque.organisation || 'Unknown' }}</dd>
-        </dl>
-
-        <div class="d-flex flex-wrap gap-2 mb-3">
-          <a class="btn btn-primary" routerLink="/nearby"
-             [queryParams]="{ plaque: plaqueId, directions: 1 }">Directions</a>
-
+      <!-- desktop: a sticky column on the right; phone: a bar fixed to the bottom of the screen -->
+      <aside class="actions" aria-label="Plaque actions">
+        @if (walkMinutes !== null) {
+          <div class="walk d-none d-lg-block">
+            <p class="label mb-1">From your location</p>
+            <p class="walk-time"><strong>{{ walkMinutes }} min</strong> walk</p>
+            <p class="small text-muted">{{ walkKm }} km · arrive {{ arriveAt | date:'HH:mm' }}</p>
+          </div>
+        }
+        <div class="action-buttons">
           @if (!authService.isLoggedIn()) {
-            <a class="btn btn-outline-success" routerLink="/login"
+            <a class="btn btn-main visit-button" routerLink="/login"
                [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">I've visited</a>
           } @else if (visitedToday()) {
-            <button type="button" class="btn btn-success" disabled>✓ Visited today</button>
+            <button type="button" class="btn btn-main visit-button visited" disabled>
+              <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" /></svg>
+              Visited today
+            </button>
           } @else {
-            <button type="button" class="btn btn-outline-success" (click)="checkIn()" [disabled]="checkingIn">
+            <button type="button" class="btn btn-main visit-button" (click)="checkIn()" [disabled]="checkingIn">
               {{ checkingIn ? 'Saving...' : "I've visited" }}
             </button>
           }
+          <a class="btn btn-outline-primary" routerLink="/nearby"
+             [queryParams]="{ plaque: plaqueId, directions: 1 }">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M14 2L2 7.5l5 1.5 1.5 5z" /></svg>
+            Directions
+          </a>
+          @if (authService.isLoggedIn()) {
+            <button type="button" class="btn btn-outline-primary save-button" aria-label="Save"
+                    [attr.aria-pressed]="isFavourite" [disabled]="favouriteBusy" (click)="toggleFavourite()">
+              <svg class="icon heart" [class.filled]="isFavourite" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 13.5S2 10 2 5.8A3 3 0 0 1 8 4.3a3 3 0 0 1 6 1.5C14 10 8 13.5 8 13.5z" />
+              </svg>
+              <span class="save-text" aria-hidden="true">{{ isFavourite ? 'Saved' : 'Save' }}</span>
+            </button>
+          }
         </div>
-
-        @if (checkInError) {
-          <div class="alert alert-danger" role="alert">{{ checkInError }}</div>
+        @if (plaque.borough && authService.isLoggedIn()) {
+          <p class="small text-muted mt-3 mb-0 d-none d-lg-block">Visits count towards your {{ plaque.borough }} progress.</p>
         }
+      </aside>
 
-        @if (justVisitedId) {
-          <div class="alert alert-success" role="status">
-            <strong>Visit saved!</strong> It's on your profile now.
-            Want to help other explorers? It only takes a minute.
-            <div class="d-flex flex-wrap gap-2 mt-2">
-              <button type="button" class="btn btn-success btn-sm" (click)="reviewNewVisit()">Rate this plaque</button>
-              <button type="button" class="btn btn-outline-success btn-sm" (click)="goToPhotos()">Add a photo</button>
-              <button type="button" class="btn btn-link btn-sm text-success" (click)="justVisitedId = null">Maybe later</button>
-            </div>
+      <div class="detail-body">
+        @if (checkInError) { <div class="alert alert-danger" role="alert">{{ checkInError }}</div> }
+        @if (favouriteError) { <div class="alert alert-danger" role="alert">{{ favouriteError }}</div> }
+
+        <dl class="facts">
+          <div class="wide">
+            <dt class="label">Inscription</dt>
+            <dd class="inscription">“{{ plaque.inscription }}”</dd>
           </div>
-        }
+          <div>
+            <dt class="label">Address</dt>
+            <dd>{{ plaque.address || 'Unknown' }}</dd>
+          </div>
+          <div>
+            <dt class="label">Borough</dt>
+            <dd><a routerLink="/plaques" [queryParams]="{ borough: plaque.borough }">{{ plaque.borough }}</a></dd>
+          </div>
+          <div>
+            <dt class="label">Erected</dt>
+            <dd>{{ plaque.erected_year || 'Year unknown' }}</dd>
+          </div>
+          <div>
+            <dt class="label">Organisation</dt>
+            <dd>{{ plaque.organisation || 'Unknown' }}</dd>
+          </div>
+        </dl>
 
         @if (plaque.people?.length) {
-          <h2 class="h5">People</h2>
-          <ul class="list-unstyled">
-            @for (person of plaque.people; track $index) {
-              <li class="mb-2">
-                <strong>{{ person.name }}</strong>
-                @if (person.born) { ({{ person.born }}–{{ person.died }}) }
-                @for (role of person.roles; track role) {
-                  <span class="badge bg-info text-dark ms-1">{{ role }}</span>
+          <section class="block" aria-labelledby="people-heading">
+            <h2 id="people-heading" class="h3">People on this plaque</h2>
+            <ul class="people">
+              @for (person of plaque.people; track $index) {
+                <li>
+                  <span class="avatar" aria-hidden="true">{{ initials(person.name) }}</span>
+                  <span>
+                    <strong class="d-block">{{ person.name }}</strong>
+                    <span class="small text-muted">{{ personLine(person) }}</span>
+                  </span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <app-plaque-photos class="block" [plaqueId]="plaqueId" />
+
+        <section class="block" aria-labelledby="visits-heading">
+          <h2 id="visits-heading" tabindex="-1">Visitor notes</h2>
+
+          @if (reviewCount() > 0) {
+            <div class="summary">
+              <p class="mb-0">
+                <span class="big-score">{{ averageRating() | number:'1.1-1' }}</span>
+                <span class="text-muted"> out of 5 · {{ reviewCount() }} {{ reviewCount() === 1 ? 'review' : 'reviews' }}
+                  · {{ visitsTotal }} {{ visitsTotal === 1 ? 'visit' : 'visits' }}</span>
+              </p>
+              <dl class="bars">
+                @for (field of ratingFields; track field.key) {
+                  <div>
+                    <dt>{{ field.label }}</dt>
+                    <dd>
+                      <strong>{{ fieldAverage(field.key) | number:'1.1-1' }}</strong>
+                      <span class="bar" aria-hidden="true"><span [style.width.%]="fieldAverage(field.key) * 20"></span></span>
+                    </dd>
+                  </div>
                 }
+              </dl>
+            </div>
+          } @else {
+            <p class="text-muted">No reviews yet · {{ visitsTotal }} {{ visitsTotal === 1 ? 'visit' : 'visits' }}</p>
+          }
+
+          @if (visitMessage) { <div class="alert alert-success" role="status">{{ visitMessage }}</div> }
+          @if (visitError) { <div class="alert alert-danger" role="alert">{{ visitError }}</div> }
+
+          <ul class="notes">
+            @for (visit of visibleVisits(); track visit._id) {
+              <li class="note" [id]="'visit-' + visit._id" [class.highlight]="visit._id === highlightedVisitId">
+                <span class="avatar" aria-hidden="true">{{ initials(visit.username) }}</span>
+                <article class="flex-grow-1">
+                  <p class="note-head">
+                    <strong>{{ visit.username }}</strong>
+                    @if (isMine(visit)) { <span class="you">You</span> }
+                    <span class="text-muted">{{ visit.date | date:'d MMM y' }}</span>
+                  </p>
+
+                  @if (reviewingVisitId === visit._id) {
+                    <form [formGroup]="reviewForm" (ngSubmit)="onSubmitReview()" class="review-form" novalidate>
+                      @for (field of ratingFields; track field.key) {
+                        <fieldset class="mb-2">
+                          <legend class="form-label mb-0">{{ field.label }}</legend>
+                          <div class="star-input">
+                            @for (n of stars; track n) {
+                              <input type="radio" class="btn-check" [id]="field.key + '-' + n"
+                                     [value]="n" [formControlName]="field.key">
+                              <label class="star" [for]="field.key + '-' + n" [class.on]="reviewForm.value[field.key] >= n">
+                                <span aria-hidden="true">{{ reviewForm.value[field.key] >= n ? '★' : '☆' }}</span>
+                                <span class="visually-hidden">{{ n }} out of 5</span>
+                              </label>
+                            }
+                            @if (reviewForm.value[field.key]) {
+                              <span class="small text-muted ms-2">{{ reviewForm.value[field.key] }} / 5</span>
+                            }
+                          </div>
+                          @if (isInvalid(field.key)) {
+                            <div class="small text-danger fw-semibold">Please choose from 1 to 5 stars.</div>
+                          }
+                        </fieldset>
+                      }
+                      <div class="mb-3">
+                        <label for="note" class="form-label">Note (optional)</label>
+                        <textarea id="note" class="form-control" rows="3" formControlName="note"
+                                  placeholder="A tip for the next visitor: is it easy to find? Anything nearby?"
+                                  [class.is-invalid]="reviewForm.get('note')!.invalid"></textarea>
+                        <div class="form-text">{{ reviewForm.value.note?.length || 0 }}/500 characters</div>
+                        <div class="invalid-feedback">The note must be 500 characters or fewer.</div>
+                      </div>
+                      <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary" [disabled]="saving">
+                          {{ saving ? 'Saving...' : 'Save review' }}
+                        </button>
+                        <button type="button" class="btn btn-link" (click)="cancelReview()">Cancel</button>
+                      </div>
+                    </form>
+                  } @else {
+                    @if (visit.note) { <p class="note-text">{{ visit.note }}</p> }
+                    <p class="note-ratings">
+                      @if (visit.ratings) {
+                        <span class="visually-hidden">Rated {{ visit.overall | number:'1.1-1' }} out of 5: </span>
+                        @for (field of ratingFields; track field.key) {
+                          {{ $first ? '' : ' · ' }}{{ field.short }} {{ visit.ratings[field.key] }}
+                        }
+                      } @else {
+                        Visited · no review
+                      }
+                    </p>
+
+                    @if (canDelete(visit)) {
+                      <div class="d-flex flex-wrap gap-2">
+                        @if (isMine(visit)) {
+                          <button type="button" class="btn btn-link btn-sm" (click)="startReview(visit)">
+                            {{ visit.ratings ? 'Edit review' : 'Add a review' }}
+                          </button>
+                        }
+                        <button type="button" class="btn btn-link btn-sm text-danger" (click)="deleteVisit(visit)"
+                                [attr.aria-label]="'Delete visit by ' + visit.username + ' on ' + visit.date">Delete</button>
+                      </div>
+                    }
+                  }
+                </article>
               </li>
+            } @empty {
+              <li class="text-muted">No visits yet. Be the first!</li>
             }
           </ul>
-        }
-      </div>
-      <div class="card-footer text-muted">
-        {{ plaque.views }} views · {{ visitsTotal }} visits
+
+          @if (visits.length > visitsShown) {
+            <button type="button" class="btn btn-link" (click)="visitsShown = visitsShown + 10">Show more notes</button>
+          }
+
+          @if (!authService.isLoggedIn()) {
+            <p>
+              <a routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">Log in</a>
+              to record your visit and leave a review.
+            </p>
+          }
+        </section>
+
+        <section class="report" aria-label="Report a problem">
+          @if (reportMessage) { <div class="alert alert-success" role="status">{{ reportMessage }}</div> }
+          @if (reportError) { <div class="alert alert-danger" role="alert">{{ reportError }}</div> }
+
+          @if (authService.isLoggedIn()) {
+            <button type="button" class="btn btn-link"
+                    [attr.aria-expanded]="showReportForm" aria-controls="report-form"
+                    (click)="toggleReportForm()">
+              <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 14V2.5M3.5 3h8l-1.5 3 1.5 3h-8" /></svg>
+              {{ showReportForm ? 'Cancel report' : 'Report a problem' }}
+            </button>
+          } @else {
+            <a class="btn btn-link" routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">
+              <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 14V2.5M3.5 3h8l-1.5 3 1.5 3h-8" /></svg>
+              Log in to report a problem
+            </a>
+          }
+          <p class="small text-muted mb-0">A wrong address, a missing plaque, or a photo that shouldn't be here.</p>
+
+          @if (authService.isLoggedIn() && showReportForm) {
+            <form id="report-form" [formGroup]="reportForm" (ngSubmit)="onSubmitReport()" class="report-form" novalidate>
+              <div class="mb-3">
+                <label for="report-type" class="form-label">What is the problem?</label>
+                <select id="report-type" class="form-select" formControlName="type"
+                        [class.is-invalid]="isReportInvalid('type')">
+                  <option value="">Choose one...</option>
+                  @for (reportType of reportTypes; track reportType.value) {
+                    <option [value]="reportType.value">{{ reportType.label }}</option>
+                  }
+                </select>
+                @if (isReportInvalid('type')) {
+                  <div class="invalid-feedback">Please choose a problem type.</div>
+                }
+              </div>
+              <div class="mb-3">
+                <label for="report-message" class="form-label">Details</label>
+                <textarea id="report-message" class="form-control" rows="3" formControlName="message"
+                          [class.is-invalid]="isReportInvalid('message')"></textarea>
+                <div class="form-text">{{ reportForm.value.message?.length || 0 }}/500 characters</div>
+                @if (isReportInvalid('message')) {
+                  <div class="invalid-feedback">Please write 5–500 characters.</div>
+                }
+              </div>
+              <button type="submit" class="btn btn-primary" [disabled]="reportSending">
+                {{ reportSending ? 'Sending...' : 'Send report' }}
+              </button>
+            </form>
+          }
+        </section>
       </div>
     </div>
 
-    <app-plaque-photos [plaqueId]="plaqueId" />
-
-    <section class="mt-4" aria-labelledby="visits-heading">
-      <h2 id="visits-heading" class="h4 mb-1">Visits ({{ visitsTotal }})</h2>
-      <p class="text-muted small">
-        @if (reviewCount() > 0) {
-          {{ reviewCount() }} {{ reviewCount() === 1 ? 'review' : 'reviews' }} ·
-          average <span class="star-icon" aria-hidden="true">★</span> {{ averageRating() | number:'1.1-1' }} out of 5
-        } @else {
-          No reviews yet.
-        }
-      </p>
-
-      @if (visitMessage) { <div class="alert alert-success" role="status">{{ visitMessage }}</div> }
-      @if (visitError) { <div class="alert alert-danger" role="alert">{{ visitError }}</div> }
-
-      @for (visit of visibleVisits(); track visit._id) {
-        <article class="card mb-2 visit-card" [id]="'visit-' + visit._id"
-                 [class.highlight]="visit._id === highlightedVisitId">
-          <div class="card-body">
-            <div class="d-flex justify-content-between gap-2">
-              <span>
-                <strong>{{ visit.username }}</strong>
-                @if (isMine(visit)) { <span class="badge text-bg-light border ms-1">You</span> }
-              </span>
-              <small class="text-muted">{{ visit.date | date:'d MMM y' }}</small>
-            </div>
-
-            @if (reviewingVisitId === visit._id) {
-              <form [formGroup]="reviewForm" (ngSubmit)="onSubmitReview()" class="mt-3" novalidate>
-                @for (field of ratingFields; track field.key) {
-                  <fieldset class="mb-2">
-                    <legend class="form-label small fw-semibold mb-0">{{ field.label }}</legend>
-                    <div class="star-input">
-                      @for (n of stars; track n) {
-                        <input type="radio" class="btn-check" [id]="field.key + '-' + n"
-                               [value]="n" [formControlName]="field.key">
-                        <label class="star" [for]="field.key + '-' + n" [class.on]="reviewForm.value[field.key] >= n">
-                          <span aria-hidden="true">{{ reviewForm.value[field.key] >= n ? '★' : '☆' }}</span>
-                          <span class="visually-hidden">{{ n }} out of 5</span>
-                        </label>
-                      }
-                      @if (reviewForm.value[field.key]) {
-                        <span class="small text-muted ms-2">{{ reviewForm.value[field.key] }} / 5</span>
-                      }
-                    </div>
-                    @if (isInvalid(field.key)) {
-                      <div class="small text-danger">Please choose from 1 to 5 stars.</div>
-                    }
-                  </fieldset>
-                }
-                <div class="mb-3">
-                  <label for="note" class="form-label small fw-semibold">Note (optional)</label>
-                  <textarea id="note" class="form-control" rows="3" formControlName="note"
-                            placeholder="What was it like? Easy to find?"
-                            [class.is-invalid]="reviewForm.get('note')!.invalid"></textarea>
-                  <div class="form-text">{{ reviewForm.value.note?.length || 0 }}/500 characters</div>
-                  <div class="invalid-feedback">The note must be 500 characters or fewer.</div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-sm me-2" [disabled]="saving">
-                  {{ saving ? 'Saving...' : 'Save review' }}
-                </button>
-                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelReview()">Cancel</button>
-              </form>
-            } @else {
-              @if (visit.ratings) {
-                <div class="mb-1">
-                  <span class="star-icon me-1" aria-hidden="true">★</span>
-                  <strong>{{ visit.overall | number:'1.1-1' }}</strong><span class="visually-hidden"> out of 5</span>
-                  <div class="text-muted small">
-                    History {{ visit.ratings.history }} · Condition {{ visit.ratings.condition }} ·
-                    Accessibility {{ visit.ratings.accessibility }}
-                  </div>
-                </div>
-              } @else {
-                <p class="mb-1 small text-muted">Visited · no review</p>
-              }
-              @if (visit.note) { <p class="mb-1">{{ visit.note }}</p> }
-
-              @if (canDelete(visit)) {
-                <div class="d-flex flex-wrap gap-2 mt-2">
-                  @if (isMine(visit)) {
-                    <button type="button" class="btn btn-sm"
-                            [class.btn-primary]="!visit.ratings" [class.btn-outline-primary]="visit.ratings"
-                            (click)="startReview(visit)">
-                      {{ visit.ratings ? 'Edit review' : 'Add a review' }}
-                    </button>
-                  }
-                  <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteVisit(visit)"
-                          [attr.aria-label]="'Delete visit by ' + visit.username + ' on ' + visit.date">Delete</button>
-                </div>
-              }
-            }
-          </div>
-        </article>
-      } @empty {
-        <p class="text-muted">No visits yet. Be the first!</p>
-      }
-
-      @if (visits.length > visitsShown) {
-        <button type="button" class="btn btn-link px-0" (click)="visitsShown = visitsShown + 10">
-          Show more visits
-        </button>
-      }
-
-      @if (!authService.isLoggedIn()) {
-        <p>
-          <a routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">Log in</a>
-          to record your visit and leave a review.
+    @if (justVisitedId) {
+      <div class="app-toast" role="status">
+        <svg class="icon toast-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" /></svg>
+        <p class="mb-0">
+          <strong>Visit saved:</strong>
+          <button type="button" class="toast-link" (click)="reviewNewVisit()">rate it</button>
+          or <button type="button" class="toast-link" (click)="goToPhotos()">add a photo</button>
         </p>
-      }
-    </section>
-
-    <section class="mt-4 mb-5" aria-labelledby="report-heading">
-      <h2 id="report-heading" class="h5">Something wrong with this plaque?</h2>
-
-      @if (reportMessage) { <div class="alert alert-success" role="status">{{ reportMessage }}</div> }
-      @if (reportError) { <div class="alert alert-danger" role="alert">{{ reportError }}</div> }
-
-      @if (authService.isLoggedIn()) {
-        <button type="button" class="btn btn-outline-secondary btn-sm"
-                [attr.aria-expanded]="showReportForm" aria-controls="report-form"
-                (click)="toggleReportForm()">
-          {{ showReportForm ? 'Cancel' : 'Report a problem' }}
+        <button type="button" class="toast-close" aria-label="Maybe later" (click)="justVisitedId = null">
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg>
         </button>
-
-        @if (showReportForm) {
-          <form id="report-form" [formGroup]="reportForm" (ngSubmit)="onSubmitReport()"
-                class="card card-body mt-3" novalidate>
-            <div class="mb-3">
-              <label for="report-type" class="form-label">What is the problem?</label>
-              <select id="report-type" class="form-select" formControlName="type"
-                      [class.is-invalid]="isReportInvalid('type')">
-                <option value="">Choose one...</option>
-                @for (reportType of reportTypes; track reportType.value) {
-                  <option [value]="reportType.value">{{ reportType.label }}</option>
-                }
-              </select>
-              @if (isReportInvalid('type')) {
-                <div class="invalid-feedback">Please choose a problem type.</div>
-              }
-            </div>
-            <div class="mb-3">
-              <label for="report-message" class="form-label">Details</label>
-              <textarea id="report-message" class="form-control" rows="3" formControlName="message"
-                        [class.is-invalid]="isReportInvalid('message')"></textarea>
-              <div class="form-text">{{ reportForm.value.message?.length || 0 }}/500 characters</div>
-              @if (isReportInvalid('message')) {
-                <div class="invalid-feedback">Please write 5–500 characters.</div>
-              }
-            </div>
-            <button type="submit" class="btn btn-danger" [disabled]="reportSending">
-              {{ reportSending ? 'Sending...' : 'Send report' }}
-            </button>
-          </form>
-        }
-      } @else {
-        <p class="text-muted">
-          <a routerLink="/login" [queryParams]="{ returnUrl: '/plaques/' + plaqueId }">Log in</a>
-          to report a problem.
-        </p>
-      }
-    </section>
+      </div>
+    }
   }
 </div>

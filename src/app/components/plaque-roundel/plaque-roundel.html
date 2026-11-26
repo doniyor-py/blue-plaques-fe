@@ -1,0 +1,11 @@
+<div class="big-roundel" [style.--disc]="plaque ? colour() : null">
+  @if (plaque) {
+    <p class="roundel-name">{{ name() }}</p>
+    @if (years()) {
+      <p class="roundel-years">{{ years() }}</p>
+    }
+    @if (role()) {
+      <p class="roundel-role">{{ role() }}</p>
+    }
+  }
+</div>

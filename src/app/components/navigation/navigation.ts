@@ -2,6 +2,7 @@ import { Component, ElementRef, HostListener, ChangeDetectionStrategy } from '@a
 import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from '../../services/auth-service';
+import { initials } from '../../plaque-text';
 
 @Component({
   selector: 'app-navigation',
@@ -23,11 +24,8 @@ export class Navigation {
     });
   }
 
-  // "jane_doe" -> "JD", "u0" -> "U0"
   initials(): string {
-    const parts = this.authService.getUsername().split(/[\s._-]+/).filter(part => part);
-    const letters = parts.length > 1 ? parts[0][0] + parts[1][0] : (parts[0] ?? '').slice(0, 2);
-    return letters.toUpperCase();
+    return initials(this.authService.getUsername());
   }
 
   toggleMenu() {
