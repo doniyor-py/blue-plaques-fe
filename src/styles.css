@@ -1,4 +1,3 @@
-/* Design tokens (design system, page 1) */
 :root {
   --green-900: #1e5b38;
   --leaf-500: #7cb342;
@@ -18,8 +17,9 @@
   --font-sans: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   --radius: 12px;
   --shadow-float: 0 8px 24px rgba(23, 35, 27, 0.16);
+  --nav-height: 72px;
+  --footer-slim-height: 48px;
 
-  /* Bootstrap points at the tokens */
   --bs-body-bg: var(--paper);
   --bs-body-bg-rgb: 246, 250, 242;
   --bs-body-color: var(--ink);
@@ -48,7 +48,6 @@
   --bs-body-line-height: 1.5;
 }
 
-/* Type scale (page 1): phone sizes first, desktop from 768px */
 body {
   font-size: 1rem;
   line-height: 1.5rem;
@@ -84,13 +83,11 @@ b, strong, .fw-bold { font-weight: 600; }
   small, .small { font-size: 0.9375rem; line-height: 1.5rem; }
 }
 
-/* Focus: one visible ink ring on everything interactive */
 :focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
 
-/* Bootstrap swaps the outline for a blue glow on these */
 .form-check-input:focus-visible,
 .nav-link:focus-visible,
 .navbar-toggler:focus-visible,
@@ -102,19 +99,6 @@ b, strong, .fw-bold { font-weight: 600; }
   box-shadow: none;
 }
 
-/* white ring on the dark green navbar, ink again inside its light dropdown */
-.navbar-dark :focus-visible,
-.navbar-dark .btn:focus-visible,
-.navbar-dark .nav-link:focus-visible,
-.navbar-dark .navbar-toggler:focus-visible {
-  outline-color: var(--surface);
-}
-
-.navbar-dark .dropdown-menu .dropdown-item:focus-visible {
-  outline-color: var(--ink);
-}
-
-/* Buttons (page 2) */
 .btn {
   --bs-btn-font-weight: 600;
   --bs-btn-padding-x: 1rem;
@@ -151,7 +135,6 @@ b, strong, .fw-bold { font-weight: 600; }
   --bs-btn-disabled-color: var(--muted);
 }
 
-/* the one main action per screen */
 .btn-main {
   --bs-btn-color: var(--ink);
   --bs-btn-bg: var(--leaf-500);
@@ -176,7 +159,6 @@ b, strong, .fw-bold { font-weight: 600; }
   --bs-btn-active-border-color: color-mix(in srgb, var(--green-900) 65%, var(--ink));
 }
 
-/* secondary */
 .btn-outline-primary {
   --bs-btn-color: var(--green-900);
   --bs-btn-bg: transparent;
@@ -200,7 +182,6 @@ b, strong, .fw-bold { font-weight: 600; }
   --bs-btn-active-border-color: var(--ink);
 }
 
-/* text link */
 .btn-link {
   --bs-btn-color: var(--green-900);
   --bs-btn-hover-color: var(--ink);
@@ -235,7 +216,6 @@ b, strong, .fw-bold { font-weight: 600; }
   --bs-btn-active-border-color: var(--danger);
 }
 
-/* Form fields (page 2): labels above, --line borders */
 .form-label {
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -278,11 +258,9 @@ b, strong, .fw-bold { font-weight: 600; }
 .form-text { color: var(--muted); }
 .invalid-feedback { font-weight: 600; }
 
-/* Bootstrap parts that hard-code its old blue */
 .dropdown-menu { --bs-dropdown-link-active-bg: var(--green-900); }
 .progress { --bs-progress-bar-bg: var(--green-900); }
 
-/* Chips (page 2) */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -323,7 +301,6 @@ b, strong, .fw-bold { font-weight: 600; }
 
 .chip-removable:hover { border-color: var(--green-900); }
 
-/* Plaque roundel: blue disc with a thin white ring */
 .roundel {
   display: inline-flex;
   align-items: center;

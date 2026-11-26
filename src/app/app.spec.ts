@@ -15,12 +15,13 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('should have a skip link, the navigation bar and a main area', () => {
+  it('should have a skip link, the navigation bar, a main area and a footer', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const page = fixture.nativeElement as HTMLElement;
     expect(page.querySelector('a.skip-link')?.textContent).toContain('Skip to main content');
     expect(page.querySelector('app-navigation')).toBeTruthy();
     expect(page.querySelector('main#main-content')).toBeTruthy();
+    expect(page.querySelector('app-footer footer')).toBeTruthy();
   });
 });

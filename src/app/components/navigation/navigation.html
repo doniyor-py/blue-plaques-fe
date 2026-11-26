@@ -1,54 +1,83 @@
-<nav class="navbar navbar-expand-md bg-primary navbar-dark mb-4">
+<nav class="navbar navbar-expand-lg site-nav mb-4" aria-label="Main">
   <div class="container">
-    <a class="navbar-brand" routerLink="/">Blue Plaques Explorer</a>
+    <a class="navbar-brand" routerLink="/">
+      <span class="roundel brand-roundel" aria-hidden="true"></span>
+      Blue Plaques Explorer
+    </a>
 
-    <!-- only on phones: the links are behind this menu button -->
-    <button class="navbar-toggler" type="button" (click)="toggleMenu()"
-            [attr.aria-expanded]="menuOpen" aria-controls="main-menu" aria-label="Open the menu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- only on phones: log in (or the avatar) and the menu button -->
+    <div class="d-flex align-items-center gap-1 ms-auto d-lg-none">
+      @if (authService.isLoggedIn()) {
+        <a class="avatar-link" routerLink="/profile" aria-label="My profile">
+          <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+        </a>
+      } @else {
+        <a class="nav-link" routerLink="/login" routerLinkActive="active">Log in</a>
+      }
+      <button class="navbar-toggler" type="button" (click)="toggleMenu()"
+              [attr.aria-expanded]="menuOpen" aria-controls="main-menu" aria-label="Open the menu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </div>
 
     <div id="main-menu" class="collapse navbar-collapse" [class.show]="menuOpen">
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/plaques" routerLinkActive="active">Plaques</a>
+          <a class="nav-link" routerLink="/plaques" routerLinkActive="active">Browse plaques</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/nearby" routerLinkActive="active">Map</a>
         </li>
-        @if (authService.isLoggedIn()) {
         <li class="nav-item">
-          <a class="nav-link" routerLink="/insights" routerLinkActive="active">Insights</a>
+          <a class="nav-link" routerLink="/insights" routerLinkActive="active">
+            Insights
+            @if (!authService.isLoggedIn()) {
+              <svg class="lock" viewBox="0 0 16 16" aria-hidden="true">
+                <rect x="3" y="7" width="10" height="7" rx="1.5" />
+                <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+              </svg>
+              <span class="visually-hidden">(members only)</span>
+            }
+          </a>
         </li>
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/profile" routerLinkActive="active">My profile</a>
-          </li>
-        }
+      </ul>
+
+      <span class="nav-divider d-none d-lg-block" aria-hidden="true"></span>
+
+      <ul class="navbar-nav">
         @if (authService.isAdmin()) {
           <li class="nav-item dropdown">
-            <button type="button" class="nav-link dropdown-toggle" (click)="toggleAdmin()"
-                    [attr.aria-expanded]="adminOpen" aria-controls="admin-menu">Admin</button>
-            <ul id="admin-menu" class="dropdown-menu" [class.show]="adminOpen">
+            <button type="button" class="nav-link" (click)="toggleAdmin()"
+                    [attr.aria-expanded]="adminOpen" aria-controls="admin-menu">
+              Admin
+              <svg class="chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" /></svg>
+            </button>
+            <ul id="admin-menu" class="dropdown-menu admin-menu" [class.show]="adminOpen">
               <li><a class="dropdown-item" routerLink="/admin/users" routerLinkActive="active">Users</a></li>
               <li><a class="dropdown-item" routerLink="/admin/plaques/new" routerLinkActive="active">Add plaque</a></li>
               <li><a class="dropdown-item" routerLink="/admin/reports" routerLinkActive="active">Reports</a></li>
             </ul>
           </li>
         }
-      </ul>
-
-      <div class="d-flex align-items-center gap-2 py-2 py-md-0">
         @if (authService.isLoggedIn()) {
-          <span class="navbar-text text-white d-none d-lg-inline">Hi, {{ authService.getUsername() }}</span>
-          <button class="btn btn-outline-light btn-sm" (click)="logout()">Log out</button>
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/profile" routerLinkActive="active">
+              <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+              <span class="link-text">My profile</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" (click)="logout()">Log out</button>
+          </li>
         } @else {
-          <a class="btn btn-outline-light btn-sm" routerLink="/signup">Sign up</a>
-          <a class="btn btn-light btn-sm" routerLink="/login">Log in</a>
+          <li class="nav-item d-none d-lg-block">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">Log in</a>
+          </li>
+          <li class="nav-item py-2 py-lg-0 ms-lg-2">
+            <a class="btn btn-primary" routerLink="/signup">Sign up</a>
+          </li>
         }
-      </div>
+      </ul>
     </div>
   </div>
 </nav>

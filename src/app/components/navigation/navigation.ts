@@ -23,6 +23,13 @@ export class Navigation {
     });
   }
 
+  // "jane_doe" -> "JD", "u0" -> "U0"
+  initials(): string {
+    const parts = this.authService.getUsername().split(/[\s._-]+/).filter(part => part);
+    const letters = parts.length > 1 ? parts[0][0] + parts[1][0] : (parts[0] ?? '').slice(0, 2);
+    return letters.toUpperCase();
+  }
+
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }

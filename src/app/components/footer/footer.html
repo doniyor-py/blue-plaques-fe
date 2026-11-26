@@ -1,0 +1,30 @@
+@if (isSlim()) {
+  <footer class="site-footer slim">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between column-gap-3">
+      <p class="credits mb-0">Plaque data: Open Plaques · Maps © Stadia Maps, © OpenStreetMap</p>
+      <ul class="footer-links">
+        <li><a routerLink="/privacy">Privacy</a></li>
+        <li><a routerLink="/terms">Terms</a></li>
+      </ul>
+    </div>
+  </footer>
+} @else {
+  <footer class="site-footer">
+    <div class="container">
+      <div class="d-lg-flex justify-content-between align-items-start gap-4">
+        <div class="mb-3">
+          <p class="footer-name mb-1">Blue Plaques Explorer</p>
+          <p class="text-muted small mb-0">Find, walk to and record London's commemorative plaques.</p>
+        </div>
+        <ul class="footer-links">
+          <li><a routerLink="/plaques">Browse plaques</a></li>
+          <li><a routerLink="/nearby">Map</a></li>
+          <li><a routerLink="/insights">Insights</a></li>
+          <li><a routerLink="/privacy">Privacy</a></li>
+          <li><a routerLink="/terms">Terms</a></li>
+        </ul>
+      </div>
+      <p class="credits mt-3 mb-0">Plaque data: Open Plaques · Maps © Stadia Maps, © OpenStreetMap</p>
+    </div>
+  </footer>
+}
